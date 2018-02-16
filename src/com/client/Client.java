@@ -12,7 +12,7 @@ public class Client {
     private DatagramSocket socket;
     private DatagramPacket packet;
 
-    public Client(String hostname, String data) throws IOException {
+    public Client(String hostname, String data) {
         this.setHostname(hostname);
         this.setData(data);
         try{
@@ -21,7 +21,12 @@ public class Client {
             e.printStackTrace();
         }
         this.createPackage();
-        socket.send(packet);
+        try {
+            System.out.println("Sending: " + new String(packet.getData()));
+            socket.send(packet);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void setHostname(String hostname){

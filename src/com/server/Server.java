@@ -8,6 +8,7 @@ import java.lang.String;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.net.DatagramPacket;
+import java.io.IOException;
 
 public class Server {
   private HashMap<LicensePlate,Owner> database;
@@ -24,15 +25,20 @@ public class Server {
     }
   }
 
-  public void ProcessRequest(String request) {
-    System.out.println(request);
+  public void ProcessRequest(byte[] request) {
+    System.out.println(new String(request));
   }
 
   public void Run() {
     while(true) {
       DatagramPacket packet = new DatagramPacket(new byte[PACKET_LENGTH], PACKET_LENGTH);
-      socket.receive(packet);
-      ProcessRequest(packet.getData());
+      try {
+        System.out.print('.');
+        socket.receive(packet);
+        ProcessRequest(packet.getData());
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
     }
   }
 

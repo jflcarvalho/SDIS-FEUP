@@ -5,15 +5,14 @@ import com.server.Server;
 
 public class Main {
 
-    /**
-     *
-     * @param args -Client -Server
-     */
     public static void main(String[] args) {
-        if (args.length != 3 && (args[0] == "--client" || args[0] == "-C")) {
-            new Client(args[1], args[2]);
-        } else if (args.length != 1 && (args[0] == "--server" || args[0] == "-S")) {
-            new Server();
+        if (args.length == 3 && (args[0].equals("--client") || args[0].equals("-C"))) {
+            System.out.println("Initializing Client");
+            Client client = new Client(args[1], args[2]);
+        } else if (args.length == 2 && (args[0].equals("--server") || args[0].equals("-S"))) {
+            System.out.println("Initializing Server");
+            Server server = new Server(Integer.parseInt(args[1]));
+            server.Run();
         }
         return;
     }
