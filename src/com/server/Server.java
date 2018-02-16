@@ -46,11 +46,4 @@ public class Server {
   public void finalize() {
     socket.close();
   }
-
-  public static void main(String[] args) {
-    Server server = new Server(80);
-    server.Run();
-    //server.ProcessRequest("REGISTER <plate number> <owner name>");
-    //server.ProcessRequest("LOOKUP <plate number>");
-  }
 }

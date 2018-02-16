@@ -5,6 +5,11 @@ import com.server.Server;
 
 public class Main {
 
+    /*!
+     * Usage:
+     *   Client: java Main -C <host_name> <port> <data>
+     *   Server: java Main -S <port>
+     */
     public static void main(String[] args) {
         if (args.length == 4 && (args[0].equals("--client") || args[0].equals("-C"))) {
             System.out.println("Initializing Client");
