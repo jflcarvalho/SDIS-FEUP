@@ -11,14 +11,17 @@ public class Client {
 
     public Client(String hostname, int port, String data) {
         try{
-            socket = new DatagramSocket();
-            address = InetAddress.getByName(hostname);
-            byte[] dataBuffer = data.getBytes();
-            DatagramPacket packet = new DatagramPacket(dataBuffer, dataBuffer.length, address, port);
-            System.out.println("Sending: " + new String(packet.getData()));
-            socket.send(packet);
+          socket = new DatagramSocket();
+          address = InetAddress.getByName(hostname);
+          byte[] dataBuffer = data.getBytes();
+          DatagramPacket packet = new DatagramPacket(dataBuffer, dataBuffer.length, address, port);
+          System.out.println("Sending: " + new String(packet.getData()));
+          socket.send(packet);
+          DatagramPacket response = new DatagramPacket(new byte[128], 128, address, port);
+          socket.receive(response);
+          System.out.println("Received: " + response.getData());
         } catch (Exception e) {
-            e.printStackTrace();
+          e.printStackTrace();
         }
     }
 

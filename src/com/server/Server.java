@@ -9,6 +9,7 @@ import java.lang.String;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.net.DatagramPacket;
+import java.net.InetAddress;
 import java.io.IOException;
 
 public class Server {
@@ -24,25 +25,52 @@ public class Server {
     } catch (SocketException e) {
       System.out.println("Couldn't create socket");
     }
-    /*database.put(new LicensePlate("12-34-AB"), new Owner("Timon"));
-    database.put(new LicensePlate("12-34-AB"), new Owner("Bayard"));
-    database.put(new LicensePlate("12-34-CD"), new Owner("Timon"));
-    for (Entry entry : database.entrySet()) {
-      System.out.println(((LicensePlate) entry.getKey()).getFull() + " - " + ((Owner) entry.getValue()).getName());
-    }*/
   }
 
-  public void ProcessRequest(byte[] request) {
-    System.out.println(new String(request));
+  public void ProcessRequest(DatagramPacket packet) {
+    String request = new String(packet.getData());
+    String[] elements = request.split(" ");
+    LicensePlate license_plate;
+    InetAddress address = packet.getAddress();
+    int port = packet.getPort();
+    DatagramPacket response;
+    String response_str;
+
+    System.out.println("Received: " + request);
+    if(elements.length > 1) {
+      license_plate = new LicensePlate(elements[1]);
+      if(elements[0].equals("REGISTER")) {
+        if(database.containsKey(license_plate)) {
+          response_str = Integer.toString(-1);
+        } else {
+          Owner owner = new Owner(elements[2]);
+          database.put(license_plate, owner);
+          response_str = Integer.toString(database.size());
+        }
+      } else if(elements[0].equals("LOOKUP")) {
+        Owner owner = database.get(license_plate);
+        if(owner == null)
+          response_str = new String("NOT_FOUND");
+        else response_str = owner.getName();
+      } else response_str = new String("UNKNOWN OPERATION");
+    }
+    else response_str = new String("INVALID ARGUMENTS");
+
+    try {
+      response = new DatagramPacket(response_str.getBytes(), response_str.getBytes().length, address, port);
+      System.out.println("Sending: " + response_str);
+      socket.send(response);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 
   public void Run() {
     while(true) {
       DatagramPacket packet = new DatagramPacket(new byte[PACKET_LENGTH], PACKET_LENGTH);
       try {
-        System.out.print('.');
         socket.receive(packet);
-        ProcessRequest(packet.getData());
+        ProcessRequest(packet);
       } catch (IOException e) {
         e.printStackTrace();
       }

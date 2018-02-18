@@ -18,7 +18,6 @@ public class LicensePlate {
     }
 
     public boolean equals(Object object) {
-      System.out.println("TOU NO EQUALS");
       return ((LicensePlate) object).full.equals(this.full);
     }
 }
