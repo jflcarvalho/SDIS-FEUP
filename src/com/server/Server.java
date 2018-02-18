@@ -4,6 +4,7 @@ import com.common.LicensePlate;
 import com.common.Owner;
 
 import java.util.HashMap;
+import java.util.Map.Entry;
 import java.lang.String;
 import java.net.DatagramSocket;
 import java.net.SocketException;
@@ -23,6 +24,12 @@ public class Server {
     } catch (SocketException e) {
       System.out.println("Couldn't create socket");
     }
+    /*database.put(new LicensePlate("12-34-AB"), new Owner("Timon"));
+    database.put(new LicensePlate("12-34-AB"), new Owner("Bayard"));
+    database.put(new LicensePlate("12-34-CD"), new Owner("Timon"));
+    for (Entry entry : database.entrySet()) {
+      System.out.println(((LicensePlate) entry.getKey()).getFull() + " - " + ((Owner) entry.getValue()).getName());
+    }*/
   }
 
   public void ProcessRequest(byte[] request) {

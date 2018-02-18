@@ -1,23 +1,24 @@
 package com.common;
 
 public class LicensePlate {
-    private int xx;
-    private int yy;
-    private int zz;
+    private String full;
+    private String[] elements;
 
-
-    /**
-     *
-     * @param LicensePlate - XX-YY-ZZ
-     */
-    public LicensePlate(String LicensePlate) {
-        if(LicensePlate.length() != 8)
-        this.xx = Integer.parseInt(LicensePlate.substring(0, 1));
-        this.yy = Integer.parseInt(LicensePlate.substring(3, 4));
-        this.zz = Integer.parseInt(LicensePlate.substring(7, 8));
+    public LicensePlate(String full) {
+      this.full = full;
+      this.elements = full.split("-");
     }
 
-    public String getLicensePlate() {
-        return Integer.toString(this.xx) + "-" + Integer.toString(this.yy) + "-" + Integer.toString(this.zz);
+    public String getFull() {
+        return this.full;
+    }
+
+    public int hashCode() {
+      return this.full.length();
+    }
+
+    public boolean equals(Object object) {
+      System.out.println("TOU NO EQUALS");
+      return ((LicensePlate) object).full.equals(this.full);
     }
 }
