@@ -8,7 +8,10 @@ public class Main {
     /*!
      * Usage:
      *   Client: java Main -C <host_name> <port> <data>
+     *     Example: java Main -C localhost 5000 "REGISTER 34-22-GT Timon"
+     *     Example: java Main -C localhost 5000 "LOOKUP 34-22-GT"
      *   Server: java Main -S <port>
+     *     Example: java Main -S 5000
      */
     public static void main(String[] args) {
         if (args.length == 4 && (args[0].equals("--client") || args[0].equals("-C"))) {

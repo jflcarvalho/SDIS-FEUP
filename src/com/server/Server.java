@@ -16,7 +16,7 @@ public class Server {
   private HashMap<LicensePlate,Owner> database;
   private DatagramSocket socket;
 
-  private final int PACKET_LENGTH = 128;
+  private final int MAX_PACKET_LENGTH = 256;
 
   public Server(int port) {
     database = new HashMap<LicensePlate,Owner>();
@@ -29,6 +29,7 @@ public class Server {
 
   public void ProcessRequest(DatagramPacket packet) {
     String request = new String(packet.getData());
+    request = request.substring(0, request.indexOf("\0"));
     String[] elements = request.split(" ");
     LicensePlate license_plate;
     InetAddress address = packet.getAddress();
@@ -52,12 +53,12 @@ public class Server {
         if(owner == null)
           response_str = new String("NOT_FOUND");
         else response_str = owner.getName();
-      } else response_str = new String("UNKNOWN OPERATION");
-    }
-    else response_str = new String("INVALID ARGUMENTS");
+      } else response_str = new String("INVALID OPERATION");
+    } else response_str = new String("INVALID OPERATION");
 
     try {
-      response = new DatagramPacket(response_str.getBytes(), response_str.getBytes().length, address, port);
+      byte[] data_buffer = response_str.getBytes();
+      response = new DatagramPacket(data_buffer, data_buffer.length, address, port);
       System.out.println("Sending: " + response_str);
       socket.send(response);
     } catch (Exception e) {
@@ -67,7 +68,7 @@ public class Server {
 
   public void Run() {
     while(true) {
-      DatagramPacket packet = new DatagramPacket(new byte[PACKET_LENGTH], PACKET_LENGTH);
+      DatagramPacket packet = new DatagramPacket(new byte[MAX_PACKET_LENGTH], MAX_PACKET_LENGTH);
       try {
         socket.receive(packet);
         ProcessRequest(packet);
