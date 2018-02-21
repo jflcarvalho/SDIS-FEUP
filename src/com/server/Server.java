@@ -2,6 +2,7 @@ package com.server;
 
 import com.common.LicensePlate;
 import com.common.Owner;
+import com.server.MulticastThread;
 
 import java.util.HashMap;
 import java.util.Map.Entry;
@@ -19,6 +20,8 @@ public class Server {
   private final int MAX_PACKET_LENGTH = 256;
 
   public Server(int port) {
+    MulticastThread multicast_thread = new MulticastThread();
+    multicast_thread.start();
     database = new HashMap<LicensePlate,Owner>();
     try {
       socket = new DatagramSocket(port);
