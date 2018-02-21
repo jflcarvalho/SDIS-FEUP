@@ -19,12 +19,12 @@ public class Server {
 
   private final int MAX_PACKET_LENGTH = 256;
 
-  public Server(int port) {
-    MulticastThread multicast_thread = new MulticastThread();
+  public Server(int service_port, String multicast_address, int multicast_port) {
+    MulticastThread multicast_thread = new MulticastThread(multicast_address, multicast_port, service_port);
     multicast_thread.start();
     database = new HashMap<LicensePlate,Owner>();
     try {
-      socket = new DatagramSocket(port);
+      socket = new DatagramSocket(service_port);
     } catch (SocketException e) {
       System.out.println("Couldn't create socket");
     }
