@@ -1,0 +1,15 @@
+component_depth: 4
+languages:
+- java
+
+DBS/
+  Main.java
+  Peer.java
+FileIO/
+  FileManager.java
+Message/
+  Message.java
+Network/
+  NetworkManager.java
+Utils/
+  Utils.java
