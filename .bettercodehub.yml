@@ -1,15 +1,3 @@
 component_depth: 3
 languages:
 - java
-
-DBS/
-  Main.java
-  Peer.java
-FileIO/
-  FileManager.java
-Message/
-  Message.java
-Network/
-  NetworkManager.java
-Utils/
-  Utils.java
