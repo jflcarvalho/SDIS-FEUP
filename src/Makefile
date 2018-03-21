@@ -1,4 +1,4 @@
-JAVA := $(wildcard com/*/*.java)
+JAVA := $(wildcard */*/*/*.java */*/*.java */*.java *.java)
 CLASS := ${JAVA:.java=.class}
 
 %.class: %.java
@@ -6,6 +6,5 @@ CLASS := ${JAVA:.java=.class}
 
 default: $(CLASS)
 	
-
 clean:
 	del /F /Q $(subst /,\,$(CLASS))
