@@ -1,10 +1,7 @@
 package com.DBS.Message;
 
-import java.util.Arrays;
-
-import static com.Utils.Constants.CRLF_D;
-import static com.Utils.Constants.SPACE;
-import static com.Utils.Constants.MessageType;
+import static com.Utils.Constants.*;
+import static com.Utils.Constants.MessageType.PUTCHUNK;
 
 public class Message {
 
@@ -68,11 +65,13 @@ public class Message {
         String[] requestSplited = request.split( SPACE+"(?=.+"+ CRLF_D +")| "+CRLF_D);
         if("PUTCHUNK".equals(requestSplited[0])){
             return new Message(
-                    MessageType.PUTCHUNK,
+                    PUTCHUNK,
                     Integer.parseInt(requestSplited[1]),
                     Integer.parseInt(requestSplited[2]),
                     requestSplited[3],
-                    Integer.parseInt(requestSplited[4])
+                    Integer.parseInt(requestSplited[4]),
+                    Integer.parseInt(requestSplited[5]),
+                    requestSplited[6].getBytes()
             );
         } else if ("STORED".equals(requestSplited[0])){
             return new Message(
@@ -80,9 +79,7 @@ public class Message {
                     Integer.parseInt(requestSplited[1]),
                     Integer.parseInt(requestSplited[2]),
                     requestSplited[3],
-                    Integer.parseInt(requestSplited[4]),
-                    Integer.parseInt(requestSplited[5]),
-                    requestSplited[6].getBytes()
+                    Integer.parseInt(requestSplited[4])
             );
         }
         return null;
@@ -92,14 +89,26 @@ public class Message {
         if(null == message)
             return null;
         String stringMessage = "";
-        stringMessage += message.messageType
-        + " " + message.version
-        + " " + message.sender_ID
-        + " " + message.file_ID
-        + " " + message.chunk_NO
-        + (message.replication_Deg < 0 ? "" : " " + message.replication_Deg)
-        + "\n\n"
-        + Arrays.toString(message.body);
+        switch (message.messageType) {
+            case PUTCHUNK:
+                stringMessage += message.messageType
+                    + SPACE + message.version
+                    + SPACE + message.sender_ID
+                    + SPACE + message.file_ID
+                    + SPACE + message.chunk_NO
+                    + (message.replication_Deg < 0 ? "" : SPACE + message.replication_Deg)
+                    + CRLF_D
+                    + new String(message.body);
+                break;
+            case STORED:
+                stringMessage += message.messageType
+                        + SPACE + message.version
+                        + SPACE + message.sender_ID
+                        + SPACE + message.file_ID
+                        + SPACE + message.chunk_NO
+                        + CRLF_D;
+                break;
+        }
         return stringMessage;
     }
 }

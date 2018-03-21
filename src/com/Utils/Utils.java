@@ -30,7 +30,7 @@ public class Utils {
      * @param raw
      * @return string with hexadecimal form
      */
-    static String getHex(byte[] raw){
+    public static String getHex(byte[] raw){
         return DatatypeConverter.printHexBinary(raw);
     }
 }
