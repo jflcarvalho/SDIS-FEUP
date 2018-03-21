@@ -2,10 +2,13 @@ package com.DBS.Message;
 
 import java.util.Arrays;
 
-public class Message {
-    public enum Type {PUTCHUNK, STORED}
+import static com.Utils.Constants.CRLF_D;
+import static com.Utils.Constants.SPACE;
+import static com.Utils.Constants.MessageType;
 
-    private Type type;
+public class Message {
+
+    private MessageType messageType;
     private int version;
     private int sender_ID;
     private String file_ID;
@@ -13,8 +16,8 @@ public class Message {
     private int replication_Deg;
     private byte[] body;
 
-    public Message(Type type, int version, int sender_ID, String file_ID, int chunk_NO, int replication_Deg, byte[] body) {
-        this.type = type;
+    public Message(MessageType messageType, int version, int sender_ID, String file_ID, int chunk_NO, int replication_Deg, byte[] body) {
+        this.messageType = messageType;
         this.version = version;
         this.sender_ID = sender_ID;
         this.file_ID = file_ID;
@@ -23,16 +26,16 @@ public class Message {
         this.body = body;
     }
 
-    public Message(Type type, int version, int sender_ID, String file_ID, int chunk_NO) {
-        this.type = type;
+    public Message(MessageType messageType, int version, int sender_ID, String file_ID, int chunk_NO) {
+        this.messageType = messageType;
         this.version = version;
         this.sender_ID = sender_ID;
         this.file_ID = file_ID;
         this.chunk_NO = chunk_NO;
     }
 
-    public Type getType() {
-        return type;
+    public MessageType getMessageType() {
+        return messageType;
     }
 
     public int getVersion() {
@@ -62,10 +65,10 @@ public class Message {
     public static Message parse(String request){
         if(null == request)
             return null;
-        String[] requestSplited = request.split( " (?=.+\\r\\n\\r\\n)| \\r\\n\\r\\n");
+        String[] requestSplited = request.split( SPACE+"(?=.+"+ CRLF_D +")| "+CRLF_D);
         if("PUTCHUNK".equals(requestSplited[0])){
             return new Message(
-                    Type.PUTCHUNK,
+                    MessageType.PUTCHUNK,
                     Integer.parseInt(requestSplited[1]),
                     Integer.parseInt(requestSplited[2]),
                     requestSplited[3],
@@ -73,7 +76,7 @@ public class Message {
             );
         } else if ("STORED".equals(requestSplited[0])){
             return new Message(
-                    Type.STORED,
+                    MessageType.STORED,
                     Integer.parseInt(requestSplited[1]),
                     Integer.parseInt(requestSplited[2]),
                     requestSplited[3],
@@ -89,7 +92,7 @@ public class Message {
         if(null == message)
             return null;
         String stringMessage = "";
-        stringMessage += message.type
+        stringMessage += message.messageType
         + " " + message.version
         + " " + message.sender_ID
         + " " + message.file_ID
