@@ -1,4 +1,4 @@
-package com.DBS.Peer;
+package com.Network.Peer;
 
 import java.rmi.RemoteException;
 

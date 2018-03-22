@@ -1,4 +1,4 @@
-package com.DBS;
+package com;
 
 import com.DBS.Message.Message;
 import com.DBS.FileIO.M_File;

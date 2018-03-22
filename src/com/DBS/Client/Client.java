@@ -1,11 +1,7 @@
 package com.DBS.Client;
 
-import com.DBS.Peer.PeerInterface;
+import com.Network.Peer.PeerInterface;
 import com.DBS.Protocol.*;
-
-import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 
 class Client {
 
