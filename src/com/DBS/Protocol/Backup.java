@@ -1,5 +1,7 @@
 package com.DBS.Protocol;
 
+import com.DBS.Chunk;
+
 public class Backup implements Protocol {
 
     private String file_path;

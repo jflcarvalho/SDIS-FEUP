@@ -1,11 +1,15 @@
-package com.FileIO;
+package com.DBS.FileIO;
+
+import com.DBS.Chunk;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.MessageDigest;
+import java.util.Arrays;
 
+import static com.Utils.Constants.CHUNKSIZE;
 import static com.Utils.Utils.getHex;
 import static com.Utils.Utils.hashString;
 
@@ -16,9 +20,9 @@ public class M_File {
     private String fileID;
     private File file;
     private byte[] data;
-    private byte[][] chuncks;
+    private Chunk[] chunks;
 
-    public M_File(String path) {
+    public M_File(String path){
         this.path = path;
         init();
     }
@@ -39,12 +43,21 @@ public class M_File {
         return data;
     }
 
+    public File getFile(){
+        return file;
+    }
+
     private void init(){
         file = new File(path);
+        if(!file.exists() || file.isDirectory()) {
+            file = null;
+            return;
+        }
         name = file.getName();
         initAttr();
         initHashedName();
         initData();
+        initChunks();
     }
 
     private void initAttr() {
@@ -69,11 +82,26 @@ public class M_File {
         }
     }
 
+    private void initChunks(){
+        chunks = new Chunk[data.length / CHUNKSIZE + 1];
+        for (int i = 0; i*CHUNKSIZE <= data.length; i++){
+            chunks[i] = new Chunk(fileID, Arrays.copyOfRange(data, i, i + CHUNKSIZE > data.length ? data.length : i + CHUNKSIZE));
+        }
+        Chunk.resetID();
+    }
+
+    @Override
     public String toString(){
-        String string = "Path= " + path + "\n";
-        string += "Name= " + name + "\n";
-        string += "FileID= " + fileID + "\n";
-        string += "Data:\n" + getHex(data) + "\n";
-        return string;
+        if(null == file)
+            return "";
+        StringBuilder string = new StringBuilder("Path= " + path + "\n");
+        string.append("Name= ").append(name).append("\n");
+        string.append("FileID= ").append(fileID).append("\n");
+        string.append("Data:\n");
+        for (int i = 0; i < chunks.length; i++){
+            string.append(chunks[i].getChunkID()).append(": ");
+            string.append(getHex(chunks[i].getData())).append("\n");
+        }
+        return string.toString();
     }
 }
