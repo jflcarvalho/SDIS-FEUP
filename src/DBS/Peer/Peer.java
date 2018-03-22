@@ -1,12 +1,12 @@
-package com.DBS.Peer;
+package DBS.Peer;
 
-import com.DBS.Chunk;
+import DBS.Chunk;
 import javafx.util.Pair;
 
 import java.rmi.RemoteException;
 import java.util.Hashtable;
 
-import static com.DBS.Utils.Utils.*;
+import static DBS.Utils.Utils.*;
 
 public class Peer implements PeerInterface{
     static Hashtable<Pair<String, Integer>, Chunk> myChunks = new Hashtable<>();
@@ -26,6 +26,14 @@ public class Peer implements PeerInterface{
     public void addChunk(Chunk chunk, long file_Size){
         myChunks.put(new Pair<>(chunk.getFileID(), chunk.getChunkID()), chunk);
         usageSpace += file_Size;
+    }
+
+    public int getUsageSpace() {
+        return usageSpace;
+    }
+
+    public int getAvailableSpace() {
+        return availableSpace;
     }
 
     @Override

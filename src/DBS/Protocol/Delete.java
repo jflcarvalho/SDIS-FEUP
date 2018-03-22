@@ -1,4 +1,4 @@
-package com.DBS.Protocol;
+package DBS.Protocol;
 
 public class Delete implements Protocol {
 

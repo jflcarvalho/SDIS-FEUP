@@ -1,4 +1,4 @@
-package com.DBS.Utils;
+package DBS.Utils;
 
 public class Constants {
     public enum MessageType {PUTCHUNK, STORED}

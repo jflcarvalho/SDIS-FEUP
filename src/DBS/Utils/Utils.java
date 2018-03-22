@@ -1,4 +1,4 @@
-package com.DBS.Utils;
+package DBS.Utils;
 
 import javax.xml.bind.DatatypeConverter;
 import java.net.InetAddress;

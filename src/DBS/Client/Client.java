@@ -1,7 +1,8 @@
-package com.DBS.Client;
+package DBS.Client;
 
-import com.DBS.Peer.PeerInterface;
-import com.DBS.Protocol.*;
+import DBS.Peer.PeerInterface;
+import DBS.Protocol.Backup;
+import DBS.Protocol.Protocol;
 
 class Client {
 

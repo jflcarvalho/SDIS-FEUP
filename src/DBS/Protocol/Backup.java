@@ -1,4 +1,4 @@
-package com.DBS.Protocol;
+package DBS.Protocol;
 
 import com.DBS.Chunk;
 import com.DBS.FileIO.M_File;

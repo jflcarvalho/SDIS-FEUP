@@ -1,9 +1,12 @@
-package com.DBS.FileIO;
+package DBS.FileIO;
 
-import com.DBS.Chunk;
-import com.DBS.Peer.Peer;
+import DBS.Chunk;
+import DBS.Peer.Peer;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 
 public class FileManager {
     public static int createFile(Chunk chunk, Peer peer){

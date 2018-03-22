@@ -1,4 +1,4 @@
-package com.DBS.FileIO;
+package DBS.FileIO;
 
 import com.DBS.Chunk;
 

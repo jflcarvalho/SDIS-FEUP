@@ -1,7 +1,7 @@
-package com.DBS.Message;
+package DBS.Message;
 
-import static com.DBS.Utils.Constants.*;
-import static com.DBS.Utils.Constants.MessageType.PUTCHUNK;
+import static DBS.Utils.Constants.*;
+import static DBS.Utils.Constants.MessageType.PUTCHUNK;
 
 public class Message {
 
