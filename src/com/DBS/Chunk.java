@@ -12,7 +12,7 @@ public class Chunk {
     private String fileID;
     private byte[] data;
 
-    Chunk(String fileID, byte[] data) {
+    public Chunk(String fileID, byte[] data) {
         this.chunkID = nextID;
         this.fileID = fileID;
         this.data = data;
@@ -39,7 +39,7 @@ public class Chunk {
         return data;
     }
 
-    static void resetID(){
+    public static void resetID(){
         nextID = 0;
     }
 }

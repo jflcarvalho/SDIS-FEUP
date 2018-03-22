@@ -1,6 +1,10 @@
-package com.DBS.Utils;
+package com.Utils;
 
 import javax.xml.bind.DatatypeConverter;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -32,5 +36,34 @@ public class Utils {
      */
     public static String getHex(byte[] raw){
         return DatatypeConverter.printHexBinary(raw);
+    }
+
+    /**
+     *
+     * @return byte[] with MAC Address
+     */
+    public static byte[] getMAC(){
+        InetAddress address = null;
+        try {
+            address = InetAddress.getLocalHost();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        NetworkInterface networkInterface = null;
+        try {
+            if (address != null) {
+                networkInterface = NetworkInterface.getByInetAddress(address);
+            }
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
+        try {
+            if (networkInterface != null) {
+                return networkInterface.getHardwareAddress();
+            }
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

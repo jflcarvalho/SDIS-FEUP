@@ -9,9 +9,9 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.security.MessageDigest;
 import java.util.Arrays;
 
-import static com.DBS.Utils.Constants.CHUNKSIZE;
-import static com.DBS.Utils.Utils.getHex;
-import static com.DBS.Utils.Utils.hashString;
+import static com.Utils.Utils.getHex;
+import static com.Utils.Utils.hashString;
+import static com.Utils.Constants.CHUNKSIZE;
 
 public class M_File {
     private String path;
@@ -45,6 +45,10 @@ public class M_File {
 
     public File getFile(){
         return file;
+    }
+
+    public Chunk[] getChunks() {
+        return chunks;
     }
 
     private void init(){
