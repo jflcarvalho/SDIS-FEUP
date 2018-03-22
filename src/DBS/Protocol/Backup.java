@@ -1,13 +1,13 @@
 package DBS.Protocol;
 
-import com.DBS.Chunk;
-import com.DBS.FileIO.M_File;
-import com.DBS.Peer.Peer;
+import DBS.Chunk;
+import DBS.FileIO.M_File;
+import DBS.Peer.Peer;
 
 import java.io.File;
 
-import static com.DBS.FileIO.FileManager.createFile;
-import static com.DBS.FileIO.FileManager.writeFile;
+import static DBS.FileIO.FileManager.createFile;
+import static DBS.FileIO.FileManager.writeFile;
 
 public class Backup implements Protocol {
 
