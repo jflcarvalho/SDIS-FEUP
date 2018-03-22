@@ -1,7 +1,7 @@
 package com.DBS.FileIO;
 
 import com.DBS.Chunk;
-import com.Network.Peer.Peer;
+import com.DBS.Peer.Peer;
 
 import java.io.*;
 

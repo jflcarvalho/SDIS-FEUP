@@ -1,6 +1,6 @@
 package com.DBS.Client;
 
-import com.Network.Peer.PeerInterface;
+import com.DBS.Peer.PeerInterface;
 import com.DBS.Protocol.*;
 
 class Client {

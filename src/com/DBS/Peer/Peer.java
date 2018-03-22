@@ -1,4 +1,4 @@
-package com.Network.Peer;
+package com.DBS.Peer;
 
 import com.DBS.Chunk;
 import javafx.util.Pair;
@@ -6,7 +6,7 @@ import javafx.util.Pair;
 import java.rmi.RemoteException;
 import java.util.Hashtable;
 
-import static com.Utils.Utils.*;
+import static com.DBS.Utils.Utils.*;
 
 public class Peer implements PeerInterface{
     static Hashtable<Pair<String, Integer>, Chunk> myChunks = new Hashtable<>();

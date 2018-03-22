@@ -1,4 +1,4 @@
-package com.Network;
+package com.DBS.Network;
 
 public class NetworkManager {
 }

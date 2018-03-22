@@ -1,11 +1,11 @@
-package com;
+package com.DBS;
 
 import com.DBS.FileIO.M_File;
 import com.DBS.Message.Message;
 
 import java.net.SocketException;
 
-import static com.Utils.Constants.testFilePath;
+import static com.DBS.Utils.Constants.testFilePath;
 
 public class Main {
 
