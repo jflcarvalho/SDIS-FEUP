@@ -20,11 +20,14 @@ public class Backup implements Protocol {
         this.file_path = file_path;
         this.replication_degree = replication_degree;
         mFile = new M_File(file_path);
+        peer = new Peer();
     }
 
     public void run() {
       System.out.println("Backing up " + file_path);
       System.out.println("Replication degree: " + replication_degree);
+      System.out.println(mFile.toString());
+      storeChunk(mFile.getChunks()[0]);
     }
 
     public void sendChunk(Chunk chunk) {
