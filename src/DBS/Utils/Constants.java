@@ -8,4 +8,5 @@ public class Constants {
     public static final String testFilePath = "testFiles/testTXT.txt";
 
     public static final int CHUNKSIZE = 64000;
+    public static final int PACKETLENGHT = 65024;
 }
