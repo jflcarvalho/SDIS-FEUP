@@ -1,6 +1,11 @@
 package dbs.network;
 
+import dbs.message.Message;
+
 import java.io.IOException;
+import java.net.DatagramPacket;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 public class MCR_Channel extends M_Channel {
     /**
@@ -15,7 +20,10 @@ public class MCR_Channel extends M_Channel {
     }
 
     @Override
-    void handleRequest(String string_message) {
+    protected void handleRequest(DatagramPacket packet) {
+        byte[] data = packet.getData();
+        String string_message = new String(Arrays.copyOfRange(data, 0, packet.getLength()), StandardCharsets.US_ASCII);
+        Message message = Message.parse(string_message);
 
     }
 

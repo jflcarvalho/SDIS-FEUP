@@ -1,22 +1,28 @@
 package dbs.peer;
 
+import com.sun.istack.internal.NotNull;
 import dbs.Chunk;
 import dbs.message.Message;
+import dbs.message.MessageFactory;
+import dbs.message.ProcessMessage;
 import dbs.network.MCB_Channel;
 import dbs.network.MCR_Channel;
 import dbs.network.MC_Channel;
 import dbs.network.M_Channel;
 import dbs.protocol.Backup;
-import com.sun.istack.internal.NotNull;
 import javafx.util.Pair;
 
-import java.util.Hashtable;
+import java.io.Serializable;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
-import static dbs.utils.Constants.MessageType.PUTCHUNK;
-import static dbs.utils.Utils.*;
+import static dbs.utils.Constants.MC;
+import static dbs.utils.Constants.MCB;
 
-public class Peer implements PeerInterface{
-    static Hashtable<Pair<String, Integer>, Chunk> myChunks = new Hashtable<>();
+public class Peer implements PeerInterface, Serializable{
+    private static Peer instance;
+    private static Map<Pair<String, Integer>, Chunk> myChunks = new ConcurrentHashMap<>();
+    private static Map<Pair<String, Integer>, HashSet<String>> chunkReplication = new ConcurrentHashMap<>();
 
     private String version;
     private String peerID;
@@ -30,10 +36,6 @@ public class Peer implements PeerInterface{
 
     private M_Channel[] channels = new M_Channel[3];
 
-    public Peer() {
-        peerID = hashString(getHex(getMAC()));
-    }
-
     public Peer(@NotNull String[] args){
         this.version = args[0];
         if(!args[1].equals("-1"))
@@ -45,15 +47,21 @@ public class Peer implements PeerInterface{
         this.mdb_port = Integer.parseInt(args[6]);
         this.mdr_ip = args[7];
         this.mdr_port = Integer.parseInt(args[8]);
+        instance = this;
     }
 
     public String getPeerID() {
         return peerID;
     }
 
+    public boolean haveChunk(Chunk chunk){
+        return myChunks.containsKey(new Pair<>(chunk.getFileID(), chunk.getChunkID()));
+    }
+
     public void addChunk(Chunk chunk, long file_Size){
-        myChunks.put(new Pair<>(chunk.getFileID(), chunk.getChunkID()), chunk);
-        usageSpace += file_Size;
+        if(myChunks.put(new Pair<>(chunk.getFileID(), chunk.getChunkID()), chunk) == null)
+            usageSpace += file_Size;
+        send(MessageFactory.getStoredMessage(peerID, chunk));
     }
 
     private void initPeer(){
@@ -71,14 +79,16 @@ public class Peer implements PeerInterface{
     }
 
     public void send(Message message){
-        if(message.getMessageType() == PUTCHUNK){
-            byte[] header = Message.encode(message).getBytes();
-            byte[] body = message.getBody();
-            byte[] packet = new byte[header.length + body.length];
-            System.arraycopy(header,0,packet,0,header.length);
-            System.arraycopy(body,0,packet,header.length,body.length);
+        switch (message.getMessageType()){
+            case PUTCHUNK:
+                ProcessMessage.sendMessage(message, channels[MCB]);
+                break;
+            case STORED:
+                ProcessMessage.sendMessage(message, channels[MC]);
+                break;
+            default:
+                break;
 
-            channels[1].send(packet);
         }
     }
 
@@ -108,11 +118,32 @@ public class Peer implements PeerInterface{
 
     }
 
+    public void updateReplicationOfFile(Chunk chunk, String senderID){
+        Pair<String, Integer> chunkIdentifier = new Pair<>(chunk.getFileID(), chunk.getChunkID());
+        HashSet<String> peersStored = chunkReplication.get(chunkIdentifier);
+        if(peersStored == null)
+            peersStored = new HashSet<>();
+        peersStored.add(senderID);
+        chunkReplication.put(chunkIdentifier, peersStored);
+    }
+
     public int getUsageSpace() {
         return usageSpace;
     }
 
     public int getAvailableSpace() {
         return availableSpace;
+    }
+
+    public static Peer getInstance(){
+        return instance;
+    }
+
+    public int getDegree(String fileID, int chunkNO) {
+        HashSet<String> degrees = chunkReplication.get(new Pair<>(fileID, chunkNO));
+        int degree = 0;
+        if(degrees != null)
+            degree = degrees.size();
+        return degree;
     }
 }

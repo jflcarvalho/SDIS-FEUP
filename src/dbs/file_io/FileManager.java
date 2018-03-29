@@ -1,7 +1,6 @@
 package dbs.file_io;
 
 import dbs.Chunk;
-import dbs.peer.Peer;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -9,24 +8,20 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class FileManager {
-    public static int createFile(Chunk chunk, Peer peer){
-        //Creates sub folders structure -> peerId/FileId/
-        String file_path = "backup/" + peer.getPeerID() + "/" + chunk.getFileID() + "/" + chunk.getChunkID();
+    public static boolean createFile(String file_path){
         try {
             File outFile = new File(file_path);
-            if(!outFile.getParentFile().mkdirs())
-                return 1;
+            outFile.getParentFile().mkdirs();
             if(!outFile.createNewFile())
-                return 1;
+                return false;
+
         } catch (IOException e) {
             e.printStackTrace();
-            return 1;
         }
-        return 0;
+        return true;
     }
 
-    public static int writeFile(Chunk chunk, Peer peer) {
-        String file_path = "backup/" + peer.getPeerID() + "/" + chunk.getFileID() + "/" + chunk.getChunkID();
+    public static boolean writeFile(Chunk chunk, String file_path) {
         OutputStream output;
         try {
             output = new FileOutputStream(file_path);
@@ -34,8 +29,8 @@ public class FileManager {
             output.close();
         } catch (IOException e) {
             e.printStackTrace();
-            return 1;
+            return false;
         }
-        return 0;
+        return true;
     }
 }

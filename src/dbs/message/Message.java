@@ -6,14 +6,14 @@ import static dbs.utils.Constants.MessageType.PUTCHUNK;
 public class Message {
 
     private MessageType messageType;
-    private int version;
+    private double version;
     private String sender_ID;
     private String file_ID;
     private int chunk_NO;
     private int replication_Deg;
     private byte[] body;
 
-    public Message(MessageType messageType, int version, String sender_ID, String file_ID, int chunk_NO, int replication_Deg, byte[] body) {
+    public Message(MessageType messageType, double version, String sender_ID, String file_ID, int chunk_NO, int replication_Deg, byte[] body) {
         this.messageType = messageType;
         this.version = version;
         this.sender_ID = sender_ID;
@@ -23,7 +23,7 @@ public class Message {
         this.body = body;
     }
 
-    public Message(MessageType messageType, int version, String sender_ID, String file_ID, int chunk_NO) {
+    public Message(MessageType messageType, double version, String sender_ID, String file_ID, int chunk_NO) {
         this.messageType = messageType;
         this.version = version;
         this.sender_ID = sender_ID;
@@ -35,7 +35,7 @@ public class Message {
         return messageType;
     }
 
-    public int getVersion() {
+    public double getVersion() {
         return version;
     }
 
@@ -66,7 +66,7 @@ public class Message {
         if("PUTCHUNK".equals(requestSplited[0])){
             return new Message(
                     PUTCHUNK,
-                    Integer.parseInt(requestSplited[1]),
+                    Double.parseDouble(requestSplited[1]),
                     requestSplited[2],
                     requestSplited[3],
                     Integer.parseInt(requestSplited[4]),
@@ -76,7 +76,7 @@ public class Message {
         } else if ("STORED".equals(requestSplited[0])){
             return new Message(
                     MessageType.STORED,
-                    Integer.parseInt(requestSplited[1]),
+                    Double.parseDouble(requestSplited[1]),
                     requestSplited[2],
                     requestSplited[3],
                     Integer.parseInt(requestSplited[4])
@@ -106,6 +106,8 @@ public class Message {
                         + SPACE + message.file_ID
                         + SPACE + message.chunk_NO
                         + SPACE + CRLF_D;
+                break;
+            default:
                 break;
         }
         return stringMessage;

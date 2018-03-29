@@ -8,7 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 
-import static dbs.utils.Constants.CHUNKSIZE;
+import static dbs.utils.Constants.CHUNK_SIZE;
 import static dbs.utils.Utils.getHex;
 import static dbs.utils.Utils.hashString;
 
@@ -85,9 +85,9 @@ public class M_File {
     }
 
     private void initChunks(){
-        chunks = new Chunk[data.length / CHUNKSIZE + 1];
-        for (int i = 0; i*CHUNKSIZE <= data.length; i++){
-            chunks[i] = new Chunk(fileID, Arrays.copyOfRange(data, i*CHUNKSIZE, i + CHUNKSIZE > data.length ? data.length : (i + 1 ) * CHUNKSIZE));
+        chunks = new Chunk[data.length / CHUNK_SIZE + 1];
+        for (int i = 0; i* CHUNK_SIZE <= data.length; i++){
+            chunks[i] = new Chunk(fileID, Arrays.copyOfRange(data, i* CHUNK_SIZE, (i + 1) * CHUNK_SIZE > data.length ? data.length : (i + 1 ) * CHUNK_SIZE));
         }
         Chunk.resetID();
     }

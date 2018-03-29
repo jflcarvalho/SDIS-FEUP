@@ -4,10 +4,8 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 
-import static dbs.utils.Constants.PACKETLENGHT;
+import static dbs.utils.Constants.PACKET_LENGTH;
 
 public abstract class M_Channel implements Runnable {
     private MulticastSocket mc_socket;
@@ -40,9 +38,9 @@ public abstract class M_Channel implements Runnable {
      * @return DatagramPacket with request
      */
     private DatagramPacket receiveRequest(){
-        byte[] buffer = new byte[PACKETLENGHT];
+        byte[] buffer = new byte[PACKET_LENGTH];
 
-        DatagramPacket packet = new DatagramPacket(buffer, PACKETLENGHT);
+        DatagramPacket packet = new DatagramPacket(buffer, PACKET_LENGTH);
 
         try {
             mc_socket.receive(packet);
@@ -65,13 +63,11 @@ public abstract class M_Channel implements Runnable {
     public void run() {
         while (true) {
             DatagramPacket packet = this.receiveRequest();
-            byte[] data = packet.getData();
-            String string_message = new String(Arrays.copyOfRange(data, 0, packet.getLength()), StandardCharsets.US_ASCII);
-            new Thread(() -> handleRequest(string_message)).start();
+            new Thread(() -> handleRequest(packet)).start();
         }
     }
 
-    abstract void handleRequest(String string_message);
+    protected abstract void handleRequest(DatagramPacket packet);
 
     public InetAddress getAddress() {
         return address;

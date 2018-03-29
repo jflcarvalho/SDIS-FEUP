@@ -12,6 +12,7 @@ public class Main {
     public static void main(String[] args) throws SocketException {
         /* Needed for Mac OS X */
         System.setProperty("java.net.preferIPv4Stack", "true");
+
         Peer initiator_Peer = new Peer(args);
         initiator_Peer.start();
 
