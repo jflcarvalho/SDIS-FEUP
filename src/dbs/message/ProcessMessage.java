@@ -20,10 +20,10 @@ public abstract class ProcessMessage {
     }
 
     public static void processMessage(Message message, Peer peer){
-        Chunk chunk = new Chunk(message.getFileID(), message.getChunkNO(), message.getBody());
+        Chunk chunk = Chunk.createChunkFromMessage(message);
         switch (message.getMessageType()){
             case STORED:
-                peer.updateReplicationOfFile(chunk, message.getSenderID());
+                peer.updateReplicationOfFile(chunk, getSenderIDFromMessage(message));
                 break;
             default:
                 break;
@@ -31,9 +31,13 @@ public abstract class ProcessMessage {
     }
 
     public static void processPutChunk(Message message, Peer peer){
-        if(peer.getPeerID().equals(message.getSenderID()))
+        if(peer.getPeerID().equals(getSenderIDFromMessage(message)))
             return;
-        Chunk chunk = new Chunk(message.getFileID(), message.getChunkNO(), message.getBody());
+        Chunk chunk = Chunk.createChunkFromMessage(message);
         new Backup(peer).storeChunk(chunk);
+    }
+
+    private static String getSenderIDFromMessage(Message message){
+        return message.getSenderID();
     }
 }

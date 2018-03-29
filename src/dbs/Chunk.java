@@ -1,5 +1,7 @@
 package dbs;
 
+import dbs.message.Message;
+
 public class Chunk {
     private static int nextID;
     private int chunkID;
@@ -33,5 +35,9 @@ public class Chunk {
 
     public static void resetID(){
         nextID = 0;
+    }
+
+    public static Chunk createChunkFromMessage(Message message){
+        return new Chunk(message.getFileID(), message.getChunkNO(), message.getBody());
     }
 }
