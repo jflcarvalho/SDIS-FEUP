@@ -1,4 +1,4 @@
-package DBS.Protocol;
+package dbs.protocol;
 
 public class ReclaimSpace implements Protocol {
 

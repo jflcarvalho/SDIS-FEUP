@@ -1,19 +1,19 @@
-package DBS.Peer;
+package dbs.peer;
 
-import DBS.Chunk;
-import DBS.Message.Message;
-import DBS.Network.MCB_Channel;
-import DBS.Network.MCR_Channel;
-import DBS.Network.MC_Channel;
-import DBS.Network.M_Channel;
-import DBS.Protocol.Backup;
+import dbs.Chunk;
+import dbs.message.Message;
+import dbs.network.MCB_Channel;
+import dbs.network.MCR_Channel;
+import dbs.network.MC_Channel;
+import dbs.network.M_Channel;
+import dbs.protocol.Backup;
 import com.sun.istack.internal.NotNull;
 import javafx.util.Pair;
 
 import java.util.Hashtable;
 
-import static DBS.Utils.Constants.MessageType.PUTCHUNK;
-import static DBS.Utils.Utils.*;
+import static dbs.utils.Constants.MessageType.PUTCHUNK;
+import static dbs.utils.Utils.*;
 
 public class Peer implements PeerInterface{
     static Hashtable<Pair<String, Integer>, Chunk> myChunks = new Hashtable<>();
@@ -57,7 +57,7 @@ public class Peer implements PeerInterface{
     }
 
     private void initPeer(){
-        System.out.println("Starting Peer + " + peerID + "\n");
+        System.out.println("Starting peer " + peerID + "\n");
         channels[0] = new MC_Channel(mc_ip, mc_port);
         channels[1] = new MCB_Channel(mdb_ip, mdb_port);
         channels[2] = new MCR_Channel(mdr_ip, mdr_port);

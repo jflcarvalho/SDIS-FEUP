@@ -6,12 +6,11 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.security.MessageDigest;
 import java.util.Arrays;
 
+import static DBS.Utils.Constants.CHUNKSIZE;
 import static DBS.Utils.Utils.getHex;
 import static DBS.Utils.Utils.hashString;
-import static DBS.Utils.Constants.CHUNKSIZE;
 
 public class M_File {
     private String path;
@@ -73,7 +72,6 @@ public class M_File {
     }
 
     private void initHashedName() {
-        MessageDigest digest = null;
         String text = name + attr.creationTime().toString() + attr.lastModifiedTime().toString();
         fileID = hashString(text);
     }

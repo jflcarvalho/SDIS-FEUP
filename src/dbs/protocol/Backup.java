@@ -1,15 +1,15 @@
-package DBS.Protocol;
+package dbs.protocol;
 
-import DBS.Chunk;
-import DBS.FileIO.M_File;
-import DBS.Message.Message;
-import DBS.Peer.Peer;
+import dbs.Chunk;
+import dbs.file_io.M_File;
+import dbs.message.Message;
+import dbs.peer.Peer;
 
 import java.io.File;
 
-import static DBS.FileIO.FileManager.createFile;
-import static DBS.FileIO.FileManager.writeFile;
-import static DBS.Utils.Constants.MessageType.PUTCHUNK;
+import static dbs.file_io.FileManager.createFile;
+import static dbs.file_io.FileManager.writeFile;
+import static dbs.utils.Constants.MessageType.PUTCHUNK;
 
 public class Backup implements Protocol {
 
