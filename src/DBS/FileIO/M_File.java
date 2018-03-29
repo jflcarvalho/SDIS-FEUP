@@ -89,7 +89,7 @@ public class M_File {
     private void initChunks(){
         chunks = new Chunk[data.length / CHUNKSIZE + 1];
         for (int i = 0; i*CHUNKSIZE <= data.length; i++){
-            chunks[i] = new Chunk(fileID, Arrays.copyOfRange(data, i, i + CHUNKSIZE > data.length ? data.length : i + CHUNKSIZE));
+            chunks[i] = new Chunk(fileID, Arrays.copyOfRange(data, i*CHUNKSIZE, i + CHUNKSIZE > data.length ? data.length : (i + 1 ) * CHUNKSIZE));
         }
         Chunk.resetID();
     }

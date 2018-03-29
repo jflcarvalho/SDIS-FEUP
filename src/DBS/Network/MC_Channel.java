@@ -1,5 +1,7 @@
 package DBS.Network;
 
+import DBS.Message.Message;
+
 import java.io.IOException;
 
 public class MC_Channel extends M_Channel {
@@ -11,12 +13,12 @@ public class MC_Channel extends M_Channel {
      * @param port    multicast port
      * @throws IOException
      */
-    MC_Channel(String address, int port) throws IOException {
+    public MC_Channel(String address, int port){
         super(address, port);
     }
 
     @Override
-    public void run() {
+    protected void handleRequest(Message message){
 
     }
 }

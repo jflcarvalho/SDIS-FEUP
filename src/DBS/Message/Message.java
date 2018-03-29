@@ -7,13 +7,13 @@ public class Message {
 
     private MessageType messageType;
     private int version;
-    private int sender_ID;
+    private String sender_ID;
     private String file_ID;
     private int chunk_NO;
     private int replication_Deg;
     private byte[] body;
 
-    public Message(MessageType messageType, int version, int sender_ID, String file_ID, int chunk_NO, int replication_Deg, byte[] body) {
+    public Message(MessageType messageType, int version, String sender_ID, String file_ID, int chunk_NO, int replication_Deg, byte[] body) {
         this.messageType = messageType;
         this.version = version;
         this.sender_ID = sender_ID;
@@ -23,7 +23,7 @@ public class Message {
         this.body = body;
     }
 
-    public Message(MessageType messageType, int version, int sender_ID, String file_ID, int chunk_NO) {
+    public Message(MessageType messageType, int version, String sender_ID, String file_ID, int chunk_NO) {
         this.messageType = messageType;
         this.version = version;
         this.sender_ID = sender_ID;
@@ -39,7 +39,7 @@ public class Message {
         return version;
     }
 
-    public int getSender_ID() {
+    public String getSender_ID() {
         return sender_ID;
     }
 
@@ -67,7 +67,7 @@ public class Message {
             return new Message(
                     PUTCHUNK,
                     Integer.parseInt(requestSplited[1]),
-                    Integer.parseInt(requestSplited[2]),
+                    requestSplited[2],
                     requestSplited[3],
                     Integer.parseInt(requestSplited[4]),
                     Integer.parseInt(requestSplited[5]),
@@ -77,7 +77,7 @@ public class Message {
             return new Message(
                     MessageType.STORED,
                     Integer.parseInt(requestSplited[1]),
-                    Integer.parseInt(requestSplited[2]),
+                    requestSplited[2],
                     requestSplited[3],
                     Integer.parseInt(requestSplited[4])
             );
@@ -97,8 +97,7 @@ public class Message {
                     + SPACE + message.file_ID
                     + SPACE + message.chunk_NO
                     + (message.replication_Deg < 0 ? "" : SPACE + message.replication_Deg)
-                    + CRLF_D
-                    + new String(message.body);
+                    + SPACE + CRLF_D;
                 break;
             case STORED:
                 stringMessage += message.messageType
@@ -106,7 +105,7 @@ public class Message {
                         + SPACE + message.sender_ID
                         + SPACE + message.file_ID
                         + SPACE + message.chunk_NO
-                        + CRLF_D;
+                        + SPACE + CRLF_D;
                 break;
         }
         return stringMessage;

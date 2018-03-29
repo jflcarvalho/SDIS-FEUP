@@ -1,8 +1,8 @@
 package DBS.Network;
 
+import DBS.Message.Message;
+
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.nio.charset.StandardCharsets;
 
 public class MCR_Channel extends M_Channel {
     /**
@@ -12,16 +12,12 @@ public class MCR_Channel extends M_Channel {
      * @param port    multicast port
      * @throws IOException
      */
-    MCR_Channel(String address, int port) throws IOException {
+    public MCR_Channel(String address, int port){
         super(address, port);
     }
 
     @Override
-    public void run() {
-        while (true) {
-            DatagramPacket packet = this.receiveRequest();
-            String message = new String(packet.getData(), StandardCharsets.UTF_8);
-
-        }
+    protected void handleRequest(Message message){
+        System.out.println(message.toString());
     }
 }

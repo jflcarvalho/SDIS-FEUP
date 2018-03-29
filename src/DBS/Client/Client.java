@@ -1,7 +1,6 @@
 package DBS.Client;
 
 import DBS.Peer.PeerInterface;
-import DBS.Protocol.Backup;
 import DBS.Protocol.Protocol;
 
 class Client {
@@ -24,7 +23,7 @@ class Client {
           case "BACKUP":
             String file_path = args[2];
             int replication_degree = Integer.parseInt(args[3]);
-            protocol = new Backup(file_path, replication_degree);
+            //protocol = new Backup(file_path, replication_degree);
             break;
           default:
             System.out.println("Invalid protocol");
