@@ -3,6 +3,7 @@ package dbs.network;
 import dbs.message.Message;
 import dbs.message.ProcessMessage;
 import dbs.peer.Peer;
+import dbs.utils.Constants;
 
 import java.net.DatagramPacket;
 import java.nio.charset.StandardCharsets;
@@ -27,8 +28,9 @@ public class MCB_Channel extends M_Channel {
         byte[] data = packet.getData();
         String string_message = new String(Arrays.copyOfRange(data, 0, packet.getLength()), StandardCharsets.US_ASCII);
         Message message = Message.parse(string_message);
-        System.out.println(message.getMessageType().toString());
-        if(message.getMessageType() == PUTCHUNK){
+        Constants.MessageType messageType = message.getMessageType();
+        System.out.println(messageType.toString());
+        if(messageType == PUTCHUNK){
             ProcessMessage.processPutChunk(message, peer);
         }
     }

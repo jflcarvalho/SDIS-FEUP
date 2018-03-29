@@ -17,10 +17,7 @@ public class Message {
         this.messageType = messageType;
         this.version = version;
         this.sender_ID = sender_ID;
-        this.file_ID = file_ID;
-        this.chunk_NO = chunk_NO;
         this.replication_Deg = replication_Deg;
-        this.body = body;
     }
 
     public Message(MessageType messageType, double version, String sender_ID, String file_ID, int chunk_NO) {
@@ -57,6 +54,12 @@ public class Message {
 
     public byte[] getBody() {
         return body;
+    }
+
+    public void addChunkInfo(String file_ID, int chunk_NO, byte[] body){
+        this.file_ID = file_ID;
+        this.chunk_NO = chunk_NO;
+        this.body = body;
     }
 
     public void setFile_ID(String file_ID) {

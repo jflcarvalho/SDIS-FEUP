@@ -15,9 +15,7 @@ public abstract class MessageFactory {
 
     public static Message getPutChunkMessage(Backup backup, Chunk chunk) {
         Message message = new Message(PUTCHUNK, VERSION, backup.getPeer().getPeerID(), backup.getReplicationDegree());
-        message.setFile_ID(getFileIDFromChunk(chunk));
-        message.setChunk_NO(getChunkIDFromChunk(chunk));
-        message.setBody(getDataFromChunk(chunk));
+        message.addChunkInfo(getFileIDFromChunk(chunk), getChunkIDFromChunk(chunk), getDataFromChunk(chunk));
         return message;
     }
 
