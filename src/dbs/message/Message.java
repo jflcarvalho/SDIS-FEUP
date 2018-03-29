@@ -13,7 +13,7 @@ public class Message {
     private int replication_Deg;
     private byte[] body;
 
-    public Message(MessageType messageType, double version, String sender_ID, String file_ID, int chunk_NO, int replication_Deg, byte[] body) {
+    public Message(MessageType messageType, double version, String sender_ID, int replication_Deg) {
         this.messageType = messageType;
         this.version = version;
         this.sender_ID = sender_ID;
@@ -59,27 +59,40 @@ public class Message {
         return body;
     }
 
+    public void setFile_ID(String file_ID) {
+        this.file_ID = file_ID;
+    }
+
+    public void setChunk_NO(int chunk_NO) {
+        this.chunk_NO = chunk_NO;
+    }
+
+    public void setBody(byte[] body) {
+        this.body = body;
+    }
+
     public static Message parse(String request){
         if(null == request)
             return null;
-        String[] requestSplited = request.split( SPACE+"(?=.+"+ CRLF_D +")| "+CRLF_D);
-        if("PUTCHUNK".equals(requestSplited[0])){
-            return new Message(
+        String[] requestSpliced = request.split( SPACE+"(?=.+"+ CRLF_D +")| "+CRLF_D);
+        if("PUTCHUNK".equals(requestSpliced[0])){
+            Message message = new Message(
                     PUTCHUNK,
-                    Double.parseDouble(requestSplited[1]),
-                    requestSplited[2],
-                    requestSplited[3],
-                    Integer.parseInt(requestSplited[4]),
-                    Integer.parseInt(requestSplited[5]),
-                    requestSplited[6].getBytes()
+                    Double.parseDouble(requestSpliced[1]),
+                    requestSpliced[2],
+                    Integer.parseInt(requestSpliced[5])
             );
-        } else if ("STORED".equals(requestSplited[0])){
+            message.setFile_ID(requestSpliced[3]);
+            message.setChunk_NO(Integer.parseInt(requestSpliced[4]));
+            message.setBody(requestSpliced[6].getBytes());
+            return message;
+        } else if ("STORED".equals(requestSpliced[0])){
             return new Message(
                     MessageType.STORED,
-                    Double.parseDouble(requestSplited[1]),
-                    requestSplited[2],
-                    requestSplited[3],
-                    Integer.parseInt(requestSplited[4])
+                    Double.parseDouble(requestSpliced[1]),
+                    requestSpliced[2],
+                    requestSpliced[3],
+                    Integer.parseInt(requestSpliced[4])
             );
         }
         return null;
