@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static dbs.utils.Constants.MC;
 import static dbs.utils.Constants.MCB;
 
-public class Peer implements PeerInterface, ChunkInterface, Serializable{
+public class Peer implements PeerInterface, Serializable{
     private static Peer instance;
     private static Map<Pair<String, Integer>, Chunk> myChunks = new ConcurrentHashMap<>();
     private static Map<Pair<String, Integer>, HashSet<String>> chunkReplication = new ConcurrentHashMap<>();
