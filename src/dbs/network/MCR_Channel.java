@@ -1,8 +1,8 @@
 package dbs.network;
 
 import dbs.message.Message;
+import dbs.peer.Peer;
 
-import java.io.IOException;
 import java.net.DatagramPacket;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -13,10 +13,10 @@ public class MCR_Channel extends M_Channel {
      *
      * @param address multicast address
      * @param port    multicast port
-     * @throws IOException
+     * @param peer    peer
      */
-    public MCR_Channel(String address, int port){
-        super(address, port);
+    public MCR_Channel(String address, int port, Peer peer){
+        super(address, port, peer);
     }
 
     @Override

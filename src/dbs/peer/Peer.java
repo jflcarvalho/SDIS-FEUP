@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static dbs.utils.Constants.MC;
 import static dbs.utils.Constants.MCB;
 
-public class Peer implements PeerInterface, Serializable{
+public class Peer implements PeerInterface, ChunkInterface, Serializable{
     private static Peer instance;
     private static Map<Pair<String, Integer>, Chunk> myChunks = new ConcurrentHashMap<>();
     private static Map<Pair<String, Integer>, HashSet<String>> chunkReplication = new ConcurrentHashMap<>();
@@ -55,20 +55,20 @@ public class Peer implements PeerInterface, Serializable{
     }
 
     public boolean haveChunk(Chunk chunk){
-        return myChunks.containsKey(new Pair<>(chunk.getFileID(), chunk.getChunkID()));
+        return myChunks.containsKey(new Pair<>(getFileIDFromChunk(chunk), getChunkIDFromChunk(chunk)));
     }
 
     public void addChunk(Chunk chunk, long file_Size){
-        if(myChunks.put(new Pair<>(chunk.getFileID(), chunk.getChunkID()), chunk) == null)
+        if(myChunks.put(new Pair<>(getFileIDFromChunk(chunk), getChunkIDFromChunk(chunk)), chunk) == null)
             usageSpace += file_Size;
         send(MessageFactory.getStoredMessage(peerID, chunk));
     }
 
     private void initPeer(){
         System.out.println("Starting peer " + peerID + "\n");
-        channels[0] = new MC_Channel(mc_ip, mc_port);
-        channels[1] = new MCB_Channel(mdb_ip, mdb_port);
-        channels[2] = new MCR_Channel(mdr_ip, mdr_port);
+        channels[0] = new MC_Channel(mc_ip, mc_port, this);
+        channels[1] = new MCB_Channel(mdb_ip, mdb_port, this);
+        channels[2] = new MCR_Channel(mdr_ip, mdr_port, this);
         for (M_Channel channel: channels) {
             new Thread(channel).start();
         }
@@ -119,7 +119,7 @@ public class Peer implements PeerInterface, Serializable{
     }
 
     public void updateReplicationOfFile(Chunk chunk, String senderID){
-        Pair<String, Integer> chunkIdentifier = new Pair<>(chunk.getFileID(), chunk.getChunkID());
+        Pair<String, Integer> chunkIdentifier = new Pair<>(getFileIDFromChunk(chunk), getChunkIDFromChunk(chunk));
         HashSet<String> peersStored = chunkReplication.get(chunkIdentifier);
         if(peersStored == null)
             peersStored = new HashSet<>();
@@ -145,5 +145,13 @@ public class Peer implements PeerInterface, Serializable{
         if(degrees != null)
             degree = degrees.size();
         return degree;
+    }
+
+    private String getFileIDFromChunk(@NotNull Chunk chunk){
+        return chunk.getFileID();
+    }
+
+    private int getChunkIDFromChunk(@NotNull Chunk chunk){
+        return chunk.getChunkID();
     }
 }

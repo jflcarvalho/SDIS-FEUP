@@ -2,8 +2,8 @@ package dbs.network;
 
 import dbs.message.Message;
 import dbs.message.ProcessMessage;
+import dbs.peer.Peer;
 
-import java.io.IOException;
 import java.net.DatagramPacket;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -16,10 +16,10 @@ public class MCB_Channel extends M_Channel {
      *
      * @param address multicast address
      * @param port    multicast port
-     * @throws IOException
+     * @param peer    peer
      */
-    public MCB_Channel(String address, int port){
-        super(address, port);
+    public MCB_Channel(String address, int port, Peer peer){
+        super(address, port, peer);
     }
 
     @Override
@@ -29,7 +29,7 @@ public class MCB_Channel extends M_Channel {
         Message message = Message.parse(string_message);
         System.out.println(message.getMessageType().toString());
         if(message.getMessageType() == PUTCHUNK){
-            ProcessMessage.processPutChunk(message);
+            ProcessMessage.processPutChunk(message, peer);
         }
     }
 }

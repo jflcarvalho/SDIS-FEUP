@@ -1,5 +1,7 @@
 package dbs.network;
 
+import dbs.peer.Peer;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
@@ -11,15 +13,17 @@ public abstract class M_Channel implements Runnable {
     private MulticastSocket mc_socket;
     private InetAddress address;
     private int port;
+    protected Peer peer;
 
     /**
      * Class that connects and listens to a multicast
      *
      * @param address multicast address
      * @param port    multicast port
-     * @throws IOException
+     * @param peer    peer
      */
-    public M_Channel(String address, int port) {
+    M_Channel(String address, int port, Peer peer) {
+        this.peer = peer;
         try {
             this.address = InetAddress.getByName(address);
             this.port = port;

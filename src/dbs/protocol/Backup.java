@@ -55,7 +55,7 @@ public class Backup implements Protocol {
         int tries = 0;
         int degree;
         do {
-            peer.send(message);
+            sendToPeer(message);
             try {
                 Thread.sleep((long) (SLEEP_TIME));
             } catch (InterruptedException e) {
@@ -71,11 +71,11 @@ public class Backup implements Protocol {
     }
 
     public void storeChunk(Chunk chunk) {
+        String peerID = getPeerID();
         if(peer.haveChunk(chunk)){
-            peer.send(MessageFactory.getStoredMessage(peer.getPeerID(), chunk));
+            sendToPeer(MessageFactory.getStoredMessage(peerID, chunk));
             return;
         }
-        String peerID = peer.getPeerID();
         String file_path = "backup/" + peerID + "/" + chunk.getFileID() + "/" + chunk.getChunkID();
         if(createFile(file_path)){
             if (!writeFile(chunk, file_path))
@@ -87,6 +87,14 @@ public class Backup implements Protocol {
 
     public Chunk readChunk(){
         return null;
+    }
+
+    private void sendToPeer(Message message){
+        peer.send(message);
+    }
+
+    private String getPeerID(){
+        return peer.getPeerID();
     }
 
 }
