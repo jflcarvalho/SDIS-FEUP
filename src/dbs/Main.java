@@ -1,11 +1,11 @@
-package DBS;
+package dbs;
 
-import DBS.Peer.Peer;
+import dbs.peer.Peer;
 
 import java.net.SocketException;
 import java.util.Scanner;
 
-import static DBS.Utils.Constants.testFilePath;
+import static dbs.utils.Constants.testFilePath;
 
 public class Main {
 
@@ -17,7 +17,7 @@ public class Main {
 
         System.out.println("What u wanna do?");
         Scanner scan = new Scanner(System.in);
-        if(scan.next().equals("1"));
+        if(scan.next().equals("1"))
             initiator_Peer.backup(testFilePath, 2);
     }
 }

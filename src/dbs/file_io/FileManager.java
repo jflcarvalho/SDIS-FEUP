@@ -1,7 +1,7 @@
-package DBS.FileIO;
+package dbs.file_io;
 
-import DBS.Chunk;
-import DBS.Peer.Peer;
+import dbs.Chunk;
+import dbs.peer.Peer;
 
 import java.io.File;
 import java.io.FileOutputStream;

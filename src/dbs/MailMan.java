@@ -1,4 +1,5 @@
-package DBS;
+package dbs;
 
 public class MailMan {
+
 }

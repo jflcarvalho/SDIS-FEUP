@@ -1,7 +1,7 @@
-package DBS.Message;
+package dbs.message;
 
-import static DBS.Utils.Constants.*;
-import static DBS.Utils.Constants.MessageType.PUTCHUNK;
+import static dbs.utils.Constants.*;
+import static dbs.utils.Constants.MessageType.PUTCHUNK;
 
 public class Message {
 
@@ -39,19 +39,19 @@ public class Message {
         return version;
     }
 
-    public String getSender_ID() {
+    public String getSenderID() {
         return sender_ID;
     }
 
-    public String getFile_ID() {
+    public String getFileID() {
         return file_ID;
     }
 
-    public int getChunk_NO() {
+    public int getChunkNO() {
         return chunk_NO;
     }
 
-    public int getReplication_Deg() {
+    public int getReplicationDeg() {
         return replication_Deg;
     }
 

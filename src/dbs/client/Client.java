@@ -1,7 +1,7 @@
-package DBS.Client;
+package dbs.client;
 
-import DBS.Peer.PeerInterface;
-import DBS.Protocol.Protocol;
+import dbs.peer.PeerInterface;
+import dbs.protocol.Protocol;
 
 class Client {
 

@@ -1,14 +1,13 @@
-package DBS.Network;
-
-import DBS.Message.Message;
+package dbs.network;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
-import static DBS.Utils.Constants.PACKETLENGHT;
+import static dbs.utils.Constants.PACKETLENGHT;
 
 public abstract class M_Channel implements Runnable {
     private MulticastSocket mc_socket;
@@ -66,13 +65,13 @@ public abstract class M_Channel implements Runnable {
     public void run() {
         while (true) {
             DatagramPacket packet = this.receiveRequest();
-            String string_message = new String(packet.getData(), StandardCharsets.UTF_8);
-            Message message = Message.parse(string_message);
-            new Thread(() -> handleRequest(message)).start();
+            byte[] data = packet.getData();
+            String string_message = new String(Arrays.copyOfRange(data, 0, packet.getLength()), StandardCharsets.US_ASCII);
+            new Thread(() -> handleRequest(string_message)).start();
         }
     }
 
-    abstract void handleRequest(Message message);
+    abstract void handleRequest(String string_message);
 
     public InetAddress getAddress() {
         return address;

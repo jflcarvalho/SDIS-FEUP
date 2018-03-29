@@ -1,6 +1,6 @@
-package DBS.FileIO;
+package dbs.file_io;
 
-import DBS.Chunk;
+import dbs.Chunk;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,9 +8,9 @@ import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 
-import static DBS.Utils.Constants.CHUNKSIZE;
-import static DBS.Utils.Utils.getHex;
-import static DBS.Utils.Utils.hashString;
+import static dbs.utils.Constants.CHUNKSIZE;
+import static dbs.utils.Utils.getHex;
+import static dbs.utils.Utils.hashString;
 
 public class M_File {
     private String path;

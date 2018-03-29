@@ -1,4 +1,4 @@
-package DBS;
+package dbs;
 
 import javafx.util.Pair;
 

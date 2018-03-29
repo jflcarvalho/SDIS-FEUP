@@ -1,6 +1,4 @@
-package DBS.Network;
-
-import DBS.Message.Message;
+package dbs.network;
 
 import java.io.IOException;
 
@@ -18,7 +16,7 @@ public class MC_Channel extends M_Channel {
     }
 
     @Override
-    protected void handleRequest(Message message){
+    void handleRequest(String string_message) {
 
     }
 }

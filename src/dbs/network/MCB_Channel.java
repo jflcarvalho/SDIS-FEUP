@@ -1,8 +1,10 @@
-package DBS.Network;
+package dbs.network;
 
-import DBS.Message.Message;
+import dbs.message.Message;
 
 import java.io.IOException;
+
+import static dbs.utils.Constants.MessageType.PUTCHUNK;
 
 public class MCB_Channel extends M_Channel {
     /**
@@ -17,7 +19,10 @@ public class MCB_Channel extends M_Channel {
     }
 
     @Override
-    protected void handleRequest(Message message){
-        System.out.println(message.toString());
+    protected void handleRequest(String string_message){
+        Message message = Message.parse(string_message);
+        if(message.getMessageType() == PUTCHUNK){
+
+        }
     }
 }
