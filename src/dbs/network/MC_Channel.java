@@ -26,7 +26,7 @@ public class MC_Channel extends M_Channel {
         byte[] data = packet.getData();
         String string_message = new String(Arrays.copyOfRange(data, 0, packet.getLength()), StandardCharsets.US_ASCII);
         Message message = Message.parse(string_message);
-        System.out.println(message.getMessageType().toString());
+        System.out.println(message.getMessageType().toString() + " " + message.getSenderID());
         ProcessMessage.processMessage(message, peer);
     }
 }

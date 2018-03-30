@@ -9,7 +9,6 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 
 import static dbs.utils.Constants.CHUNK_SIZE;
-import static dbs.utils.Utils.getHex;
 import static dbs.utils.Utils.hashString;
 
 public class M_File {
@@ -99,11 +98,7 @@ public class M_File {
         StringBuilder string = new StringBuilder("Path= " + path + "\n");
         string.append("Name= ").append(name).append("\n");
         string.append("FileID= ").append(fileID).append("\n");
-        string.append("Data:\n");
-        for (int i = 0; i < chunks.length; i++){
-            string.append(chunks[i].getChunkID()).append(": ");
-            string.append(getHex(chunks[i].getData())).append("\n");
-        }
+        string.append("Number of Chunks: ").append(chunks.length);
         return string.toString();
     }
 }

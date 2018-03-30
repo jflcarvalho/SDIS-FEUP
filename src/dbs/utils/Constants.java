@@ -10,6 +10,7 @@ public class Constants {
     public static final int CHUNK_SIZE = 64000;
     public static final int PACKET_LENGTH = 65536;
 
+    public static final int NUMBER_OF_TRIES = 5;
     public static final int SLEEP_TIME = 1000;
 
     public static final int MC = 0;

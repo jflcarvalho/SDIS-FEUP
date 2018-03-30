@@ -10,6 +10,7 @@ import java.io.File;
 
 import static dbs.file_io.FileManager.createFile;
 import static dbs.file_io.FileManager.writeFile;
+import static dbs.utils.Constants.NUMBER_OF_TRIES;
 import static dbs.utils.Constants.SLEEP_TIME;
 
 public class Backup implements Protocol {
@@ -46,34 +47,46 @@ public class Backup implements Protocol {
         System.out.println(mFile.toString());
         for(Chunk chunk : mFile.getChunks())
             new Thread(() -> sendChunk(chunk)).start();
-            //sendChunk(chunk);
         System.out.println("\n------------------ END ---------------------\n");
     }
 
+    /**
+     * Sends PUTCHUNK request for the multicast backup channel (MDB) with the following format:
+     * PUTCHUNK <Version> <SenderId> <FileId> <ChunkNo> <ReplicationDeg> <CRLF><CRLF><Body>
+     * Then waits one second, in first try, and checks if the desired replication degree
+     * has been accomplished. Otherwise it resend the PUTCHUNK request, and in this tries
+     * waits the double of the first time, until a maximum of 5 tries.
+     * @param chunk
+     */
     private void sendChunk(Chunk chunk) {
         Message message = MessageFactory.getPutChunkMessage(this, chunk);
+        peer.initReplicationDatabase(message);
         int tries = 0;
         int degree;
         do {
             sendToPeer(message);
             try {
-                Thread.sleep((long) (SLEEP_TIME));
+                //Waiting time is double if have fail in first time
+                Thread.sleep((long) (SLEEP_TIME * (tries < 1 ? 1 : 2)));
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            degree = peer.getDegree(message.getFileID(), message.getChunkNO());
+            degree = peer.getActualRepDegree(mFile.getFileID(), chunk.getChunkID());
             tries++;
+        }while (tries < NUMBER_OF_TRIES && degree < replication_degree);
 
-            System.out.println("Chunk nº: " + chunk.getChunkID());
-            System.out.println("Try nº: " + tries);
-            System.out.println("RepDeg: " + degree);
-        }while (tries < 3 && degree < replication_degree);
+        System.out.print("Chunk nº: " + chunk.getChunkID());
+        if(tries <= NUMBER_OF_TRIES && degree >= replication_degree)
+            System.out.print(" Stored with Success\n");
+        else
+            System.out.print(" Unsuccessful\n");
     }
 
     public void storeChunk(Chunk chunk) {
         String peerID = getPeerID();
+        Message message = MessageFactory.getStoredMessage(peerID, chunk);
         if(peer.haveChunk(chunk)){
-            sendToPeer(MessageFactory.getStoredMessage(peerID, chunk));
+            sendToPeer(message);
             return;
         }
         String file_path = "backup/" + peerID + "/" + chunk.getFileID() + "/" + chunk.getChunkID();
@@ -83,6 +96,7 @@ public class Backup implements Protocol {
         }
         long file_Size = (new File(file_path)).length();
         peer.addChunk(chunk, file_Size);
+        sendToPeer(message);
     }
 
     public Chunk readChunk(){
@@ -90,6 +104,11 @@ public class Backup implements Protocol {
     }
 
     private void sendToPeer(Message message){
+        try {
+            Thread.sleep((long) (Math.random() * 400));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         peer.send(message);
     }
 

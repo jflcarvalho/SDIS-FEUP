@@ -3,7 +3,6 @@ package dbs.peer;
 import com.sun.istack.internal.NotNull;
 import dbs.Chunk;
 import dbs.message.Message;
-import dbs.message.MessageFactory;
 import dbs.message.ProcessMessage;
 import dbs.network.MCB_Channel;
 import dbs.network.MCR_Channel;
@@ -13,7 +12,8 @@ import dbs.protocol.Backup;
 import javafx.util.Pair;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static dbs.utils.Constants.MC;
@@ -22,7 +22,7 @@ import static dbs.utils.Constants.MCB;
 public class Peer implements PeerInterface, Serializable{
     private static Peer instance;
     private static Map<Pair<String, Integer>, Chunk> myChunks = new ConcurrentHashMap<>();
-    private static Map<Pair<String, Integer>, HashSet<String>> chunkReplication = new ConcurrentHashMap<>();
+    private static Map<Pair<String, Integer>, Pair<Integer, HashSet<String>>> chunkReplication = new ConcurrentHashMap<>();
 
     private String version;
     private String peerID;
@@ -61,7 +61,6 @@ public class Peer implements PeerInterface, Serializable{
     public void addChunk(Chunk chunk, long file_Size){
         if(myChunks.put(new Pair<>(getFileIDFromChunk(chunk), getChunkIDFromChunk(chunk)), chunk) == null)
             usageSpace += file_Size;
-        send(MessageFactory.getStoredMessage(peerID, chunk));
     }
 
     private void initPeer(){
@@ -118,13 +117,22 @@ public class Peer implements PeerInterface, Serializable{
 
     }
 
-    public void updateReplicationOfFile(Chunk chunk, String senderID){
-        Pair<String, Integer> chunkIdentifier = new Pair<>(getFileIDFromChunk(chunk), getChunkIDFromChunk(chunk));
-        HashSet<String> peersStored = chunkReplication.get(chunkIdentifier);
+    public void initReplicationDatabase(Message message){
+        Pair<String, Integer> chunkIdentifier = new Pair<>(message.getFileID(), message.getChunkNO());
+        Pair<Integer, HashSet<String>> peersStored = chunkReplication.get(chunkIdentifier);
         if(peersStored == null)
-            peersStored = new HashSet<>();
-        peersStored.add(senderID);
+            peersStored = new Pair<>(message.getReplicationDeg(), new HashSet<>());
+        else
+            peersStored = new Pair<>(message.getReplicationDeg(), peersStored.getValue());
         chunkReplication.put(chunkIdentifier, peersStored);
+    }
+
+    public void updateReplicationDatabase(Message message){
+        Pair<String, Integer> chunkIdentifier = new Pair<>(message.getFileID(), message.getChunkNO());
+        Pair<Integer, HashSet<String>> peersStored = chunkReplication.get(chunkIdentifier);
+        if(peersStored == null)
+            peersStored = new Pair<>(null, new HashSet<>());
+        peersStored.getValue().add(message.getSenderID());
     }
 
     public int getUsageSpace() {
@@ -135,15 +143,11 @@ public class Peer implements PeerInterface, Serializable{
         return availableSpace;
     }
 
-    public static Peer getInstance(){
-        return instance;
-    }
-
-    public int getDegree(String fileID, int chunkNO) {
-        HashSet<String> degrees = chunkReplication.get(new Pair<>(fileID, chunkNO));
+    public int getActualRepDegree(String fileID, int chunkNO) {
+        Pair<Integer, HashSet<String>> peersStored = chunkReplication.get(new Pair<>(fileID, chunkNO));
         int degree = 0;
-        if(degrees != null)
-            degree = degrees.size();
+        if(peersStored != null)
+            degree = peersStored.getValue().size();
         return degree;
     }
 

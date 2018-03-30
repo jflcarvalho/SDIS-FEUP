@@ -29,7 +29,7 @@ public class MCB_Channel extends M_Channel {
         String string_message = new String(Arrays.copyOfRange(data, 0, packet.getLength()), StandardCharsets.US_ASCII);
         Message message = Message.parse(string_message);
         Constants.MessageType messageType = message.getMessageType();
-        System.out.println(messageType.toString());
+        System.out.println(messageType.toString() + " " + message.getSenderID());
         if(messageType == PUTCHUNK){
             ProcessMessage.processPutChunk(message, peer);
         }

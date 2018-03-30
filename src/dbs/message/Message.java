@@ -1,5 +1,7 @@
 package dbs.message;
 
+import java.nio.charset.StandardCharsets;
+
 import static dbs.utils.Constants.*;
 import static dbs.utils.Constants.MessageType.PUTCHUNK;
 
@@ -62,11 +64,11 @@ public class Message {
         this.body = body;
     }
 
-    public void setFile_ID(String file_ID) {
+    public void setFileID(String file_ID) {
         this.file_ID = file_ID;
     }
 
-    public void setChunk_NO(int chunk_NO) {
+    public void setChunkNO(int chunk_NO) {
         this.chunk_NO = chunk_NO;
     }
 
@@ -85,9 +87,9 @@ public class Message {
                     requestSpliced[2],
                     Integer.parseInt(requestSpliced[5])
             );
-            message.setFile_ID(requestSpliced[3]);
-            message.setChunk_NO(Integer.parseInt(requestSpliced[4]));
-            message.setBody(requestSpliced[6].getBytes());
+            message.setFileID(requestSpliced[3]);
+            message.setChunkNO(Integer.parseInt(requestSpliced[4]));
+            message.setBody(requestSpliced[6].getBytes(StandardCharsets.US_ASCII));
             return message;
         } else if ("STORED".equals(requestSpliced[0])){
             return new Message(
