@@ -9,6 +9,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 
 import static dbs.utils.Constants.CHUNK_SIZE;
+import static dbs.utils.Constants.DEBUG;
 import static dbs.utils.Utils.hashString;
 
 public class M_File {
@@ -31,6 +32,16 @@ public class M_File {
 
     public String getFileID() {
         return fileID;
+    }
+
+    public static String getFileID(String file_path){
+        File file = new File(file_path);
+        if(!file.exists() || file.isDirectory()) {
+            return null;
+        }
+        String name = file.getName();
+        BasicFileAttributes attr = initAttr(file);
+        return initHashedName(name, attr);
     }
 
     public BasicFileAttributes getAttr() {
@@ -56,39 +67,48 @@ public class M_File {
             return;
         }
         name = file.getName();
-        initAttr();
-        initHashedName();
-        initData();
-        initChunks();
+        attr = initAttr(file);
+        fileID = initHashedName(name, attr);
+        data = initData(file);
+        chunks = initChunks(fileID, data);
     }
 
-    private void initAttr() {
+    private static BasicFileAttributes initAttr(File file) {
         try {
-            attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
+            return Files.readAttributes(file.toPath(), BasicFileAttributes.class);
         } catch (IOException e) {
-            e.printStackTrace();
+            if(DEBUG)
+                e.printStackTrace();
+            else
+                System.out.println("[ERROR] Reading File Attributes");
         }
+        return null;
     }
 
-    private void initHashedName() {
+    private static String initHashedName(String name, BasicFileAttributes attr) {
         String text = name + attr.creationTime().toString() + attr.lastModifiedTime().toString();
-        fileID = hashString(text);
+        return hashString(text);
     }
 
-    private void initData() {
+    private static byte[] initData(File file) {
         try {
-            data = Files.readAllBytes(file.toPath());
+            return Files.readAllBytes(file.toPath());
         } catch (IOException e) {
-            e.printStackTrace();
+            if(DEBUG)
+                e.printStackTrace();
+            else
+                System.out.println("[ERROR] Reading File Data");
         }
+        return null;
     }
 
-    private void initChunks(){
-        chunks = new Chunk[data.length / CHUNK_SIZE + 1];
+    private static Chunk[] initChunks(String fileID, byte[] data){
+        Chunk[] chunks = new Chunk[data.length / CHUNK_SIZE + 1];
         for (int i = 0; i* CHUNK_SIZE <= data.length; i++){
             chunks[i] = new Chunk(fileID, Arrays.copyOfRange(data, i* CHUNK_SIZE, (i + 1) * CHUNK_SIZE > data.length ? data.length : (i + 1 ) * CHUNK_SIZE));
         }
         Chunk.resetID();
+        return chunks;
     }
 
     @Override

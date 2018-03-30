@@ -7,6 +7,7 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 
+import static dbs.utils.Constants.DEBUG;
 import static dbs.utils.Constants.PACKET_LENGTH;
 
 public abstract class M_Channel implements Runnable {
@@ -32,7 +33,10 @@ public abstract class M_Channel implements Runnable {
             mc_socket = new MulticastSocket(port);
             mc_socket.joinGroup(this.address);
         } catch (IOException e) {
-            e.printStackTrace();
+            if(DEBUG)
+                e.printStackTrace();
+            else
+                System.out.println("[ERROR] Starting Channel" + " - " + address + ":" + port);
         }
     }
 
@@ -49,7 +53,10 @@ public abstract class M_Channel implements Runnable {
         try {
             mc_socket.receive(packet);
         } catch (IOException e) {
-            e.printStackTrace();
+            if(DEBUG)
+                e.printStackTrace();
+            else
+                System.out.println("[ERROR] Receiving DatagramPacket");
         }
 
         return packet;
@@ -59,7 +66,10 @@ public abstract class M_Channel implements Runnable {
         try {
             mc_socket.send(new DatagramPacket(packetBody, packetBody.length, this.address, this.port));
         } catch (IOException e) {
-            e.printStackTrace();
+            if(DEBUG)
+                e.printStackTrace();
+            else
+                System.out.println("[ERROR] Sending DatagramPacket");
         }
     }
 

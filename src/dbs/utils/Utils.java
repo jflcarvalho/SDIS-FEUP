@@ -9,6 +9,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import static dbs.utils.Constants.DEBUG;
+
 public class Utils {
     /**
      * Encode string to SHA-256
@@ -23,7 +25,10 @@ public class Utils {
             byte [] hashByte = digest.digest(data.getBytes(StandardCharsets.UTF_8));
             encodedHash = getHex(hashByte);
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            if(DEBUG)
+                e.printStackTrace();
+            else
+                System.out.println("[ERROR] Hashing String");
         }
         return encodedHash;
     }
@@ -44,25 +49,19 @@ public class Utils {
      */
     public static byte[] getMAC(){
         InetAddress address = null;
-        try {
-            address = InetAddress.getLocalHost();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
         NetworkInterface networkInterface = null;
         try {
-            if (address != null) {
-                networkInterface = NetworkInterface.getByInetAddress(address);
-            }
-        } catch (SocketException e) {
-            e.printStackTrace();
-        }
-        try {
-            if (networkInterface != null) {
+            address = InetAddress.getLocalHost();
+            if (address == null)
+                return null;
+            networkInterface = NetworkInterface.getByInetAddress(address);
+            if (networkInterface != null)
                 return networkInterface.getHardwareAddress();
-            }
-        } catch (SocketException e) {
-            e.printStackTrace();
+        } catch (SocketException | UnknownHostException e) {
+            if(DEBUG)
+                e.printStackTrace();
+            else
+                System.out.println("[ERROR] Getting MAC Address");
         }
         return null;
     }

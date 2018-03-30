@@ -1,12 +1,10 @@
 package dbs.client;
 
 import dbs.peer.PeerInterface;
-import dbs.protocol.Protocol;
 
 class Client {
 
     private PeerInterface peer;
-    private Protocol protocol;
 
     public Client(String[] args) {
         String peer_access_point = args[0];
@@ -31,12 +29,7 @@ class Client {
         }
     }
 
-    public void run() {
-      protocol.run();
-    }
-
     public static void main(String[] args) {
         Client client = new Client(args);
-        client.run();
     }
 }

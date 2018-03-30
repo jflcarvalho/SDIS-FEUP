@@ -2,18 +2,20 @@ package dbs.protocol;
 
 import dbs.Chunk;
 import dbs.file_io.M_File;
-import dbs.message.Message;
 import dbs.message.MessageFactory;
+import dbs.message.PutChunkMessage;
+import dbs.message.StoredMessage;
 import dbs.peer.Peer;
 
 import java.io.File;
 
 import static dbs.file_io.FileManager.createFile;
 import static dbs.file_io.FileManager.writeFile;
+import static dbs.utils.Constants.DEBUG;
 import static dbs.utils.Constants.NUMBER_OF_TRIES;
 import static dbs.utils.Constants.SLEEP_TIME;
 
-public class Backup implements Protocol {
+public class Backup implements Runnable {
     public final static double VERSION = 1.0;
 
     private String file_path;
@@ -59,17 +61,20 @@ public class Backup implements Protocol {
      * @param chunk
      */
     private void sendChunk(Chunk chunk) {
-        Message message = MessageFactory.getPutChunkMessage(this, chunk);
-        peer.initReplicationDatabase(message);
+        PutChunkMessage message = MessageFactory.getPutChunkMessage(this, chunk);
+        peer.updateReplicationDatabase(message);
         int tries = 0;
         int degree;
         do {
-            sendToPeer(message);
+            peer.send(message);
             try {
                 //Waiting time is double if have fail in first time
                 Thread.sleep((long) (SLEEP_TIME * (tries < 1 ? 1 : 2)));
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                if(DEBUG)
+                    e.printStackTrace();
+                else
+                    System.out.println("[ERROR] Sleeping Thread");
             }
             degree = peer.getActualRepDegree(mFile.getFileID(), chunk.getChunkID());
             tries++;
@@ -82,11 +87,16 @@ public class Backup implements Protocol {
             System.out.print(" Unsuccessful\n");
     }
 
+    /**
+     * Chunks stored in path like this:
+     * ./backup/<peedID>/<fileID>/<chunkNO>
+     * @param chunk
+     */
     public void storeChunk(Chunk chunk) {
         String peerID = getPeerID();
-        Message message = MessageFactory.getStoredMessage(peerID, chunk);
+        StoredMessage message = MessageFactory.getStoredMessage(peerID, chunk);
         if(peer.haveChunk(chunk)){
-            sendToPeer(message);
+            sendStored(message);
             return;
         }
         String file_path = "backup/" + peerID + "/" + chunk.getFileID() + "/" + chunk.getChunkID();
@@ -96,18 +106,22 @@ public class Backup implements Protocol {
         }
         long file_Size = (new File(file_path)).length();
         peer.addChunk(chunk, file_Size);
-        sendToPeer(message);
+        sendStored(message);
     }
 
     public Chunk readChunk(){
         return null;
     }
 
-    private void sendToPeer(Message message){
+    private void sendStored(StoredMessage message){
+        peer.addReplicationDatabase(message);
         try {
             Thread.sleep((long) (Math.random() * 400));
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            if(DEBUG)
+                e.printStackTrace();
+            else
+                System.out.println("[ERROR] Sleeping Thread");
         }
         peer.send(message);
     }

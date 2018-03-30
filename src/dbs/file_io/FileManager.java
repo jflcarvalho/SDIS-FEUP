@@ -6,6 +6,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
+
+import static dbs.utils.Constants.DEBUG;
 
 public class FileManager {
     public static boolean createFile(String file_path){
@@ -16,7 +19,10 @@ public class FileManager {
                 return false;
 
         } catch (IOException e) {
-            e.printStackTrace();
+            if(DEBUG)
+                e.printStackTrace();
+            else
+                System.out.println("[ERROR] Creating File: " + file_path);
         }
         return true;
     }
@@ -28,8 +34,27 @@ public class FileManager {
             output.write(chunk.getData(), 0, chunk.getData().length);
             output.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            if(DEBUG)
+                e.printStackTrace();
+            else
+                System.out.println("[ERROR] Writing File: " + file_path);
             return false;
+        }
+        return true;
+    }
+
+    public static boolean deleteFile(String file_path){
+        File file = new File(file_path);
+        if(file.exists()) {
+            try {
+                Files.delete(file.toPath());
+            } catch (IOException e) {
+                if(DEBUG)
+                    e.printStackTrace();
+                else
+                    System.out.println("[ERROR] Deleting File: " + file_path);
+                return false;
+            }
         }
         return true;
     }

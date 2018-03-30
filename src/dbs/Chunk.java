@@ -1,8 +1,10 @@
 package dbs;
 
-import dbs.message.Message;
+import dbs.message.PutChunkMessage;
 
-public class Chunk {
+import java.io.Serializable;
+
+public class Chunk implements Serializable{
     private static int nextID;
     private int chunkID;
     private String fileID;
@@ -37,7 +39,7 @@ public class Chunk {
         nextID = 0;
     }
 
-    public static Chunk createChunkFromMessage(Message message){
+    public static Chunk createChunkFromMessage(PutChunkMessage message){
         return new Chunk(message.getFileID(), message.getChunkNO(), message.getBody());
     }
 }

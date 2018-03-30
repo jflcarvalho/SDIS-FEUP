@@ -2,27 +2,27 @@ package dbs.peer;
 
 import com.sun.istack.internal.NotNull;
 import dbs.Chunk;
-import dbs.message.Message;
-import dbs.message.ProcessMessage;
+import dbs.message.*;
 import dbs.network.MCB_Channel;
 import dbs.network.MCR_Channel;
 import dbs.network.MC_Channel;
 import dbs.network.M_Channel;
 import dbs.protocol.Backup;
+import dbs.protocol.Delete;
 import javafx.util.Pair;
 
-import java.io.Serializable;
+import java.io.*;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static dbs.utils.Constants.MC;
-import static dbs.utils.Constants.MCB;
+import static dbs.file_io.FileManager.createFile;
+import static dbs.utils.Constants.*;
 
 public class Peer implements PeerInterface, Serializable{
     private static Peer instance;
-    private static Map<Pair<String, Integer>, Chunk> myChunks = new ConcurrentHashMap<>();
-    private static Map<Pair<String, Integer>, Pair<Integer, HashSet<String>>> chunkReplication = new ConcurrentHashMap<>();
+    private Map<String, HashSet<Integer>> myChunks = new ConcurrentHashMap<>();
+    private Map<String, Map<Integer, Pair<Integer, HashSet<String>>>> chunkReplication = new ConcurrentHashMap<>();
 
     private String version;
     private String peerID;
@@ -32,7 +32,7 @@ public class Peer implements PeerInterface, Serializable{
     private int mc_port, mdb_port, mdr_port;
 
     private int usageSpace = 0;
-    private int availableSpace;
+    private int availableSpace = AVAILABLE_SPACE;
 
     private M_Channel[] channels = new M_Channel[3];
 
@@ -54,17 +54,44 @@ public class Peer implements PeerInterface, Serializable{
         return peerID;
     }
 
+    public int getRemainSpace(){
+        return availableSpace - usageSpace;
+    }
+
     public boolean haveChunk(Chunk chunk){
-        return myChunks.containsKey(new Pair<>(getFileIDFromChunk(chunk), getChunkIDFromChunk(chunk)));
+        HashSet<Integer> chunks = myChunks.get(getFileIDFromChunk(chunk));
+        if(chunks == null)
+            return false;
+        return chunks.contains(chunk.getChunkID());
     }
 
     public void addChunk(Chunk chunk, long file_Size){
-        if(myChunks.put(new Pair<>(getFileIDFromChunk(chunk), getChunkIDFromChunk(chunk)), chunk) == null)
-            usageSpace += file_Size;
+        HashSet<Integer> chunks = myChunks.get(getFileIDFromChunk(chunk));
+        if(chunks == null)
+            chunks = new HashSet<>();
+        chunks.add(chunk.getChunkID());
+        myChunks.put(getFileIDFromChunk(chunk), chunks);
+        usageSpace += file_Size;
+    }
+
+    public void removeChunk(String fileID, int chunkID, long file_Size){
+        myChunks.get(fileID).remove(chunkID);
+        removeReplicationDatabase(fileID, chunkID);
+        usageSpace -= file_Size;
+    }
+
+    public HashSet<Integer> getChunksOfFile(String fileID) {
+        return myChunks.get(fileID);
+    }
+
+    public void start() {
+        initPeer();
+        //TODO: add pending messages
     }
 
     private void initPeer(){
         System.out.println("Starting peer " + peerID + "\n");
+        loadData();
         channels[0] = new MC_Channel(mc_ip, mc_port, this);
         channels[1] = new MCB_Channel(mdb_ip, mdb_port, this);
         channels[2] = new MCR_Channel(mdr_ip, mdr_port, this);
@@ -73,38 +100,21 @@ public class Peer implements PeerInterface, Serializable{
         }
     }
 
-    public void start() {
-        initPeer();
-    }
-
-    public void send(Message message){
-        switch (message.getMessageType()){
-            case PUTCHUNK:
-                ProcessMessage.sendMessage(message, channels[MCB]);
-                break;
-            case STORED:
-                ProcessMessage.sendMessage(message, channels[MC]);
-                break;
-            default:
-                break;
-
-        }
-    }
-
     @Override
-    public void backup(String file, int replicationDegree){
-        Backup backup = new Backup(file, replicationDegree, this);
+    public void backup(String file_path, int replicationDegree){
+        Backup backup = new Backup(file_path, replicationDegree, this);
         backup.run();
     }
 
     @Override
-    public void restore(String file){
+    public void restore(String file_path){
 
     }
 
     @Override
-    public void delete(String file){
-
+    public void delete(String file_path){
+        Delete delete = new Delete(file_path, this);
+        delete.run();
     }
 
     @Override
@@ -117,39 +127,101 @@ public class Peer implements PeerInterface, Serializable{
 
     }
 
-    public void initReplicationDatabase(Message message){
-        Pair<String, Integer> chunkIdentifier = new Pair<>(message.getFileID(), message.getChunkNO());
-        Pair<Integer, HashSet<String>> peersStored = chunkReplication.get(chunkIdentifier);
-        if(peersStored == null)
-            peersStored = new Pair<>(message.getReplicationDeg(), new HashSet<>());
-        else
-            peersStored = new Pair<>(message.getReplicationDeg(), peersStored.getValue());
-        chunkReplication.put(chunkIdentifier, peersStored);
+    public void send(Message message){
+        switch (message.getMessageType()){
+            case PUTCHUNK:
+                ProcessMessage.sendMessage(message, channels[MCB]);
+                break;
+            case RESTORE:
+                ProcessMessage.sendMessage(message, channels[MCR]);
+                break;
+            default:
+                ProcessMessage.sendMessage(message, channels[MC]);
+                break;
+        }
     }
 
-    public void updateReplicationDatabase(Message message){
-        Pair<String, Integer> chunkIdentifier = new Pair<>(message.getFileID(), message.getChunkNO());
-        Pair<Integer, HashSet<String>> peersStored = chunkReplication.get(chunkIdentifier);
-        if(peersStored == null)
-            peersStored = new Pair<>(null, new HashSet<>());
-        peersStored.getValue().add(message.getSenderID());
+    //--------- REPLICATION DEGREE ----------
+    private Map<Integer, Pair<Integer, HashSet<String>>> getReplicationChunkMap(String fileID){
+        Map<Integer, Pair<Integer, HashSet<String>>> chunkMap = chunkReplication.get(fileID);
+        if(chunkMap == null) {
+            chunkMap = new ConcurrentHashMap<>();
+            chunkReplication.put(fileID, chunkMap);
+        }
+        return chunkMap;
     }
 
-    public int getUsageSpace() {
-        return usageSpace;
+    private Pair<Integer, HashSet<String>> getReplicationPair(String fileID, Integer chunkID){
+        Pair<Integer, HashSet<String>> chunkPair = getReplicationChunkMap(fileID).get(chunkID);
+        if(chunkPair == null) {
+            chunkPair = new Pair<>(null, new HashSet<>());
+            getReplicationChunkMap(fileID).put(chunkID, chunkPair);
+        }
+        return chunkPair;
     }
 
-    public int getAvailableSpace() {
-        return availableSpace;
+    public void updateReplicationDatabase(PutChunkMessage message){
+        String fileID = getFileIDFromMessage(message);
+        int chunkID = message.getChunkNO();
+        Pair<Integer, HashSet<String>> chunkPair = getReplicationChunkMap(fileID).get(chunkID);
+        if(chunkPair == null) {
+            chunkPair = new Pair<>(message.getReplicationDeg(), new HashSet<>());
+        } else {
+            chunkPair = new Pair<>(message.getReplicationDeg(), chunkPair.getValue());
+        }
+        getReplicationChunkMap(fileID).put(chunkID, chunkPair);
+    }
+
+    public void addReplicationDatabase(StoredMessage message){
+        HashSet<String> chunkInPeers = getReplicationPair(getFileIDFromMessage(message), message.getChunkNO()).getValue();
+        chunkInPeers.add(message.getSenderID());
+    }
+
+    public void removeReplicationDatabase(String fileID, int chunkID){
+        chunkReplication.get(fileID).get(chunkID).getValue().clear();
     }
 
     public int getActualRepDegree(String fileID, int chunkNO) {
-        Pair<Integer, HashSet<String>> peersStored = chunkReplication.get(new Pair<>(fileID, chunkNO));
-        int degree = 0;
-        if(peersStored != null)
-            degree = peersStored.getValue().size();
-        return degree;
+        Pair<Integer, HashSet<String>> peersStored = getReplicationPair(fileID, chunkNO);
+        return peersStored.getValue().size();
     }
+    //----------
+
+    //---------- METADATA ------------
+    public void saveData(){
+        String METADATA_PATH = "metadata/" + peerID + "/myChunks.ser";
+        FileOutputStream fout;
+        createFile(METADATA_PATH);
+        try {
+            fout = new FileOutputStream(METADATA_PATH);
+            ObjectOutputStream oos = new ObjectOutputStream(fout);
+            oos.writeObject(myChunks);
+            oos.writeObject(chunkReplication);
+            oos.close();
+        } catch (IOException e) {
+            if(DEBUG)
+                e.printStackTrace();
+            else
+                System.out.println("[ERROR] Saving Metadata");
+        }
+    }
+
+    private void loadData(){
+        String METADATA_PATH = "metadata/" + peerID + "/myChunks.ser";
+        try {
+            FileInputStream fin = new FileInputStream(METADATA_PATH);
+            ObjectInputStream ois = new ObjectInputStream(fin);
+            myChunks = (Map<String, HashSet<Integer>>) ois.readObject();
+            chunkReplication = (Map<String, Map<Integer, Pair<Integer, HashSet<String>>>>) ois.readObject();
+            ois.close();
+        } catch (IOException | ClassNotFoundException e) {
+            if(DEBUG)
+                e.printStackTrace();
+            else
+                System.out.println("[ERROR] Loading Metadata");
+        }
+    }
+    //-----------
 
     private String getFileIDFromChunk(@NotNull Chunk chunk){
         return chunk.getFileID();
@@ -157,5 +229,9 @@ public class Peer implements PeerInterface, Serializable{
 
     private int getChunkIDFromChunk(@NotNull Chunk chunk){
         return chunk.getChunkID();
+    }
+
+    private String getFileIDFromMessage(@NotNull Message message){
+        return message.getFileID();
     }
 }

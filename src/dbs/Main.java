@@ -18,7 +18,21 @@ public class Main {
 
         System.out.println("What u wanna do?");
         Scanner scan = new Scanner(System.in);
-        if(scan.next().equals("1"))
-            initiator_Peer.backup(testFilePath, 2);
+
+        String c = scan.next();
+        while(!c.equals("exit")){
+            switch (c){
+                case "backup":
+                    initiator_Peer.backup(testFilePath, 2);
+                    break;
+                case "delete":
+                    initiator_Peer.delete(testFilePath);
+                    break;
+                case "exit":
+                    initiator_Peer.saveData();
+                    return;
+            }
+            c = scan.next();
+        }
     }
 }
