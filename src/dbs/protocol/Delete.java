@@ -40,11 +40,14 @@ public class Delete implements Runnable {
 
     public void deleteFileFromID(String fileID) {
         HashSet<Integer> chunks = peer.getChunksOfFile(fileID);
-        if(chunks == null)
+        if(chunks == null || chunks.size() == 0) {
+            peer.removeReplicationDatabase(fileID, null);
             return;
+        }
         for (Integer chunkID : chunks) {
             new Thread(() -> deleteChunk(fileID, chunkID)).start();
         }
+        peer.removeFile(fileID);
     }
 
     private void deleteChunk(String fileID, int chunkID){

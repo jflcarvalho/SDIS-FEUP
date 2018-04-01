@@ -76,9 +76,12 @@ public class Peer implements PeerInterface, Serializable{
     }
 
     public void removeChunk(String fileID, int chunkID, long file_Size){
-        myChunks.get(fileID).remove(chunkID);
         removeReplicationDatabase(fileID, chunkID);
         usageSpace -= file_Size;
+    }
+
+    public void removeFile(String fileID) {
+        myChunks.remove(fileID);
     }
 
     public HashSet<Integer> getChunksOfFile(String fileID) {
@@ -179,8 +182,11 @@ public class Peer implements PeerInterface, Serializable{
         chunkInPeers.add(message.getSenderID());
     }
 
-    public void removeReplicationDatabase(String fileID, int chunkID){
-        chunkReplication.get(fileID).get(chunkID).getValue().clear();
+    public void removeReplicationDatabase(String fileID, Integer chunkID){
+        if(chunkID == null)
+            chunkReplication.remove(fileID);
+        else
+            chunkReplication.get(fileID).get(chunkID).getValue().clear();
     }
 
     public int getActualRepDegree(String fileID, int chunkNO) {
@@ -236,4 +242,5 @@ public class Peer implements PeerInterface, Serializable{
     private String getFileIDFromMessage(@NotNull Message message){
         return message.getFileID();
     }
+
 }

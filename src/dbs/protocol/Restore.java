@@ -57,8 +57,16 @@ public class Restore implements Runnable {
         HashSet<Integer> myChunks = peer.getChunksOfFile(fileID);
         if(myChunks == null)
             myChunks = new HashSet<>();
+        if(chunksInfo.size() == 0){
+            System.out.println("No File in System to Restore");
+            return;
+        }
         for (Map.Entry<Integer, Pair<Integer, HashSet<String>>> entry : chunksInfo.entrySet())
         {
+            if(entry.getValue().getValue().size() == 0){
+                System.out.println("The File is not Possible to Restore");
+                return;
+            }
             if(!myChunks.contains(entry.getKey()))
                 new Thread(() -> requestChunk(fileID, entry.getKey())).start();
             else{
@@ -66,7 +74,6 @@ public class Restore implements Runnable {
                 new Thread(() -> addChunk(readChunk(fileID, chunkID))).start();
             }
         }
-        //TODO: check if i already have all chunk to create the original file
     }
 
     private void requestChunk(String fileID, int chunkID) {
@@ -79,7 +86,7 @@ public class Restore implements Runnable {
         }while (tries < NUMBER_OF_TRIES && !restoredChunks.containsKey(new Pair<>(fileID, chunkID)));
 
         System.out.print("Chunk nº: " + chunkID);
-        if(tries <= NUMBER_OF_TRIES)
+        if(tries < NUMBER_OF_TRIES)
             System.out.print(" Restored with Success\n");
         else
             System.out.print(" Unsuccessful\n");
