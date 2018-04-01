@@ -11,9 +11,10 @@ import java.io.File;
 
 import static dbs.file_io.FileManager.createFile;
 import static dbs.file_io.FileManager.writeFile;
-import static dbs.utils.Constants.DEBUG;
 import static dbs.utils.Constants.NUMBER_OF_TRIES;
 import static dbs.utils.Constants.SLEEP_TIME;
+import static dbs.utils.Utils.sleepRandomTime;
+import static dbs.utils.Utils.sleepThread;
 
 public class Backup implements Runnable {
     public final static double VERSION = 1.0;
@@ -46,6 +47,7 @@ public class Backup implements Runnable {
         System.out.println("Backing up " + file_path);
         System.out.println("Replication degree: " + replication_degree + "\n");
         mFile = new M_File(file_path);
+        //writeFile(mFile.getData(), "restore/" + peer.getPeerID() + "/" + "original_" + mFile.getName());
         System.out.println(mFile.toString());
         for(Chunk chunk : mFile.getChunks())
             new Thread(() -> sendChunk(chunk)).start();
@@ -67,15 +69,7 @@ public class Backup implements Runnable {
         int degree;
         do {
             peer.send(message);
-            try {
-                //Waiting time is double if have fail in first time
-                Thread.sleep((long) (SLEEP_TIME * (tries < 1 ? 1 : 2)));
-            } catch (InterruptedException e) {
-                if(DEBUG)
-                    e.printStackTrace();
-                else
-                    System.out.println("[ERROR] Sleeping Thread");
-            }
+            sleepThread(SLEEP_TIME * (tries < 1 ? 1 : 2));
             degree = peer.getActualRepDegree(mFile.getFileID(), chunk.getChunkID());
             tries++;
         }while (tries < NUMBER_OF_TRIES && degree < replication_degree);
@@ -101,7 +95,7 @@ public class Backup implements Runnable {
         }
         String file_path = "backup/" + peerID + "/" + chunk.getFileID() + "/" + chunk.getChunkID();
         if(createFile(file_path)){
-            if (!writeFile(chunk, file_path))
+            if (!writeFile(chunk.getData(), file_path))
                 return;
         }
         long file_Size = (new File(file_path)).length();
@@ -109,20 +103,9 @@ public class Backup implements Runnable {
         sendStored(message);
     }
 
-    public Chunk readChunk(){
-        return null;
-    }
-
     private void sendStored(StoredMessage message){
         peer.addReplicationDatabase(message);
-        try {
-            Thread.sleep((long) (Math.random() * 400));
-        } catch (InterruptedException e) {
-            if(DEBUG)
-                e.printStackTrace();
-            else
-                System.out.println("[ERROR] Sleeping Thread");
-        }
+        sleepRandomTime(400);
         peer.send(message);
     }
 

@@ -25,6 +25,9 @@ public class Main {
                 case "backup":
                     initiator_Peer.backup(testFilePath, 2);
                     break;
+                case "restore":
+                    initiator_Peer.restore(testFilePath);
+                    break;
                 case "delete":
                     initiator_Peer.delete(testFilePath);
                     break;

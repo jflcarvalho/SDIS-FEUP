@@ -65,4 +65,26 @@ public class Utils {
         }
         return null;
     }
+
+    public static void sleepThread(long sleepingTime){
+        try {
+            Thread.sleep(sleepingTime);
+        } catch (InterruptedException e) {
+            if(DEBUG)
+                e.printStackTrace();
+            else
+                System.out.println("[ERROR] Sleeping Thread");
+        }
+    }
+
+    public static void sleepRandomTime(int sleepingTime){
+        try {
+            Thread.sleep((long) (Math.random() * sleepingTime));
+        } catch (InterruptedException e) {
+            if(DEBUG)
+                e.printStackTrace();
+            else
+                System.out.println("[ERROR] Sleeping Thread");
+        }
+    }
 }

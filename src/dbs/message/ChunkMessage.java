@@ -7,17 +7,23 @@ import java.nio.charset.StandardCharsets;
 import static dbs.utils.Constants.CRLF_D;
 import static dbs.utils.Constants.SPACE;
 
-public class PutChunkMessage extends ChunkMessage {
-    private int replication_Deg;
+public class ChunkMessage extends Message {
+    int chunk_ID;
+    byte[] body;
 
-    PutChunkMessage(double version, String sender_ID, String file_ID, int chunk_NO, int replication_Deg,  byte[] body) {
-        super(version, sender_ID, file_ID, chunk_NO, body);
-        this.messageType = Constants.MessageType.PUTCHUNK;
-        this.replication_Deg = replication_Deg;
+    ChunkMessage(double version, String sender_ID, String fileID, int chunkID, byte[] data) {
+        super(version, sender_ID, fileID);
+        this.messageType = Constants.MessageType.CHUNK;
+        this.chunk_ID = chunkID;
+        this.body = data;
     }
 
-    public int getReplicationDeg() {
-        return replication_Deg;
+    public int getChunkNO() {
+        return chunk_ID;
+    }
+
+    public byte[] getBody() {
+        return body;
     }
 
     @Override
@@ -27,7 +33,6 @@ public class PutChunkMessage extends ChunkMessage {
                 + SPACE + this.sender_ID
                 + SPACE + this.file_ID
                 + SPACE + this.chunk_ID
-                + (this.replication_Deg < 0 ? "" : SPACE + this.replication_Deg)
                 + SPACE + CRLF_D).getBytes(StandardCharsets.ISO_8859_1);
         byte[] packet = new byte[header.length + body.length];
         System.arraycopy(header, 0, packet, 0, header.length);

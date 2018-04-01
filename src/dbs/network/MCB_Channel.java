@@ -27,7 +27,7 @@ public class MCB_Channel extends M_Channel {
     @Override
     protected void handleRequest(DatagramPacket packet){
         byte[] data = packet.getData();
-        String string_message = new String(Arrays.copyOfRange(data, 0, packet.getLength()), StandardCharsets.US_ASCII);
+        String string_message = new String(Arrays.copyOfRange(data, 0, packet.getLength()), StandardCharsets.ISO_8859_1);
         PutChunkMessage message = (PutChunkMessage) Message.parse(string_message);
         Constants.MessageType messageType = message.getMessageType();
         System.out.println(messageType.toString() + " " + message.getSenderID());

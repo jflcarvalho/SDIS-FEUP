@@ -2,6 +2,8 @@ package dbs.message;
 
 import dbs.utils.Constants;
 
+import java.nio.charset.StandardCharsets;
+
 import static dbs.utils.Constants.CRLF_D;
 import static dbs.utils.Constants.SPACE;
 
@@ -9,7 +11,8 @@ public class StoredMessage extends Message{
     private int chunk_NO;
 
     StoredMessage(double version, String sender_ID, String file_ID, int chunkNo) {
-        super(Constants.MessageType.STORED, version, sender_ID, file_ID);
+        super(version, sender_ID, file_ID);
+        this.messageType = Constants.MessageType.STORED;
         this.chunk_NO = chunkNo;
     }
 
@@ -18,12 +21,12 @@ public class StoredMessage extends Message{
     }
 
     @Override
-    public String encode() {
-         return this.messageType
+    public byte[] encode() {
+         return (this.messageType
                 + SPACE + this.version
                 + SPACE + this.sender_ID
                 + SPACE + this.file_ID
                 + SPACE + this.chunk_NO
-                + SPACE + CRLF_D;
+                + SPACE + CRLF_D).getBytes(StandardCharsets.ISO_8859_1);
     }
 }

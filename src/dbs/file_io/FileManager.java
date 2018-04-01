@@ -1,7 +1,5 @@
 package dbs.file_io;
 
-import dbs.Chunk;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -17,7 +15,6 @@ public class FileManager {
             outFile.getParentFile().mkdirs();
             if(!outFile.createNewFile())
                 return false;
-
         } catch (IOException e) {
             if(DEBUG)
                 e.printStackTrace();
@@ -27,11 +24,11 @@ public class FileManager {
         return true;
     }
 
-    public static boolean writeFile(Chunk chunk, String file_path) {
+    public static boolean writeFile(byte[] data, String file_path) {
         OutputStream output;
         try {
             output = new FileOutputStream(file_path);
-            output.write(chunk.getData(), 0, chunk.getData().length);
+            output.write(data, 0, data.length);
             output.close();
         } catch (IOException e) {
             if(DEBUG)
@@ -57,5 +54,20 @@ public class FileManager {
             }
         }
         return true;
+    }
+
+    public static byte[] readFile(String file_path){
+        File file = new File(file_path);
+        if(file.exists()) {
+            try {
+                return Files.readAllBytes(file.toPath());
+            } catch (IOException e) {
+                if(DEBUG)
+                    e.printStackTrace();
+                else
+                    System.out.println("[ERROR] Reading File: " + file_path);
+            }
+        }
+        return null;
     }
 }

@@ -1,17 +1,18 @@
 package dbs.message;
 
+import dbs.utils.Constants;
+
 import java.nio.charset.StandardCharsets;
 
 import static dbs.utils.Constants.*;
 
 public abstract class Message {
-    protected MessageType messageType;
+    protected Constants.MessageType messageType;
     protected double version;
     protected String sender_ID;
     protected String file_ID;
 
-    public Message(MessageType messageType, double version, String sender_ID, String file_ID) {
-        this.messageType = messageType;
+    public Message(double version, String sender_ID, String file_ID) {
         this.version = version;
         this.sender_ID = sender_ID;
         this.file_ID = file_ID;
@@ -37,15 +38,14 @@ public abstract class Message {
         String[] requestSpliced = request.split( SPACE+"(?=.+"+ CRLF_D +")| "+CRLF_D);
         switch (requestSpliced[0]){
             case "PUTCHUNK":
-                PutChunkMessage message = new PutChunkMessage(
+                return new PutChunkMessage(
                         Double.parseDouble(requestSpliced[1]),
                         requestSpliced[2],
-                        requestSpliced[3]
-                );
-                message.addChunkInfo(Integer.parseInt(requestSpliced[4]),
+                        requestSpliced[3],
+                        Integer.parseInt(requestSpliced[4]),
                         Integer.parseInt(requestSpliced[5]),
-                        requestSpliced[6].getBytes(StandardCharsets.US_ASCII));
-                return message;
+                        requestSpliced[6].getBytes(StandardCharsets.ISO_8859_1)
+                );
             case "STORED":
                 return new StoredMessage(
                         Double.parseDouble(requestSpliced[1]),
@@ -59,11 +59,26 @@ public abstract class Message {
                         requestSpliced[2],
                         requestSpliced[3]
                 );
+            case "CHUNK":
+                return new ChunkMessage(
+                        Double.parseDouble(requestSpliced[1]),
+                        requestSpliced[2],
+                        requestSpliced[3],
+                        Integer.parseInt(requestSpliced[4]),
+                        requestSpliced[5].getBytes(StandardCharsets.ISO_8859_1)
+                );
+            case "GETCHUNK":
+                return new GetChunkMessage(
+                        Double.parseDouble(requestSpliced[1]),
+                        requestSpliced[2],
+                        requestSpliced[3],
+                        Integer.parseInt(requestSpliced[4])
+                );
             default:
                 break;
         }
         return null;
     }
 
-    public abstract String encode();
+    public abstract byte[] encode();
 }

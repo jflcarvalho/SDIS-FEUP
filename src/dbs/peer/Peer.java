@@ -9,6 +9,7 @@ import dbs.network.MC_Channel;
 import dbs.network.M_Channel;
 import dbs.protocol.Backup;
 import dbs.protocol.Delete;
+import dbs.protocol.Restore;
 import javafx.util.Pair;
 
 import java.io.*;
@@ -108,7 +109,8 @@ public class Peer implements PeerInterface, Serializable{
 
     @Override
     public void restore(String file_path){
-
+        Restore restore = new Restore(file_path, this);
+        restore.run();
     }
 
     @Override
@@ -130,19 +132,19 @@ public class Peer implements PeerInterface, Serializable{
     public void send(Message message){
         switch (message.getMessageType()){
             case PUTCHUNK:
-                ProcessMessage.sendMessage(message, channels[MCB]);
+                channels[MCB].send(message.encode());
                 break;
-            case RESTORE:
-                ProcessMessage.sendMessage(message, channels[MCR]);
+            case CHUNK:
+                channels[MCR].send(message.encode());
                 break;
             default:
-                ProcessMessage.sendMessage(message, channels[MC]);
+                channels[MC].send(message.encode());
                 break;
         }
     }
 
     //--------- REPLICATION DEGREE ----------
-    private Map<Integer, Pair<Integer, HashSet<String>>> getReplicationChunkMap(String fileID){
+    public Map<Integer, Pair<Integer, HashSet<String>>> getReplicationChunkMap(String fileID){
         Map<Integer, Pair<Integer, HashSet<String>>> chunkMap = chunkReplication.get(fileID);
         if(chunkMap == null) {
             chunkMap = new ConcurrentHashMap<>();

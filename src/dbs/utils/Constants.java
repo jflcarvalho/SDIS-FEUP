@@ -1,14 +1,14 @@
 package dbs.utils;
 
 public class Constants {
-    public enum MessageType {PUTCHUNK, STORED, RESTORE, DELETE}
+    public enum MessageType {PUTCHUNK, STORED, CHUNK, DELETE, GETCHUNK}
     public static final String CRLF_D = "\r\n\r\n";
     public static final String SPACE = " ";
-    public static final String testFilePath = "testFiles/testPdf.pdf";
+    public static final String testFilePath = "testFiles/butterfly-wallpaper.jpeg";
 
     public static final int CHUNK_SIZE = 64000;
     public static final int PACKET_LENGTH = 65536;
-    public static final int AVAILABLE_SPACE = 1000000;
+    public static final int AVAILABLE_SPACE = 10000000;
 
     public static final int NUMBER_OF_TRIES = 5;
     public static final int SLEEP_TIME = 1000;

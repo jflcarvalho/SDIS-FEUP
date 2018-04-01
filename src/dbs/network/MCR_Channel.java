@@ -1,11 +1,16 @@
 package dbs.network;
 
+import dbs.message.ChunkMessage;
 import dbs.message.Message;
+import dbs.message.ProcessMessage;
 import dbs.peer.Peer;
+import dbs.utils.Constants;
 
 import java.net.DatagramPacket;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+
+import static dbs.utils.Constants.MessageType.CHUNK;
 
 public class MCR_Channel extends M_Channel {
     /**
@@ -22,9 +27,12 @@ public class MCR_Channel extends M_Channel {
     @Override
     protected void handleRequest(DatagramPacket packet) {
         byte[] data = packet.getData();
-        String string_message = new String(Arrays.copyOfRange(data, 0, packet.getLength()), StandardCharsets.US_ASCII);
-        Message message = Message.parse(string_message);
-
+        String string_message = new String(Arrays.copyOfRange(data, 0, packet.getLength()), StandardCharsets.ISO_8859_1);
+        ChunkMessage message = (ChunkMessage) Message.parse(string_message);
+        Constants.MessageType messageType = message.getMessageType();
+        System.out.println(messageType.toString() + " " + message.getSenderID());
+        if(messageType == CHUNK){
+            ProcessMessage.processChunkMessage(message, peer);
+        }
     }
-
 }

@@ -1,6 +1,6 @@
 package dbs;
 
-import dbs.message.PutChunkMessage;
+import dbs.message.ChunkMessage;
 
 import java.io.Serializable;
 
@@ -39,7 +39,7 @@ public class Chunk implements Serializable{
         nextID = 0;
     }
 
-    public static Chunk createChunkFromMessage(PutChunkMessage message){
+    public static Chunk createChunkFromMessage(ChunkMessage message){
         return new Chunk(message.getFileID(), message.getChunkNO(), message.getBody());
     }
 }
