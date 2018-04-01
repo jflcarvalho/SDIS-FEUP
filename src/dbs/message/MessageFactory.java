@@ -4,6 +4,7 @@ import com.sun.istack.internal.NotNull;
 import dbs.Chunk;
 import dbs.protocol.Backup;
 import dbs.protocol.Delete;
+import dbs.protocol.ReclaimSpace;
 import dbs.protocol.Restore;
 
 public abstract class MessageFactory {
@@ -11,9 +12,9 @@ public abstract class MessageFactory {
         return new StoredMessage(Backup.VERSION, peerID, getFileIDFromChunk(chunk), getChunkIDFromChunk(chunk));
     }
 
-    public static PutChunkMessage getPutChunkMessage(Backup backup, Chunk chunk) {
-        return new PutChunkMessage(Backup.VERSION, backup.getPeer().getPeerID(), getFileIDFromChunk(chunk),
-                getChunkIDFromChunk(chunk), backup.getReplicationDegree(), getDataFromChunk(chunk));
+    public static PutChunkMessage getPutChunkMessage(String peerID, Chunk chunk, int replication_Deg) {
+        return new PutChunkMessage(Backup.VERSION, peerID, getFileIDFromChunk(chunk),
+                getChunkIDFromChunk(chunk), replication_Deg, getDataFromChunk(chunk));
     }
 
     public static DeleteMessage getDeleteMessage(String peerID, String fileID) {
@@ -26,6 +27,10 @@ public abstract class MessageFactory {
 
     public static ChunkMessage getChunkMessage(String peerID, Chunk chunk){
         return new ChunkMessage(Restore.VERSION, peerID, chunk.getFileID(), chunk.getChunkID(), chunk.getData());
+    }
+
+    public static RemovedMessage getRemovedMessage(String peerID, String fileID, int chunkID){
+        return new RemovedMessage(ReclaimSpace.VERSION, peerID, fileID, chunkID);
     }
 
     private static String getFileIDFromChunk(@NotNull Chunk chunk){

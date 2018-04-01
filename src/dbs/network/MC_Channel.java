@@ -23,9 +23,11 @@ public class MC_Channel extends M_Channel {
 
     @Override
     protected void handleRequest(DatagramPacket packet) {
-        byte[] data = packet.getData();
-        String string_message = new String(Arrays.copyOfRange(data, 0, packet.getLength()), StandardCharsets.ISO_8859_1);
+        byte[] data = Arrays.copyOfRange(packet.getData(), 0, packet.getLength());
+        String string_message = new String(data, StandardCharsets.ISO_8859_1);
         Message message = Message.parse(string_message);
+        //peersConnected.put(message.getSenderID(), new Pair<>(packet.getAddress(), packet.getPort()));
+
         System.out.println(message.getMessageType().toString() + " " + message.getSenderID());
         ProcessMessage.processMessage(message, peer);
     }

@@ -44,10 +44,10 @@ public class Delete implements Runnable {
             peer.removeReplicationDatabase(fileID, null);
             return;
         }
+        chunks = (HashSet<Integer>) chunks.clone();
         for (Integer chunkID : chunks) {
             new Thread(() -> deleteChunk(fileID, chunkID)).start();
         }
-        peer.removeFile(fileID);
     }
 
     private void deleteChunk(String fileID, int chunkID){
@@ -55,6 +55,7 @@ public class Delete implements Runnable {
         int tries = 0;
         long file_Size = (new File(file_path)).length();
         peer.removeChunk(fileID, chunkID, file_Size);
+        peer.removeReplicationDatabase(fileID, chunkID);
         while (!deleteFile(file_path) && tries < 3)
             tries++;
     }

@@ -31,6 +31,9 @@ public class Main {
                 case "delete":
                     initiator_Peer.delete(testFilePath);
                     break;
+                case "reclaim":
+                    initiator_Peer.reclaimSpace(1000000);
+                    break;
                 case "exit":
                     initiator_Peer.saveData();
                     return;

@@ -9,10 +9,13 @@ import dbs.network.MC_Channel;
 import dbs.network.M_Channel;
 import dbs.protocol.Backup;
 import dbs.protocol.Delete;
+import dbs.protocol.ReclaimSpace;
 import dbs.protocol.Restore;
 import javafx.util.Pair;
 
 import java.io.*;
+import java.net.InetAddress;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -24,6 +27,7 @@ public class Peer implements PeerInterface, Serializable{
     private static Peer instance;
     private Map<String, HashSet<Integer>> myChunks = new ConcurrentHashMap<>();
     private Map<String, Map<Integer, Pair<Integer, HashSet<String>>>> chunkReplication = new ConcurrentHashMap<>();
+    private Map<String, Pair<InetAddress, Integer>> peersConnected = new HashMap<>();
 
     private String version;
     private String peerID;
@@ -33,7 +37,8 @@ public class Peer implements PeerInterface, Serializable{
     private int mc_port, mdb_port, mdr_port;
 
     private int usageSpace = 0;
-    private int availableSpace = AVAILABLE_SPACE;
+    private int reclaimSpace = 0;
+    private int totalSpace = AVAILABLE_SPACE;
 
     private M_Channel[] channels = new M_Channel[3];
 
@@ -55,15 +60,23 @@ public class Peer implements PeerInterface, Serializable{
         return peerID;
     }
 
-    public int getRemainSpace(){
-        return availableSpace - usageSpace;
+    public void updateReclaimSpace(int value){
+        this.reclaimSpace = value;
     }
 
-    public boolean haveChunk(Chunk chunk){
-        HashSet<Integer> chunks = myChunks.get(getFileIDFromChunk(chunk));
+    public int getAvailableSpace(){
+        return totalSpace - usageSpace - reclaimSpace;
+    }
+
+    public Map<String, HashSet<Integer>> getMyChunks() {
+        return myChunks;
+    }
+
+    public boolean haveChunk(String fileID, int chunkID){
+        HashSet<Integer> chunks = myChunks.get(fileID);
         if(chunks == null)
             return false;
-        return chunks.contains(chunk.getChunkID());
+        return chunks.contains(chunkID);
     }
 
     public void addChunk(Chunk chunk, long file_Size){
@@ -76,12 +89,8 @@ public class Peer implements PeerInterface, Serializable{
     }
 
     public void removeChunk(String fileID, int chunkID, long file_Size){
-        removeReplicationDatabase(fileID, chunkID);
+        myChunks.get(fileID).remove(chunkID);
         usageSpace -= file_Size;
-    }
-
-    public void removeFile(String fileID) {
-        myChunks.remove(fileID);
     }
 
     public HashSet<Integer> getChunksOfFile(String fileID) {
@@ -124,7 +133,8 @@ public class Peer implements PeerInterface, Serializable{
 
     @Override
     public void reclaimSpace(int value){
-
+        ReclaimSpace reclaimSpace = new ReclaimSpace(value, this);
+        reclaimSpace.run();
     }
 
     @Override
@@ -189,6 +199,12 @@ public class Peer implements PeerInterface, Serializable{
             chunkReplication.get(fileID).get(chunkID).getValue().clear();
     }
 
+    public void removeReplicationDatabase(RemovedMessage message){
+        String fileID = message.getFileID();
+        int chunkID = message.getChunkID();
+        chunkReplication.get(fileID).get(chunkID).getValue().remove(message.getSenderID());
+    }
+
     public int getActualRepDegree(String fileID, int chunkNO) {
         Pair<Integer, HashSet<String>> peersStored = getReplicationPair(fileID, chunkNO);
         return peersStored.getValue().size();
@@ -241,6 +257,15 @@ public class Peer implements PeerInterface, Serializable{
 
     private String getFileIDFromMessage(@NotNull Message message){
         return message.getFileID();
+    }
+
+    public void addConnectedPeer(String peerID, Pair<InetAddress, Integer> peerAddress){
+        if(!peersConnected.containsKey(peerID))
+            peersConnected.put(peerID, peerAddress);
+    }
+
+    public int getNumberOfPeersConneced(){
+        return peersConnected.size();
     }
 
 }

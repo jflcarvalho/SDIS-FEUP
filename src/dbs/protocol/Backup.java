@@ -50,7 +50,7 @@ public class Backup implements Runnable {
         //writeFile(mFile.getData(), "restore/" + peer.getPeerID() + "/" + "original_" + mFile.getName());
         System.out.println(mFile.toString());
         for(Chunk chunk : mFile.getChunks())
-            new Thread(() -> sendChunk(chunk)).start();
+            new Thread(() -> sendChunk(chunk, replication_degree)).start();
         System.out.println("\n------------------ END ---------------------\n");
     }
 
@@ -62,20 +62,20 @@ public class Backup implements Runnable {
      * waits the double of the first time, until a maximum of 5 tries.
      * @param chunk
      */
-    private void sendChunk(Chunk chunk) {
-        PutChunkMessage message = MessageFactory.getPutChunkMessage(this, chunk);
+    void sendChunk(Chunk chunk, int repDeg) {
+        PutChunkMessage message = MessageFactory.getPutChunkMessage(peer.getPeerID(), chunk, repDeg);
         peer.updateReplicationDatabase(message);
         int tries = 0;
         int degree;
         do {
             peer.send(message);
             sleepThread(SLEEP_TIME * (tries < 1 ? 1 : 2));
-            degree = peer.getActualRepDegree(mFile.getFileID(), chunk.getChunkID());
+            degree = peer.getActualRepDegree(chunk.getFileID(), chunk.getChunkID());
             tries++;
-        }while (tries < NUMBER_OF_TRIES && degree < replication_degree);
+        }while (tries < NUMBER_OF_TRIES && degree < repDeg);
 
         System.out.print("Chunk nº: " + chunk.getChunkID());
-        if(tries <= NUMBER_OF_TRIES && degree >= replication_degree)
+        if(tries <= NUMBER_OF_TRIES && degree >= repDeg)
             System.out.print(" Stored with Success\n");
         else
             System.out.print(" Unsuccessful\n");
@@ -87,13 +87,14 @@ public class Backup implements Runnable {
      * @param chunk
      */
     public void storeChunk(Chunk chunk) {
-        String peerID = getPeerID();
+        String peerID = getPeerID(), fileID = chunk.getFileID();
+        int chunkID = chunk.getChunkID();
         StoredMessage message = MessageFactory.getStoredMessage(peerID, chunk);
-        if(peer.haveChunk(chunk)){
+        if(peer.haveChunk(fileID, chunkID)){
             sendStored(message);
             return;
         }
-        String file_path = "backup/" + peerID + "/" + chunk.getFileID() + "/" + chunk.getChunkID();
+        String file_path = "backup/" + peerID + "/" + fileID + "/" + chunkID;
         if(createFile(file_path)){
             if (!writeFile(chunk.getData(), file_path))
                 return;

@@ -74,6 +74,13 @@ public abstract class Message {
                         requestSpliced[3],
                         Integer.parseInt(requestSpliced[4])
                 );
+            case "REMOVED":
+                return new RemovedMessage(
+                        Double.parseDouble(requestSpliced[1]),
+                        requestSpliced[2],
+                        requestSpliced[3],
+                        Integer.parseInt(requestSpliced[4])
+                );
             default:
                 break;
         }

@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static dbs.Chunk.readChunk;
 import static dbs.file_io.FileManager.*;
 import static dbs.file_io.M_File.getFileID;
 import static dbs.utils.Constants.*;
@@ -71,7 +72,7 @@ public class Restore implements Runnable {
                 new Thread(() -> requestChunk(fileID, entry.getKey())).start();
             else{
                 int chunkID = entry.getKey();
-                new Thread(() -> addChunk(readChunk(fileID, chunkID))).start();
+                new Thread(() -> addChunk(readChunk(peer.getPeerID(), fileID, chunkID))).start();
             }
         }
     }
@@ -93,20 +94,12 @@ public class Restore implements Runnable {
     }
 
     public void replyChunk(String fileID, int chunkID){
-        Chunk chunk = readChunk(fileID, chunkID);
+        Chunk chunk = readChunk(peer.getPeerID(), fileID, chunkID);
         if(chunk == null)
             return;
         ChunkMessage message = MessageFactory.getChunkMessage(peer.getPeerID(), chunk);
         sleepRandomTime(400);
         peer.send(message);
-    }
-
-    private Chunk readChunk(String fileID, int chunkID){
-        String file_path = "backup/" + peer.getPeerID() + "/" + fileID + "/" + chunkID;
-        byte[] chunkData = readFile(file_path);
-        if(chunkData == null)
-            return null;
-        return new Chunk(fileID, chunkID, chunkData);
     }
 
     public void addChunk(Chunk chunk) {

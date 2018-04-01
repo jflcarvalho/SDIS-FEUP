@@ -4,6 +4,8 @@ import dbs.message.ChunkMessage;
 
 import java.io.Serializable;
 
+import static dbs.file_io.FileManager.readFile;
+
 public class Chunk implements Serializable{
     private static int nextID;
     private int chunkID;
@@ -41,5 +43,13 @@ public class Chunk implements Serializable{
 
     public static Chunk createChunkFromMessage(ChunkMessage message){
         return new Chunk(message.getFileID(), message.getChunkNO(), message.getBody());
+    }
+
+    public static Chunk readChunk(String peerID, String fileID, int chunkID){
+        String file_path = "backup/" + peerID + "/" + fileID + "/" + chunkID;
+        byte[] chunkData = readFile(file_path);
+        if(chunkData == null)
+            return null;
+        return new Chunk(fileID, chunkID, chunkData);
     }
 }

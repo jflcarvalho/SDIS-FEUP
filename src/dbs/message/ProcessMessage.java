@@ -4,6 +4,7 @@ import dbs.Chunk;
 import dbs.peer.Peer;
 import dbs.protocol.Backup;
 import dbs.protocol.Delete;
+import dbs.protocol.ReclaimSpace;
 import dbs.protocol.Restore;
 
 public abstract class ProcessMessage {
@@ -18,6 +19,10 @@ public abstract class ProcessMessage {
                 break;
             case GETCHUNK:
                 new Restore(peer).replyChunk(message.file_ID, ((GetChunkMessage) message).getChunkID());
+            case REMOVED:
+                peer.removeReplicationDatabase((RemovedMessage) message);
+                new ReclaimSpace(peer).removedChunk(message.getFileID(), ((RemovedMessage) message).getChunkID());
+                break;
             default:
                 break;
         }
@@ -26,7 +31,7 @@ public abstract class ProcessMessage {
     public static void processPutChunk(PutChunkMessage message, Peer peer){
         if(peer.getPeerID().equals(getSenderIDFromMessage(message)))
             return;
-        if(peer.getRemainSpace() < message.getBody().length)
+        if(peer.getAvailableSpace() < message.getBody().length)
             return;
         peer.updateReplicationDatabase(message);
         Chunk chunk = Chunk.createChunkFromMessage(message);
