@@ -25,7 +25,6 @@ import static dbs.utils.Constants.*;
 public class Peer implements PeerInterface, Serializable {
     private Map<String, HashSet<Integer>> myChunks = new ConcurrentHashMap<>();
     private Map<String, Map<Integer, Pair<Integer, HashSet<String>>>> chunkReplication = new ConcurrentHashMap<>();
-    //private final Map<String, Pair<InetAddress, Integer>> peersConnected = new HashMap<>();
     private Map<String, ConcurrentLinkedQueue<Message>> pendingMessages = new ConcurrentHashMap<>();
 
     private final String version;
@@ -253,16 +252,7 @@ public class Peer implements PeerInterface, Serializable {
     private String getFileIDFromMessage(@NotNull Message message){
         return message.getFileID();
     }
-/*
-    public void addConnectedPeer(String peerID, Pair<InetAddress, Integer> peerAddress){
-        if(!peersConnected.containsKey(peerID))
-            peersConnected.put(peerID, peerAddress);
-    }
 
-    public int getNumberOfPeersConnected(){
-        return peersConnected.size();
-    }
-*/
     public void addPendingMessage(String peerID, DeleteMessage message) {
         ConcurrentLinkedQueue<Message> messages = pendingMessages.get(peerID);
         if(messages == null){

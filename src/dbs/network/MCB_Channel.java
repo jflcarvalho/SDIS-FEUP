@@ -29,8 +29,10 @@ public class MCB_Channel extends M_Channel {
         byte[] data = Arrays.copyOfRange(packet.getData(), 0, packet.getLength());
         String string_message = new String(data, StandardCharsets.ISO_8859_1);
         PutChunkMessage message = (PutChunkMessage) Message.parse(string_message);
+        if(message == null)
+            return;
+
         Constants.MessageType messageType = message.getMessageType();
-        //peersConnected.put(message.getSenderID(), new Pair<>(packet.getAddress(), packet.getPort()));
         System.out.println(messageType.toString() + " " + message.getSenderID());
         if(messageType == PUTCHUNK){
             ProcessMessage.processPutChunk(message, peer);
