@@ -1,7 +1,7 @@
 package dbs.utils;
 
 public class Constants {
-    public enum MessageType {PUTCHUNK, STORED, CHUNK, DELETE, GETCHUNK, REMOVED}
+    public enum MessageType {PUTCHUNK, STORED, CHUNK, DELETE, GETCHUNK, REMOVED, DELETED, ALIVE}
     public static final String CRLF_D = "\r\n\r\n";
     public static final String SPACE = " ";
     public static final String testFilePath = "testFiles/butterfly-wallpaper.jpeg";

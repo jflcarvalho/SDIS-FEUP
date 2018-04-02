@@ -2,10 +2,7 @@ package dbs.peer;
 
 import com.sun.istack.internal.NotNull;
 import dbs.Chunk;
-import dbs.message.Message;
-import dbs.message.PutChunkMessage;
-import dbs.message.RemovedMessage;
-import dbs.message.StoredMessage;
+import dbs.message.*;
 import dbs.network.MCB_Channel;
 import dbs.network.MCR_Channel;
 import dbs.network.MC_Channel;
@@ -17,11 +14,10 @@ import dbs.protocol.Restore;
 import javafx.util.Pair;
 
 import java.io.*;
-import java.net.InetAddress;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static dbs.file_io.FileManager.createFile;
 import static dbs.utils.Constants.*;
@@ -29,7 +25,8 @@ import static dbs.utils.Constants.*;
 public class Peer implements PeerInterface, Serializable {
     private Map<String, HashSet<Integer>> myChunks = new ConcurrentHashMap<>();
     private Map<String, Map<Integer, Pair<Integer, HashSet<String>>>> chunkReplication = new ConcurrentHashMap<>();
-    private final Map<String, Pair<InetAddress, Integer>> peersConnected = new HashMap<>();
+    //private final Map<String, Pair<InetAddress, Integer>> peersConnected = new HashMap<>();
+    private Map<String, ConcurrentLinkedQueue<Message>> pendingMessages = new ConcurrentHashMap<>();
 
     private final String version;
     private String peerID;
@@ -101,7 +98,7 @@ public class Peer implements PeerInterface, Serializable {
 
     public void start() {
         initPeer();
-        //TODO: add pending messages
+        send(MessageFactory.getAliveMessage(peerID));
     }
 
     private void initPeer(){
@@ -256,7 +253,7 @@ public class Peer implements PeerInterface, Serializable {
     private String getFileIDFromMessage(@NotNull Message message){
         return message.getFileID();
     }
-
+/*
     public void addConnectedPeer(String peerID, Pair<InetAddress, Integer> peerAddress){
         if(!peersConnected.containsKey(peerID))
             peersConnected.put(peerID, peerAddress);
@@ -265,5 +262,21 @@ public class Peer implements PeerInterface, Serializable {
     public int getNumberOfPeersConnected(){
         return peersConnected.size();
     }
+*/
+    public void addPendingMessage(String peerID, DeleteMessage message) {
+        ConcurrentLinkedQueue<Message> messages = pendingMessages.get(peerID);
+        if(messages == null){
+            messages = new ConcurrentLinkedQueue<>();
+        }
+        messages.add(message);
+        pendingMessages.put(peerID, messages);
+    }
 
+    public void sendPending(String senderID) {
+        ConcurrentLinkedQueue<Message> messages = pendingMessages.get(senderID);
+        if(messages != null){
+            while (!messages.isEmpty())
+                send(messages.poll());
+        }
+    }
 }

@@ -27,7 +27,7 @@ public class Restore implements Runnable {
     private String file_path;
     private File file;
     private final Peer peer;
-    private final Map<Pair<String, Integer>,Chunk> restoredChunks = new ConcurrentHashMap<>();
+    private Map<Pair<String, Integer>,Chunk> restoredChunks = new ConcurrentHashMap<>();
     private int lastChunkID;
 
     private static Restore instance;
