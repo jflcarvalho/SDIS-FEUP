@@ -22,6 +22,8 @@ class InitPeer {
             System.out.println("Failed to bind peer to registry");
         }
 
+        Runtime.getRuntime().addShutdownHook(new Thread(initiator_Peer::saveData));
+
         initiator_Peer.start();
     }
 }

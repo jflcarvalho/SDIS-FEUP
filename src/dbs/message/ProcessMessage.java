@@ -19,6 +19,7 @@ public abstract class ProcessMessage {
                 break;
             case GETCHUNK:
                 new Restore(peer).replyChunk(message.file_ID, ((GetChunkMessage) message).getChunkID());
+                break;
             case REMOVED:
                 peer.removeReplicationDatabase((RemovedMessage) message);
                 new ReclaimSpace(peer).removedChunk(message.getFileID(), ((RemovedMessage) message).getChunkID());
