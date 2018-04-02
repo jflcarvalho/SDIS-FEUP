@@ -8,7 +8,7 @@ import static dbs.utils.Constants.CRLF_D;
 import static dbs.utils.Constants.SPACE;
 
 public class PutChunkMessage extends ChunkMessage {
-    private int replication_Deg;
+    private final int replication_Deg;
 
     PutChunkMessage(double version, String sender_ID, String file_ID, int chunk_NO, int replication_Deg,  byte[] body) {
         super(version, sender_ID, file_ID, chunk_NO, body);

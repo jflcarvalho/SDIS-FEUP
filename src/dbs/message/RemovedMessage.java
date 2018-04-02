@@ -7,7 +7,7 @@ import static dbs.utils.Constants.MessageType.REMOVED;
 import static dbs.utils.Constants.SPACE;
 
 public class RemovedMessage extends Message {
-    private int chunk_NO;
+    private final int chunk_NO;
 
     public RemovedMessage(double version, String sender_ID, String file_ID, int chunk_NO) {
         super(version, sender_ID, file_ID);

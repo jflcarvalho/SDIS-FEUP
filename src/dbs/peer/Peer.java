@@ -2,7 +2,10 @@ package dbs.peer;
 
 import com.sun.istack.internal.NotNull;
 import dbs.Chunk;
-import dbs.message.*;
+import dbs.message.Message;
+import dbs.message.PutChunkMessage;
+import dbs.message.RemovedMessage;
+import dbs.message.StoredMessage;
 import dbs.network.MCB_Channel;
 import dbs.network.MCR_Channel;
 import dbs.network.MC_Channel;
@@ -15,6 +18,8 @@ import javafx.util.Pair;
 
 import java.io.*;
 import java.net.InetAddress;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -24,23 +29,26 @@ import static dbs.file_io.FileManager.createFile;
 import static dbs.utils.Constants.*;
 
 public class Peer implements PeerInterface, Serializable{
-    private static Peer instance;
     private Map<String, HashSet<Integer>> myChunks = new ConcurrentHashMap<>();
     private Map<String, Map<Integer, Pair<Integer, HashSet<String>>>> chunkReplication = new ConcurrentHashMap<>();
-    private Map<String, Pair<InetAddress, Integer>> peersConnected = new HashMap<>();
+    private final Map<String, Pair<InetAddress, Integer>> peersConnected = new HashMap<>();
 
-    private String version;
+    private final String version;
     private String peerID;
-    private String accessPoint;
+    private final String accessPoint;
 
-    private String mc_ip, mdb_ip, mdr_ip;
-    private int mc_port, mdb_port, mdr_port;
+    private final String mc_ip;
+    private final String mdb_ip;
+    private final String mdr_ip;
+    private final int mc_port;
+    private final int mdb_port;
+    private final int mdr_port;
 
     private int usageSpace = 0;
     private int reclaimSpace = 0;
-    private int totalSpace = AVAILABLE_SPACE;
+    private final int totalSpace = AVAILABLE_SPACE;
 
-    private M_Channel[] channels = new M_Channel[3];
+    private final M_Channel[] channels = new M_Channel[3];
 
     public Peer(@NotNull String[] args){
         this.version = args[0];
@@ -53,7 +61,6 @@ public class Peer implements PeerInterface, Serializable{
         this.mdb_port = Integer.parseInt(args[6]);
         this.mdr_ip = args[7];
         this.mdr_port = Integer.parseInt(args[8]);
-        instance = this;
     }
 
     public String getPeerID() {
@@ -72,11 +79,9 @@ public class Peer implements PeerInterface, Serializable{
         return myChunks;
     }
 
-    public boolean haveChunk(String fileID, int chunkID){
+    public boolean haveChunk(String fileID, int chunkID) {
         HashSet<Integer> chunks = myChunks.get(fileID);
-        if(chunks == null)
-            return false;
-        return chunks.contains(chunkID);
+        return chunks != null && chunks.contains(chunkID);
     }
 
     public void addChunk(Chunk chunk, long file_Size){
@@ -98,6 +103,12 @@ public class Peer implements PeerInterface, Serializable{
     }
 
     public void start() {
+        try {
+            Registry registry = LocateRegistry.getRegistry();
+            registry.rebind(accessPoint, this);
+        } catch (Exception e) {
+            System.out.println("Failed to bind peer to registry");
+        }
         initPeer();
         //TODO: add pending messages
     }
@@ -114,7 +125,7 @@ public class Peer implements PeerInterface, Serializable{
     }
 
     @Override
-    public void backup(String file_path, int replicationDegree){
+    public void backup(String file_path, int replicationDegree) {
         Backup backup = new Backup(file_path, replicationDegree, this);
         backup.run();
     }
@@ -167,11 +178,7 @@ public class Peer implements PeerInterface, Serializable{
     }
 
     private Pair<Integer, HashSet<String>> getReplicationPair(String fileID, Integer chunkID){
-        Pair<Integer, HashSet<String>> chunkPair = getReplicationChunkMap(fileID).get(chunkID);
-        if(chunkPair == null) {
-            chunkPair = new Pair<>(null, new HashSet<>());
-            getReplicationChunkMap(fileID).put(chunkID, chunkPair);
-        }
+        Pair<Integer, HashSet<String>> chunkPair = getReplicationChunkMap(fileID).computeIfAbsent(chunkID, k -> new Pair<>(null, new HashSet<>()));
         return chunkPair;
     }
 
@@ -264,7 +271,7 @@ public class Peer implements PeerInterface, Serializable{
             peersConnected.put(peerID, peerAddress);
     }
 
-    public int getNumberOfPeersConneced(){
+    public int getNumberOfPeersConnected(){
         return peersConnected.size();
     }
 

@@ -8,14 +8,14 @@ import dbs.peer.Peer;
 import javafx.util.Pair;
 
 import java.io.File;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static dbs.Chunk.readChunk;
-import static dbs.file_io.FileManager.*;
+import static dbs.file_io.FileManager.createFile;
+import static dbs.file_io.FileManager.writeFile;
 import static dbs.file_io.M_File.getFileID;
 import static dbs.utils.Constants.*;
 import static dbs.utils.Utils.sleepRandomTime;
@@ -26,8 +26,8 @@ public class Restore implements Runnable {
 
     private String file_path;
     private File file;
-    private Peer peer;
-    private Map<Pair<String, Integer>,Chunk> restoredChunks = new ConcurrentHashMap<>();
+    private final Peer peer;
+    private final Map<Pair<String, Integer>,Chunk> restoredChunks = new ConcurrentHashMap<>();
     private int lastChunkID;
 
     private static Restore instance;
@@ -112,15 +112,12 @@ public class Restore implements Runnable {
     }
 
     private void recreatingFile() {
-        Map<Pair<String, Integer>,Chunk> sortedChunks = new TreeMap<>(new Comparator<Pair<String, Integer>>() {
-            @Override
-            public int compare(Pair<String, Integer> o1, Pair<String, Integer> o2) {
-                int fileIDComparator = o1.getKey().compareTo(o2.getKey());
-                if(fileIDComparator == 0)
-                    return o1.getValue().compareTo(o2.getValue());
-                else
-                    return fileIDComparator;
-            }
+        Map<Pair<String, Integer>,Chunk> sortedChunks = new TreeMap<>((o1, o2) -> {
+            int fileIDComparator = o1.getKey().compareTo(o2.getKey());
+            if(fileIDComparator == 0)
+                return o1.getValue().compareTo(o2.getValue());
+            else
+                return fileIDComparator;
         });
         sortedChunks.putAll(restoredChunks);
         byte[] data = chunkAggregator(sortedChunks);

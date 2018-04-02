@@ -8,9 +8,9 @@ import static dbs.file_io.FileManager.readFile;
 
 public class Chunk implements Serializable{
     private static int nextID;
-    private int chunkID;
-    private String fileID;
-    private byte[] data;
+    private final int chunkID;
+    private final String fileID;
+    private final byte[] data;
 
     public Chunk(String fileID, byte[] data) {
         this.chunkID = nextID;
@@ -19,7 +19,7 @@ public class Chunk implements Serializable{
         nextID++;
     }
 
-    public Chunk(String fileID, int chunkID, byte[] data) {
+    private Chunk(String fileID, int chunkID, byte[] data) {
         this.chunkID = chunkID;
         this.fileID = fileID;
         this.data = data;

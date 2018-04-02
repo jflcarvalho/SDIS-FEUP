@@ -13,7 +13,7 @@ import static dbs.utils.Constants.DEBUG;
 import static dbs.utils.Utils.hashString;
 
 public class M_File {
-    private String path;
+    private final String path;
     private String name;
     private BasicFileAttributes attr;
     private String fileID;
@@ -115,10 +115,9 @@ public class M_File {
     public String toString(){
         if(null == file)
             return "";
-        StringBuilder string = new StringBuilder("Path= " + path + "\n");
-        string.append("Name= ").append(name).append("\n");
-        string.append("FileID= ").append(fileID).append("\n");
-        string.append("Number of Chunks: ").append(chunks.length);
-        return string.toString();
+        String string = "Path= " + path + "\n" + "Name= " + name + "\n" +
+                "FileID= " + fileID + "\n" +
+                "Number of Chunks: " + chunks.length;
+        return string;
     }
 }

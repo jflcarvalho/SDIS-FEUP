@@ -14,7 +14,7 @@ public class Delete implements Runnable {
     public final static double VERSION = 1.0;
 
     private String file_path;
-    private Peer peer;
+    private final Peer peer;
 
     public Delete(Peer peer) {
         this.peer = peer;

@@ -7,15 +7,19 @@ import dbs.peer.Peer;
 import javafx.util.Pair;
 
 import java.io.File;
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.PriorityQueue;
 
 import static dbs.file_io.FileManager.deleteFile;
+import static dbs.utils.Utils.sleepRandomTime;
 
 public class ReclaimSpace implements Runnable {
     public final static double VERSION = 1.0;
 
     private int necessary_Space;
-    private Peer peer;
+    private final Peer peer;
 
     public ReclaimSpace(Peer peer) {
         this.peer = peer;
@@ -83,6 +87,8 @@ public class ReclaimSpace implements Runnable {
         int pretendedReplication = peer.getReplicationChunkMap(fileID).get(chunkID).getKey();
         if(getReplicationDiff(fileID, chunkID) > 0){
             Chunk chunkToSend = Chunk.readChunk(peer.getPeerID(), fileID, chunkID);
+            sleepRandomTime(400);
+            //TODO: don't start protocol if already received a stored message for this chunk
             new Backup(peer).sendChunk(chunkToSend, pretendedReplication);
         }
     }

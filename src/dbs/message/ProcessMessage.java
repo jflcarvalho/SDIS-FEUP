@@ -31,6 +31,7 @@ public abstract class ProcessMessage {
     public static void processPutChunk(PutChunkMessage message, Peer peer){
         if(peer.getPeerID().equals(getSenderIDFromMessage(message)))
             return;
+        //TODO: add something to say "i receive this chunk" (reclaim space)
         if(peer.getAvailableSpace() < message.getBody().length)
             return;
         peer.updateReplicationDatabase(message);

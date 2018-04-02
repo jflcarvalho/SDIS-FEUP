@@ -7,12 +7,12 @@ import java.nio.charset.StandardCharsets;
 import static dbs.utils.Constants.*;
 
 public abstract class Message {
-    protected Constants.MessageType messageType;
-    protected double version;
-    protected String sender_ID;
-    protected String file_ID;
+    Constants.MessageType messageType;
+    final double version;
+    final String sender_ID;
+    final String file_ID;
 
-    public Message(double version, String sender_ID, String file_ID) {
+    Message(double version, String sender_ID, String file_ID) {
         this.version = version;
         this.sender_ID = sender_ID;
         this.file_ID = file_ID;

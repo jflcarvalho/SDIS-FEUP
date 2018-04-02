@@ -14,7 +14,7 @@ public abstract class M_Channel implements Runnable {
     private MulticastSocket mc_socket;
     private InetAddress address;
     private int port;
-    protected Peer peer;
+    final Peer peer;
 
     /**
      * Class that connects and listens to a multicast

@@ -22,7 +22,7 @@ public class Backup implements Runnable {
     private String file_path;
     private int replication_degree;
     private M_File mFile;
-    private Peer peer;
+    private final Peer peer;
 
     public Backup(Peer peer){
         this.peer = peer;

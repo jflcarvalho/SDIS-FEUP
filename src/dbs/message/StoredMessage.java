@@ -8,7 +8,7 @@ import static dbs.utils.Constants.CRLF_D;
 import static dbs.utils.Constants.SPACE;
 
 public class StoredMessage extends Message{
-    private int chunk_NO;
+    private final int chunk_NO;
 
     StoredMessage(double version, String sender_ID, String file_ID, int chunkNo) {
         super(version, sender_ID, file_ID);

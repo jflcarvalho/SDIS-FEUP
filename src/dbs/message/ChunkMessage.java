@@ -8,8 +8,8 @@ import static dbs.utils.Constants.CRLF_D;
 import static dbs.utils.Constants.SPACE;
 
 public class ChunkMessage extends Message {
-    int chunk_ID;
-    byte[] body;
+    final int chunk_ID;
+    final byte[] body;
 
     ChunkMessage(double version, String sender_ID, String fileID, int chunkID, byte[] data) {
         super(version, sender_ID, fileID);

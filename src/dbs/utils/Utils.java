@@ -16,7 +16,7 @@ public class Utils {
      * Encode string to SHA-256
      *
      * @param data
-     * @return strinng encoded in SHA-256
+     * @return string encoded in SHA-256
      */
     public static String hashString(String data){
         String encodedHash = null;
@@ -39,7 +39,7 @@ public class Utils {
      * @param raw
      * @return string with hexadecimal form
      */
-    public static String getHex(byte[] raw){
+    private static String getHex(byte[] raw){
         return DatatypeConverter.printHexBinary(raw);
     }
 
@@ -48,8 +48,8 @@ public class Utils {
      * @return byte[] with MAC Address
      */
     public static byte[] getMAC(){
-        InetAddress address = null;
-        NetworkInterface networkInterface = null;
+        InetAddress address;
+        NetworkInterface networkInterface;
         try {
             address = InetAddress.getLocalHost();
             if (address == null)
