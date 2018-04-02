@@ -7,10 +7,8 @@ import dbs.peer.Peer;
 import javafx.util.Pair;
 
 import java.io.File;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.PriorityQueue;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static dbs.file_io.FileManager.deleteFile;
 import static dbs.utils.Utils.sleepRandomTime;
@@ -18,8 +16,12 @@ import static dbs.utils.Utils.sleepRandomTime;
 public class ReclaimSpace implements Runnable {
     public final static double VERSION = 1.0;
 
+    private static Map<Pair<String, Integer>, Boolean> sendBackup = new ConcurrentHashMap<>();
+    private static Map<Pair<String, Integer>, Boolean> reclaimedChunks = new ConcurrentHashMap<>();
+
     private int necessary_Space;
-    private final Peer peer;
+    private Peer peer;
+
 
     public ReclaimSpace(Peer peer) {
         this.peer = peer;
@@ -34,7 +36,6 @@ public class ReclaimSpace implements Runnable {
         System.out.println("\n------------- RECLAIM SPACE ----------------\n");
         System.out.println("Reclaiming " + necessary_Space + " Kb of Space");
         manageSpace();
-        peer.updateReclaimSpace(necessary_Space);
         System.out.println("\n------------------ END ---------------------\n");
     }
 
@@ -53,6 +54,7 @@ public class ReclaimSpace implements Runnable {
                 System.out.println("Can't Reclaim More Space");
                 return;
             }
+            reclaimedChunks.put(new Pair<>(chunkToDelete.getKey(), chunkToDelete.getValue()), true);
             deleteChunk(chunkToDelete.getKey(), chunkToDelete.getValue());
         }
     }
@@ -84,12 +86,24 @@ public class ReclaimSpace implements Runnable {
     public void removedChunk(String fileID, int chunkID){
         if(!peer.haveChunk(fileID, chunkID))
             return;
+        Pair<String, Integer> chunkPair = new Pair<>(fileID, chunkID);
+        sendBackup.put(chunkPair, true);
         int pretendedReplication = peer.getReplicationChunkMap(fileID).get(chunkID).getKey();
         if(getReplicationDiff(fileID, chunkID) > 0){
             Chunk chunkToSend = Chunk.readChunk(peer.getPeerID(), fileID, chunkID);
             sleepRandomTime(400);
-            //TODO: don't start protocol if already received a stored message for this chunk
-            new Backup(peer).sendChunk(chunkToSend, pretendedReplication);
+            if(sendBackup.get(chunkPair)){
+                new Backup(peer).sendChunk(chunkToSend, pretendedReplication);
+                removeSendChunk(fileID, chunkID);
+            }
         }
+    }
+
+    public static void removeSendChunk(String fileID, int chunkID){
+        sendBackup.put(new Pair<>(fileID, chunkID), false);
+    }
+
+    public static boolean haveBeReclaimed(String fileID, int chunkID){
+        return reclaimedChunks.remove(new Pair<>(fileID, chunkID)) != null;
     }
 }

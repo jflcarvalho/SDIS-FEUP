@@ -19,7 +19,7 @@ public class M_File {
     private String fileID;
     private File file;
     private byte[] data;
-    private Chunk[] chunks;
+    private Chunk[] chunks = new Chunk[0];
 
     public M_File(String path){
         this.path = path;
@@ -114,10 +114,9 @@ public class M_File {
     @Override
     public String toString(){
         if(null == file)
-            return "";
-        String string = "Path= " + path + "\n" + "Name= " + name + "\n" +
+            return "[ERROR] Loading File";
+        return "Path= " + path + "\n" + "Name= " + name + "\n" +
                 "FileID= " + fileID + "\n" +
                 "Number of Chunks: " + chunks.length;
-        return string;
     }
 }

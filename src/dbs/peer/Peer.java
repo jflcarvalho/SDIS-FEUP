@@ -43,7 +43,6 @@ public class Peer implements PeerInterface, Serializable {
     private final int mdr_port;
 
     private int usageSpace = 0;
-    private int reclaimSpace = 0;
     private final int totalSpace = AVAILABLE_SPACE;
 
     private final M_Channel[] channels = new M_Channel[3];
@@ -69,12 +68,8 @@ public class Peer implements PeerInterface, Serializable {
         return peerID;
     }
 
-    public void updateReclaimSpace(int value){
-        this.reclaimSpace = value;
-    }
-
     public int getAvailableSpace(){
-        return totalSpace - usageSpace - reclaimSpace;
+        return totalSpace - usageSpace;
     }
 
     public Map<String, HashSet<Integer>> getMyChunks() {

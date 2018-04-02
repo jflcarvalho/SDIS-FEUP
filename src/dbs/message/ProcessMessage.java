@@ -32,9 +32,12 @@ public abstract class ProcessMessage {
     public static void processPutChunk(PutChunkMessage message, Peer peer){
         if(peer.getPeerID().equals(getSenderIDFromMessage(message)))
             return;
-        //TODO: add something to say "i receive this chunk" (reclaim space)
+        ReclaimSpace.removeSendChunk(message.file_ID, message.chunk_ID);
+        if(ReclaimSpace.haveBeReclaimed(message.file_ID, message.chunk_ID))
+            return;
         if(peer.getAvailableSpace() < message.getBody().length)
             return;
+        //TODO: call reclaim space for save the received chunk (reclaim space)
         peer.updateReplicationDatabase(message);
         Chunk chunk = Chunk.createChunkFromMessage(message);
         new Backup(peer).storeChunk(chunk);

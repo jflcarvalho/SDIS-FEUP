@@ -4,6 +4,8 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
+import static dbs.utils.Constants.DEBUG;
+
 class InitPeer {
 
     public static void main(String[] args) {
@@ -18,8 +20,10 @@ class InitPeer {
             Registry registry = LocateRegistry.getRegistry();
             registry.rebind(initiator_Peer.getAccessPoint(), peerRMI);
         } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Failed to bind peer to registry");
+            if(DEBUG)
+                e.printStackTrace();
+            else
+                System.out.println("Failed to bind peer to registry");
         }
 
         Runtime.getRuntime().addShutdownHook(new Thread(initiator_Peer::saveData));

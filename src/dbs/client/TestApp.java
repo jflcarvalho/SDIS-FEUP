@@ -6,6 +6,8 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
+import static dbs.utils.Constants.DEBUG;
+
 class TestApp {
 
     private PeerInterface peer;
@@ -52,6 +54,8 @@ class TestApp {
             case "STATE":
                 client.startState();
                 break;
+            default:
+                System.out.println("Protocol does don't exists");
         }
     }
 
@@ -59,7 +63,10 @@ class TestApp {
         try {
             peer.backup(file_path, replication_degree);
         } catch (RemoteException e) {
-            e.printStackTrace();
+            if(DEBUG)
+                e.printStackTrace();
+            else
+                System.out.println("[ERROR] Starting Backup Protocol");
         }
     }
 
@@ -67,7 +74,10 @@ class TestApp {
         try {
             peer.restore(file_path);
         } catch (RemoteException e) {
-            e.printStackTrace();
+            if(DEBUG)
+                e.printStackTrace();
+            else
+                System.out.println("[ERROR] Starting Restore Protocol");
         }
     }
 
@@ -75,7 +85,10 @@ class TestApp {
         try {
             peer.delete(file_path);
         } catch (RemoteException e) {
-            e.printStackTrace();
+            if(DEBUG)
+                e.printStackTrace();
+            else
+                System.out.println("[ERROR] Starting Delete Protocol");
         }
     }
 
@@ -83,7 +96,10 @@ class TestApp {
         try {
             peer.reclaimSpace(space_Reclaim);
         } catch (RemoteException e) {
-            e.printStackTrace();
+            if(DEBUG)
+                e.printStackTrace();
+            else
+                System.out.println("[ERROR] Starting Space Reclaim Protocol");
         }
     }
 
@@ -91,7 +107,10 @@ class TestApp {
         try {
             peer.state();
         } catch (RemoteException e) {
-            e.printStackTrace();
+            if(DEBUG)
+                e.printStackTrace();
+            else
+                System.out.println("[ERROR] Starting State Protocol");
         }
     }
 }
