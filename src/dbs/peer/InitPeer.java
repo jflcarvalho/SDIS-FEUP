@@ -1,5 +1,9 @@
 package dbs.peer;
 
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
+
 class InitPeer {
 
     public static void main(String[] args) {
@@ -7,6 +11,17 @@ class InitPeer {
         System.setProperty("java.net.preferIPv4Stack", "true");
 
         Peer initiator_Peer = new Peer(args);
+
+        try {
+            System.out.println("Access Point: " + initiator_Peer.getAccessPoint());
+            PeerInterface peerRMI = (PeerInterface) UnicastRemoteObject.exportObject(initiator_Peer, 0);
+            Registry registry = LocateRegistry.getRegistry();
+            registry.rebind(initiator_Peer.getAccessPoint(), peerRMI);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Failed to bind peer to registry");
+        }
+
         initiator_Peer.start();
     }
 }

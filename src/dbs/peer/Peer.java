@@ -18,8 +18,6 @@ import javafx.util.Pair;
 
 import java.io.*;
 import java.net.InetAddress;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -28,7 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static dbs.file_io.FileManager.createFile;
 import static dbs.utils.Constants.*;
 
-public class Peer implements PeerInterface, Serializable{
+public class Peer implements PeerInterface, Serializable {
     private Map<String, HashSet<Integer>> myChunks = new ConcurrentHashMap<>();
     private Map<String, Map<Integer, Pair<Integer, HashSet<String>>>> chunkReplication = new ConcurrentHashMap<>();
     private final Map<String, Pair<InetAddress, Integer>> peersConnected = new HashMap<>();
@@ -61,6 +59,10 @@ public class Peer implements PeerInterface, Serializable{
         this.mdb_port = Integer.parseInt(args[6]);
         this.mdr_ip = args[7];
         this.mdr_port = Integer.parseInt(args[8]);
+    }
+
+    public String getAccessPoint() {
+        return accessPoint;
     }
 
     public String getPeerID() {
@@ -103,12 +105,6 @@ public class Peer implements PeerInterface, Serializable{
     }
 
     public void start() {
-        try {
-            Registry registry = LocateRegistry.getRegistry();
-            registry.rebind(accessPoint, this);
-        } catch (Exception e) {
-            System.out.println("Failed to bind peer to registry");
-        }
         initPeer();
         //TODO: add pending messages
     }
