@@ -81,6 +81,19 @@ public abstract class Message {
                         requestSpliced[3],
                         Integer.parseInt(requestSpliced[4])
                 );
+            case "DELETED":
+                return new DeletedMessage(
+                        Double.parseDouble(requestSpliced[1]),
+                        requestSpliced[2],
+                        requestSpliced[3],
+                        Integer.parseInt(requestSpliced[4])
+                );
+            case "ALIVE":
+                return new AliveMessage(
+                        Double.parseDouble(requestSpliced[1]),
+                        requestSpliced[2],
+                        requestSpliced[3]
+                );
             default:
                 break;
         }

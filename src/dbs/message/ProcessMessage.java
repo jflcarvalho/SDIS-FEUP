@@ -15,7 +15,10 @@ public abstract class ProcessMessage {
                     peer.addReplicationDatabase((StoredMessage) message);
                 break;
             case DELETE:
-                new Delete(peer).deleteFileFromID(message.file_ID);
+                new Delete(peer, message.getVersion()).deleteFileFromID(message.file_ID);
+                break;
+            case DELETED:
+                peer.removeReplicationDatabase((DeletedMessage) message);
                 break;
             case GETCHUNK:
                 new Restore(peer).replyChunk(message.file_ID, ((GetChunkMessage) message).getChunkID());
@@ -23,6 +26,10 @@ public abstract class ProcessMessage {
             case REMOVED:
                 peer.removeReplicationDatabase((RemovedMessage) message);
                 new ReclaimSpace(peer).removedChunk(message.getFileID(), ((RemovedMessage) message).getChunkID());
+                break;
+            case ALIVE:
+                System.out.println("Peer " + message.getSenderID() + " is alive");
+                peer.sendPending(message.getSenderID());
                 break;
             default:
                 break;

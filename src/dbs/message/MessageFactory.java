@@ -22,7 +22,7 @@ public abstract class MessageFactory {
     }
 
     public static GetChunkMessage getGetChunkMessage(String peerID, String fileID, int chunkID) {
-        return new GetChunkMessage(Delete.VERSION, peerID, fileID, chunkID);
+        return new GetChunkMessage(Restore.VERSION, peerID, fileID, chunkID);
     }
 
     public static ChunkMessage getChunkMessage(String peerID, Chunk chunk){
@@ -31,6 +31,14 @@ public abstract class MessageFactory {
 
     public static RemovedMessage getRemovedMessage(String peerID, String fileID, int chunkID){
         return new RemovedMessage(ReclaimSpace.VERSION, peerID, fileID, chunkID);
+    }
+
+    public static DeletedMessage getDeletedMessage(String peerID, String fileID, int chunkID){
+        return new DeletedMessage(Delete.VERSION, peerID, fileID, chunkID);
+    }
+
+    public static AliveMessage getAliveMessage(String peerID){
+        return new AliveMessage(1.11, peerID, "#");
     }
 
     private static String getFileIDFromChunk(@NotNull Chunk chunk){
