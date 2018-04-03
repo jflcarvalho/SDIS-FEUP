@@ -13,8 +13,8 @@ CLASS := ${JAVA:.java=.class}
 default: $(CLASS)
 
 clean:
-	ifeq ($(OS),Windows_NT)
-		del /F /Q $(subst /,\,$(CLASS))
-	else
-		rm -rf $(CLASS)
-	endif
+ifeq ($(OS),Windows_NT)
+	del /F /Q $(subst /,\,$(CLASS))
+else
+	rm -rf $(CLASS)
+endif
