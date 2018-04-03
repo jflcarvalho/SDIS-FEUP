@@ -4,4 +4,5 @@ Compile instructions:
 
 Run instructions:
 1. Change directory to ./src
-2. Run "java dbs.client.TestApp" with the arguments from the specification (for example: "java dbs.client.TestApp peer0 BACKUP ../testFiles/testPdf.pdf 3")
+2. In terminal 1: Run "rmiregistry"
+3. In terminal 2: Run "java dbs.client.TestApp" with the arguments from the specification (for example: "java dbs.client.TestApp peer0 BACKUP ../testFiles/testPdf.pdf 3")
