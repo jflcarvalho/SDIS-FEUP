@@ -17,6 +17,6 @@ public class Constants {
     public static final int MCB = 1;
     public static final int MCR = 2;
 
-    public static final boolean DEBUG = true;
+    public static final boolean DEBUG = false;
     public static double VERSION;
 }

@@ -70,8 +70,10 @@ public class Restore implements Runnable {
             System.out.println("No File in System to Restore");
             return;
         }
-        if(version == VERSION)
-            new Thread(this::startTCPServer).start();
+        if(version == VERSION){
+            System.out.println("Don't implement...");
+            //new Thread(this::startTCPServer).start();
+        }
         for (Map.Entry<Integer, Pair<Integer, HashSet<String>>> entry : chunksInfo.entrySet())
         {
             if(entry.getValue().getValue().size() == 0){
@@ -142,10 +144,13 @@ public class Restore implements Runnable {
             return;
         ChunkMessage message = MessageFactory.getChunkMessage(peer.getPeerID(), chunk);
         sleepRandomTime(400);
+        peer.send(message);
+        /*
         if(version != VERSION)
             peer.send(message);
         else
             peer.send(message, senderID);
+        */
     }
     
     public void addChunk(Chunk chunk) {
