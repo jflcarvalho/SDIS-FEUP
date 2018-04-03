@@ -44,7 +44,7 @@ public abstract class ProcessMessage {
             return;
         if(peer.getAvailableSpace() < message.getBody().length)
             return;
-        //TODO: call reclaim space for save the received chunk (reclaim space)
+        new ReclaimSpace(message.getBody().length, peer).manageSpace(false);
         peer.updateReplicationDatabase(message);
         Chunk chunk = Chunk.createChunkFromMessage(message);
         new Backup(peer, message.version).storeChunk(chunk, message.getReplicationDeg());

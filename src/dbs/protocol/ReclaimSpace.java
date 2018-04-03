@@ -35,7 +35,7 @@ public class ReclaimSpace implements Runnable {
     public void run() {
         System.out.println("\n------------- RECLAIM SPACE ----------------\n");
         System.out.println("Reclaiming " + necessary_Space + " Kb of Space");
-        manageSpace();
+        manageSpace(true);
         System.out.println("\n------------------ END ---------------------\n");
     }
 
@@ -44,7 +44,7 @@ public class ReclaimSpace implements Runnable {
         peer.send(message);
     }
 
-    private void manageSpace() {
+    public void manageSpace(boolean canDelete) {
         if(peer.getAvailableSpace() > necessary_Space)
             return;
         PriorityQueue<Pair<String, Integer>> chunksOrdered = getChunksOrdered(peer.getMyChunks());
@@ -54,8 +54,10 @@ public class ReclaimSpace implements Runnable {
                 System.out.println("Can't Reclaim More Space");
                 return;
             }
-            reclaimedChunks.put(new Pair<>(chunkToDelete.getKey(), chunkToDelete.getValue()), true);
-            deleteChunk(chunkToDelete.getKey(), chunkToDelete.getValue());
+            if(getReplicationDiff(chunkToDelete.getKey(), chunkToDelete.getValue()) < 0 || canDelete){
+                reclaimedChunks.put(new Pair<>(chunkToDelete.getKey(), chunkToDelete.getValue()), true);
+                deleteChunk(chunkToDelete.getKey(), chunkToDelete.getValue());
+            }
         }
     }
 
