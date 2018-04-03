@@ -93,7 +93,7 @@ public class ReclaimSpace implements Runnable {
             Chunk chunkToSend = Chunk.readChunk(peer.getPeerID(), fileID, chunkID);
             sleepRandomTime(400);
             if(sendBackup.get(chunkPair)){
-                new Backup(peer).sendChunk(chunkToSend, pretendedReplication);
+                new Backup(peer, Backup.VERSION).sendChunk(chunkToSend, pretendedReplication);
                 removeSendChunk(fileID, chunkID);
             }
         }

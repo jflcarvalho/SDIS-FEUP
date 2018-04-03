@@ -10,6 +10,7 @@ import dbs.peer.Peer;
 import java.io.File;
 
 import static dbs.file_io.FileManager.createFile;
+import static dbs.file_io.FileManager.deleteFile;
 import static dbs.file_io.FileManager.writeFile;
 import static dbs.utils.Constants.NUMBER_OF_TRIES;
 import static dbs.utils.Constants.SLEEP_TIME;
@@ -17,15 +18,17 @@ import static dbs.utils.Utils.sleepRandomTime;
 import static dbs.utils.Utils.sleepThread;
 
 public class Backup implements Runnable {
-    public final static double VERSION = 1.0;
+    public final static double VERSION = 1.11;
 
     private String file_path;
     private int replication_degree;
     private M_File mFile;
     private final Peer peer;
+    private double version;
 
-    public Backup(Peer peer){
+    public Backup(Peer peer, double version){
         this.peer = peer;
+        this.version = version;
     }
 
     public Backup(String file_path, int replication_degree, Peer peer) {
@@ -86,12 +89,12 @@ public class Backup implements Runnable {
      * ./backup/<peedID>/<fileID>/<chunkNO>
      * @param chunk
      */
-    private void storeChunk(Chunk chunk) {
+    public void storeChunk(Chunk chunk, int pretendedReplication) {
         String peerID = getPeerID(), fileID = chunk.getFileID();
         int chunkID = chunk.getChunkID();
         StoredMessage message = MessageFactory.getStoredMessage(peerID, chunk);
         if(peer.haveChunk(fileID, chunkID)){
-            sendStored(message);
+            sendStored(message, pretendedReplication);
             return;
         }
         String file_path = "backup/" + peerID + "/" + fileID + "/" + chunkID;
@@ -101,27 +104,19 @@ public class Backup implements Runnable {
         }
         long file_Size = (new File(file_path)).length();
         peer.addChunk(chunk, file_Size);
-        sendStored(message);
+        sendStored(message, pretendedReplication);
     }
 
-    public void storeChunk(double version, Chunk chunk, int pretendedReplication){
-        String fileID = chunk.getFileID();
-        int chunkID = chunk.getChunkID();
-        if(version != VERSION)
-            storeChunk(chunk);
-        else {
-            sleepRandomTime(1000);
-            int actualReplication = peer.getActualRepDegree(fileID, chunkID);
-            System.out.println("Rep: " + pretendedReplication + " actual " + actualReplication + " chunkId: " + chunkID);
-            if(pretendedReplication - actualReplication > 0)
-                storeChunk(chunk);
-        }
-    }
-
-    private void sendStored(StoredMessage message){
+    private void sendStored(StoredMessage message, int pretendedReplication){
         peer.addReplicationDatabase(message);
         sleepRandomTime(400);
-        peer.send(message);
+        int degreeDiff = pretendedReplication - peer.getActualRepDegree(message.getFileID(), message.getChunkNO());
+        if(version == VERSION && (degreeDiff < 0)){
+            String file_path = "backup/" + peer.getPeerID() + "/" + message.getFileID() + "/" + message.getChunkNO();
+            peer.removeChunk(message.getFileID(), message.getChunkNO(), new File(file_path).length());
+            deleteFile(file_path);
+        } else
+            peer.send(message);
     }
 
     private String getPeerID(){
