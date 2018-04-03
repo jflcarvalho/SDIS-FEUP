@@ -31,7 +31,7 @@ public class MCR_Channel extends M_Channel {
         ChunkMessage message = (ChunkMessage) Message.parse(string_message);
         if(message == null)
             return;
-        
+
         Constants.MessageType messageType = message.getMessageType();
         System.out.println(messageType.toString() + " " + message.getSenderID());
         if(messageType == CHUNK){

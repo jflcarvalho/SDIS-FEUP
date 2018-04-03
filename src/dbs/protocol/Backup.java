@@ -86,7 +86,7 @@ public class Backup implements Runnable {
      * ./backup/<peedID>/<fileID>/<chunkNO>
      * @param chunk
      */
-    public void storeChunk(Chunk chunk) {
+    private void storeChunk(Chunk chunk) {
         String peerID = getPeerID(), fileID = chunk.getFileID();
         int chunkID = chunk.getChunkID();
         StoredMessage message = MessageFactory.getStoredMessage(peerID, chunk);
@@ -102,6 +102,20 @@ public class Backup implements Runnable {
         long file_Size = (new File(file_path)).length();
         peer.addChunk(chunk, file_Size);
         sendStored(message);
+    }
+
+    public void storeChunk(double version, Chunk chunk, int pretendedReplication){
+        String fileID = chunk.getFileID();
+        int chunkID = chunk.getChunkID();
+        if(version != VERSION)
+            storeChunk(chunk);
+        else {
+            sleepRandomTime(1000);
+            int actualReplication = peer.getActualRepDegree(fileID, chunkID);
+            System.out.println("Rep: " + pretendedReplication + " actual " + actualReplication + " chunkId: " + chunkID);
+            if(pretendedReplication - actualReplication > 0)
+                storeChunk(chunk);
+        }
     }
 
     private void sendStored(StoredMessage message){

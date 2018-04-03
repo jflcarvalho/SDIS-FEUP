@@ -41,15 +41,15 @@ public abstract class MessageFactory {
         return new AliveMessage(1.11, peerID, "#");
     }
 
-    private static String getFileIDFromChunk(@NotNull Chunk chunk){
+    private static String getFileIDFromChunk(Chunk chunk){
         return chunk.getFileID();
     }
 
-    private static int getChunkIDFromChunk(@NotNull Chunk chunk){
+    private static int getChunkIDFromChunk(Chunk chunk){
         return chunk.getChunkID();
     }
 
-    private static byte[] getDataFromChunk(@NotNull Chunk chunk){
+    private static byte[] getDataFromChunk(Chunk chunk){
         return chunk.getData();
     }
 

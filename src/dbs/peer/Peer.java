@@ -1,6 +1,5 @@
 package dbs.peer;
 
-import com.sun.istack.internal.NotNull;
 import dbs.Chunk;
 import dbs.message.*;
 import dbs.network.MCB_Channel;
@@ -43,7 +42,7 @@ public class Peer implements PeerInterface, Serializable {
 
     private final M_Channel[] channels = new M_Channel[3];
 
-    public Peer(@NotNull String[] args){
+    public Peer(String[] args){
         this.version = args[0];
         if(!args[1].equals("-1"))
             this.peerID = args[1];
@@ -241,15 +240,15 @@ public class Peer implements PeerInterface, Serializable {
     }
     //-----------
 
-    private String getFileIDFromChunk(@NotNull Chunk chunk){
+    private String getFileIDFromChunk(Chunk chunk){
         return chunk.getFileID();
     }
 
-    private int getChunkIDFromChunk(@NotNull Chunk chunk){
+    private int getChunkIDFromChunk(Chunk chunk){
         return chunk.getChunkID();
     }
 
-    private String getFileIDFromMessage(@NotNull Message message){
+    private String getFileIDFromMessage(Message message){
         return message.getFileID();
     }
 
