@@ -18,4 +18,5 @@ public class Constants {
     public static final int MCR = 2;
 
     public static final boolean DEBUG = true;
+    public static double VERSION;
 }

@@ -16,5 +16,5 @@ public interface PeerInterface extends Remote{
 
     void reclaimSpace(int value) throws RemoteException;
 
-    void state() throws RemoteException;
+    String state() throws RemoteException;
 }

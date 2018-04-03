@@ -21,7 +21,7 @@ public abstract class ProcessMessage {
                 peer.removeReplicationDatabase((DeletedMessage) message);
                 break;
             case GETCHUNK:
-                new Restore(peer).replyChunk(message.file_ID, ((GetChunkMessage) message).getChunkID());
+                new Restore(peer, message.version).replyChunk(message.file_ID, ((GetChunkMessage) message).getChunkID(), message.sender_ID);
                 break;
             case REMOVED:
                 peer.removeReplicationDatabase((RemovedMessage) message);

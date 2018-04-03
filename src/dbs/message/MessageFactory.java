@@ -1,39 +1,37 @@
 package dbs.message;
 
 import dbs.Chunk;
-import dbs.protocol.Backup;
-import dbs.protocol.Delete;
-import dbs.protocol.ReclaimSpace;
-import dbs.protocol.Restore;
+import dbs.utils.Constants;
+
 
 public abstract class MessageFactory {
     public static StoredMessage getStoredMessage(String peerID, Chunk chunk){
-        return new StoredMessage(Backup.VERSION, peerID, getFileIDFromChunk(chunk), getChunkIDFromChunk(chunk));
+        return new StoredMessage(Constants.VERSION, peerID, getFileIDFromChunk(chunk), getChunkIDFromChunk(chunk));
     }
 
     public static PutChunkMessage getPutChunkMessage(String peerID, Chunk chunk, int replication_Deg) {
-        return new PutChunkMessage(Backup.VERSION, peerID, getFileIDFromChunk(chunk),
+        return new PutChunkMessage(Constants.VERSION, peerID, getFileIDFromChunk(chunk),
                 getChunkIDFromChunk(chunk), replication_Deg, getDataFromChunk(chunk));
     }
 
     public static DeleteMessage getDeleteMessage(String peerID, String fileID) {
-        return new DeleteMessage(Delete.VERSION, peerID, fileID);
+        return new DeleteMessage(Constants.VERSION, peerID, fileID);
     }
 
     public static GetChunkMessage getGetChunkMessage(String peerID, String fileID, int chunkID) {
-        return new GetChunkMessage(Restore.VERSION, peerID, fileID, chunkID);
+        return new GetChunkMessage(Constants.VERSION, peerID, fileID, chunkID);
     }
 
     public static ChunkMessage getChunkMessage(String peerID, Chunk chunk){
-        return new ChunkMessage(Restore.VERSION, peerID, chunk.getFileID(), chunk.getChunkID(), chunk.getData());
+        return new ChunkMessage(Constants.VERSION, peerID, chunk.getFileID(), chunk.getChunkID(), chunk.getData());
     }
 
     public static RemovedMessage getRemovedMessage(String peerID, String fileID, int chunkID){
-        return new RemovedMessage(ReclaimSpace.VERSION, peerID, fileID, chunkID);
+        return new RemovedMessage(Constants.VERSION, peerID, fileID, chunkID);
     }
 
     public static DeletedMessage getDeletedMessage(String peerID, String fileID, int chunkID){
-        return new DeletedMessage(Delete.VERSION, peerID, fileID, chunkID);
+        return new DeletedMessage(Constants.VERSION, peerID, fileID, chunkID);
     }
 
     public static AliveMessage getAliveMessage(String peerID){

@@ -31,7 +31,7 @@ public class MCB_Channel extends M_Channel {
         PutChunkMessage message = (PutChunkMessage) Message.parse(string_message);
         if(message == null)
             return;
-
+        peersConnected.put(message.getSenderID(), packet.getAddress());
         Constants.MessageType messageType = message.getMessageType();
         System.out.println(messageType.toString() + " " + message.getSenderID());
         if(messageType == PUTCHUNK){

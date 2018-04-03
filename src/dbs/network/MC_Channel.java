@@ -28,7 +28,7 @@ public class MC_Channel extends M_Channel {
         Message message = Message.parse(string_message);
         if(message == null)
             return;
-
+        peersConnected.put(message.getSenderID(), packet.getAddress());
         System.out.println(message.getMessageType().toString() + " " + message.getSenderID());
         ProcessMessage.processMessage(message, peer);
     }

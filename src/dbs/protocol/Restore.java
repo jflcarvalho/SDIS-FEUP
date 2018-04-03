@@ -1,13 +1,18 @@
 package dbs.protocol;
 
 import dbs.Chunk;
-import dbs.message.ChunkMessage;
-import dbs.message.GetChunkMessage;
-import dbs.message.MessageFactory;
+import dbs.message.*;
 import dbs.peer.Peer;
+import dbs.utils.Constants;
 import javafx.util.Pair;
 
+import java.io.DataInputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.TreeMap;
@@ -18,22 +23,25 @@ import static dbs.file_io.FileManager.createFile;
 import static dbs.file_io.FileManager.writeFile;
 import static dbs.file_io.M_File.getFileID;
 import static dbs.utils.Constants.*;
+import static dbs.utils.Constants.MessageType.CHUNK;
 import static dbs.utils.Utils.sleepRandomTime;
 import static dbs.utils.Utils.sleepThread;
 
 public class Restore implements Runnable {
-    public final static double VERSION = 1.0;
+    public final static double VERSION = 1.11;
 
     private String file_path;
     private File file;
     private final Peer peer;
+    private double version;
     private Map<Pair<String, Integer>,Chunk> restoredChunks = new ConcurrentHashMap<>();
     private int lastChunkID;
 
     private static Restore instance;
 
-    public Restore(Peer peer) {
+    public Restore(Peer peer, double version) {
         this.peer = peer;
+        this.version = version;
     }
 
     public Restore(String file_path, Peer peer) {
@@ -62,6 +70,8 @@ public class Restore implements Runnable {
             System.out.println("No File in System to Restore");
             return;
         }
+        if(version == VERSION)
+            new Thread(this::startTCPServer).start();
         for (Map.Entry<Integer, Pair<Integer, HashSet<String>>> entry : chunksInfo.entrySet())
         {
             if(entry.getValue().getValue().size() == 0){
@@ -93,15 +103,51 @@ public class Restore implements Runnable {
             System.out.print(" Unsuccessful\n");
     }
 
-    public void replyChunk(String fileID, int chunkID){
+    private void startTCPServer() {
+        try {
+            System.out.println("Start server at: " + peer.getMdr_port());
+            ServerSocket server = new ServerSocket(peer.getMdr_port());
+            while (true){
+                Socket connect = server.accept();
+                System.out.println("Connected to : " + connect.getInetAddress().toString() + ":" + connect.getPort());
+                InputStream in = connect.getInputStream();
+                DataInputStream dis = new DataInputStream(in);
+
+                int len = dis.readInt();
+                byte[] data = new byte[len];
+                if (len > 0) {
+                    dis.readFully(data);
+                }
+                String string_message = new String(data, StandardCharsets.ISO_8859_1);
+                ChunkMessage message = (ChunkMessage) Message.parse(string_message);
+                if(message == null)
+                    return;
+                Constants.MessageType messageType = message.getMessageType();
+                System.out.println(messageType.toString() + " " + message.getSenderID());
+                if(messageType == CHUNK){
+                    ProcessMessage.processChunkMessage(message, peer);
+                }
+            }
+        } catch (IOException e) {
+            if(DEBUG)
+                e.printStackTrace();
+            else
+                System.out.println("[ERROR] Start TCP Server");
+        }
+    }
+
+    public void replyChunk(String fileID, int chunkID, String senderID){
         Chunk chunk = readChunk(peer.getPeerID(), fileID, chunkID);
         if(chunk == null)
             return;
         ChunkMessage message = MessageFactory.getChunkMessage(peer.getPeerID(), chunk);
         sleepRandomTime(400);
-        peer.send(message);
+        if(version != VERSION)
+            peer.send(message);
+        else
+            peer.send(message, senderID);
     }
-
+    
     public void addChunk(Chunk chunk) {
         if(restoredChunks.put(new Pair<>(chunk.getFileID(), chunk.getChunkID()), chunk) != null)
             return;
@@ -126,6 +172,11 @@ public class Restore implements Runnable {
         writeFile(data, file_Path);
     }
 
+    /**
+     *
+     * @param sortedChunks all received chunks to aggregate
+     * @return byte[] with all chunks aggregated
+     */
     private byte[] chunkAggregator(Map<Pair<String, Integer>, Chunk> sortedChunks) {
         byte[] allBytes = new byte[0];
         for(Map.Entry<Pair<String, Integer>,Chunk> entry: sortedChunks.entrySet()){
@@ -138,6 +189,10 @@ public class Restore implements Runnable {
         return allBytes;
     }
 
+    /**
+     * Singleton Design Patter
+     * @return singleton instance
+     */
     public static Restore getInstance(){
         return instance;
     }

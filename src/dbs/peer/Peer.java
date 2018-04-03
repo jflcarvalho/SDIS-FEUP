@@ -10,6 +10,7 @@ import dbs.protocol.Backup;
 import dbs.protocol.Delete;
 import dbs.protocol.ReclaimSpace;
 import dbs.protocol.Restore;
+import dbs.utils.Constants;
 import javafx.util.Pair;
 
 import java.io.*;
@@ -19,14 +20,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static dbs.file_io.FileManager.createFile;
+import static dbs.file_io.M_File.getFileID;
 import static dbs.utils.Constants.*;
 
 public class Peer implements PeerInterface, Serializable {
     private Map<String, HashSet<Integer>> myChunks = new ConcurrentHashMap<>();
     private Map<String, Map<Integer, Pair<Integer, HashSet<String>>>> chunkReplication = new ConcurrentHashMap<>();
     private Map<String, ConcurrentLinkedQueue<Message>> pendingMessages = new ConcurrentHashMap<>();
+    private HashSet<String> filesBackedUp = new HashSet<>();
 
-    private final String version;
     private String peerID;
     private final String accessPoint;
 
@@ -38,12 +40,11 @@ public class Peer implements PeerInterface, Serializable {
     private final int mdr_port;
 
     private int usageSpace = 0;
-    private final int totalSpace = AVAILABLE_SPACE;
 
     private final M_Channel[] channels = new M_Channel[3];
 
     public Peer(String[] args){
-        this.version = args[0];
+        Constants.VERSION = Double.parseDouble(args[0]);
         if(!args[1].equals("-1"))
             this.peerID = args[1];
         this.accessPoint = args[2];
@@ -64,7 +65,7 @@ public class Peer implements PeerInterface, Serializable {
     }
 
     public int getAvailableSpace(){
-        return totalSpace - usageSpace;
+        return AVAILABLE_SPACE - usageSpace;
     }
 
     public Map<String, HashSet<Integer>> getMyChunks() {
@@ -114,6 +115,7 @@ public class Peer implements PeerInterface, Serializable {
     public void backup(String file_path, int replicationDegree) {
         Backup backup = new Backup(file_path, replicationDegree, this);
         backup.run();
+        filesBackedUp.add(file_path);
     }
 
     @Override
@@ -135,8 +137,33 @@ public class Peer implements PeerInterface, Serializable {
     }
 
     @Override
-    public void state(){
-
+    public String state(){
+        StringBuilder returnString = new StringBuilder();
+        returnString.append("-------- MY FILES -------\n");
+        for(String file_path : filesBackedUp){
+            returnString.append("--------- FILE ---------\n");
+            returnString.append("File Path: ").append(file_path).append("\n");
+            String fileID = getFileID(file_path);
+            returnString.append("FileID: ").append(fileID).append("\n");
+            returnString.append("Desired Replication Degree: ").append(getReplicationChunkMap(fileID).get(0).getKey()).append("\n");
+            returnString.append("-------- CHUNKS --------\n");
+            for(Map.Entry<Integer, Pair<Integer, HashSet<String>>> entry : getReplicationChunkMap(fileID).entrySet()){
+                returnString.append("    ID: ").append(entry.getKey()).append(" - Actual Replication Degree: ").append(entry.getValue().getValue().size()).append("\n");
+            }
+        }
+        returnString.append("\n------- MY CHUNKS -------\n");
+        for(Map.Entry<String, HashSet<Integer>> entry : myChunks.entrySet()){
+            for(Integer chunkID : entry.getValue()){
+                returnString.append("CHUNK -> fileID: ").append(entry.getKey()).append(" chunkID: ").append(chunkID).append("\n");
+                returnString.append("         Size: ").append(new File("backup/" + peerID + "/" + entry.getKey() + "/" + chunkID).length());
+                returnString.append(" Actual Replication Degree: ").append(getActualRepDegree(entry.getKey(), chunkID)).append("\n");
+            }
+        }
+        returnString.append("\n------- DISK INFO -------\n");
+        returnString.append("Maximum Amount of Disk: " + AVAILABLE_SPACE + "\n");
+        returnString.append("Available Space in Disk: ").append(getAvailableSpace()).append("\n");
+        returnString.append("Used Amount of Disk: ").append(usageSpace).append("\n");
+        return returnString.toString();
     }
 
     public void send(Message message){
@@ -149,6 +176,16 @@ public class Peer implements PeerInterface, Serializable {
                 break;
             default:
                 channels[MC].send(message.encode());
+                break;
+        }
+    }
+
+    public void send(Message message, String senderID){
+        switch (message.getMessageType()){
+            case CHUNK:
+                ((MCR_Channel) channels[MCR]).send(message.encode(), senderID);
+                break;
+            default:
                 break;
         }
     }
@@ -267,5 +304,9 @@ public class Peer implements PeerInterface, Serializable {
             while (!messages.isEmpty())
                 send(messages.poll());
         }
+    }
+
+    public int getMdr_port() {
+        return channels[MCR].getPort();
     }
 }

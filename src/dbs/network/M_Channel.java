@@ -6,15 +6,17 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.util.HashMap;
 
 import static dbs.utils.Constants.DEBUG;
 import static dbs.utils.Constants.PACKET_LENGTH;
 
 public abstract class M_Channel implements Runnable {
-    private MulticastSocket mc_socket;
+    MulticastSocket mc_socket;
     private InetAddress address;
-    private int port;
+    int port;
     final Peer peer;
+    static HashMap<String, InetAddress> peersConnected = new HashMap<>();
 
     /**
      * Class that connects and listens to a multicast

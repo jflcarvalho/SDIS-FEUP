@@ -105,7 +105,7 @@ class TestApp {
 
     private void startState(){
         try {
-            peer.state();
+            System.out.print(peer.state());
         } catch (RemoteException e) {
             if(DEBUG)
                 e.printStackTrace();
