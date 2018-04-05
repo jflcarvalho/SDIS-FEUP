@@ -1,7 +1,7 @@
 # SDIS-FEUP
 [![BCH compliance](https://bettercodehub.com/edge/badge/jflcarvalho/SDIS-FEUP?branch=project&token=2d8467f22312dd57f5d76ab38592445ef673d7c4)](https://bettercodehub.com/)
 [![CodeFactor](https://www.codefactor.io/repository/github/jflcarvalho/sdis-feup/badge)](https://www.codefactor.io/repository/github/jflcarvalho/sdis-feup)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/322adeafbb664a7995776a14bf2f8c39)](https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=jflcarvalho/SDIS-FEUP&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/241e93849db04ceb80b45a43eb972792)](https://www.codacy.com/app/jflcarvalho/SDIS-FEUP?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=jflcarvalho/SDIS-FEUP&amp;utm_campaign=Badge_Grade)
 
 To compile and launch peers run:
 ```sh
