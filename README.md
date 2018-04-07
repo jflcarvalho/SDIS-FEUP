@@ -57,7 +57,7 @@ java -cp out\production\SDIS-FEUP dbs.client.testAPP <Access Point> RESTORE <Fil
 #LINUX/UNIX:
 java -cp out/production/SDIS-FEUP dbs.client.testAPP <Access Point> RESTORE <File>
 ```
-To test the STATE protocol run the following command:WINDOWS:
+To test the STATE protocol run the following command:
 ```bash
 #WINDOWS:
 java -cp out\production\SDIS-FEUP dbs.client.testAPP <Access Point> STATE
