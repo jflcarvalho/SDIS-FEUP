@@ -97,7 +97,7 @@ public class Peer implements PeerInterface, Serializable {
 
     public void start() {
         initPeer();
-        if(version != 1.0)
+        if(VERSION != 1.0)
             send(MessageFactory.getAliveMessage(peerID));
     }
 
