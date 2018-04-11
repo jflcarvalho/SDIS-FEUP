@@ -36,32 +36,32 @@ consolejava -cp out/production/SDIS-FEUP dbs.peer.InitPeer [1.0 | 1.11] <peerID>
 To test the DELETE protocol run the following command:
 ```bash
 #WINDOWS:
-java -cp out\production\SDIS-FEUP dbs.client.testAPP <Access Point> DELETE <File>
+java -cp out\production\SDIS-FEUP dbs.client.TestApp <Access Point> DELETE <File>
 
 #LINUX/UNIX:
-java -cp out/production/SDIS-FEUP dbs.client.testAPP <Access Point> DELETE <File>
+java -cp out/production/SDIS-FEUP dbs.client.TestApp <Access Point> DELETE <File>
 ```
 To test the BACKUP protocol run the following command:
 ```bash
 #WINDOWS:
-java -cp out\production\SDIS-FEUP dbs.client.testAPP <Access Point> BACKUP <File> <Replication Degree>
+java -cp out\production\SDIS-FEUP dbs.client.TestApp <Access Point> BACKUP <File> <Replication Degree>
 
 #LINUX/UNIX:
-java -cp out/production/SDIS-FEUP dbs.client.testAPP <Access Point> BACKUP <File> <Replication Degree>
+java -cp out/production/SDIS-FEUP dbs.client.TestApp <Access Point> BACKUP <File> <Replication Degree>
 ```
 To test the RESTORE protocol run the following command:
 ```bash
 #WINDOWS:
-java -cp out\production\SDIS-FEUP dbs.client.testAPP <Access Point> RESTORE <File>
+java -cp out\production\SDIS-FEUP dbs.client.TestApp <Access Point> RESTORE <File>
 
 #LINUX/UNIX:
-java -cp out/production/SDIS-FEUP dbs.client.testAPP <Access Point> RESTORE <File>
+java -cp out/production/SDIS-FEUP dbs.client.TestApp <Access Point> RESTORE <File>
 ```
 To test the STATE protocol run the following command:
 ```bash
 #WINDOWS:
-java -cp out\production\SDIS-FEUP dbs.client.testAPP <Access Point> STATE
+java -cp out\production\SDIS-FEUP dbs.client.TestApp <Access Point> STATE
 
 #LINUX/UNIX:
-java -cp out/production/SDIS-FEUP dbs.client.testAPP <Access Point> STATE
+java -cp out/production/SDIS-FEUP dbs.client.TestApp <Access Point> STATE
 ```
