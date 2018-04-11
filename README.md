@@ -3,19 +3,24 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/jflcarvalho/sdis-feup/badge)](https://www.codefactor.io/repository/github/jflcarvalho/sdis-feup)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/241e93849db04ceb80b45a43eb972792)](https://www.codacy.com/app/jflcarvalho/SDIS-FEUP?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=jflcarvalho/SDIS-FEUP&amp;utm_campaign=Badge_Grade)
 
-To compile and launch peers run:
+### Introduction
+In this project you will develop a distributed backup service for a local area network (LAN). The idea is to use the free disk space of the computers in a LAN for backing up files in other computers in the same LAN. The service is provided by servers in an environment that is assumed cooperative (rather than hostile). Nevertheless, each server retains control over its own disks and, if needed, may reclaim the space it made available for backing up other computers' files.
+
+##### To compile and launch peers run:
 ```sh
 sh initPeers.sh <Number of Peers> <Version> <MCip> <MCport> <MDBip> <MDBport> <MDRip> <MDRport>
 sh initPeer.sh 4 1.0 224.0.0.0 4445 224.0.0.1 4446 224.0.0.2 4447
 ```
-To start the testApp run:
+##### To start the testApp run:
 ```sh
 sh testApp.sh <Access Point> <Protocol> [ <Number of Bytes> | <File> | <File>, <Replication Degree>]
 sh testApp.sh pee0 BACKUP testFiles/testPdf.pdf 3
 ```
-OR RUN MANUALLY:
+____
+RUN MANUALLY:
+____
 
-To start rmi run the following command:
+##### To start rmi run the following command:
 ```bash
 #WINDOWS:
 cd out\production\SDIS-FEUP
@@ -25,7 +30,7 @@ start rmiregistry
 cd out/production/SDIS-FEUP
 rmiregistry
 ```
-To start the peer run the following command(advised to run at least 3 peers):
+##### To start the peer run the following command(advised to run at least 3 peers):
 ```bash
 #WINDOWS:
 java -cp out\production\SDIS-FEUP dbs.peer.InitPeer [1.0 | 1.11] <peerID> <accessPoint> 224.0.0.0 4445 224.0.0.1 4446 224.0.0.2 4447
@@ -33,7 +38,7 @@ java -cp out\production\SDIS-FEUP dbs.peer.InitPeer [1.0 | 1.11] <peerID> <acces
 #LINUX/UNIX:
 consolejava -cp out/production/SDIS-FEUP dbs.peer.InitPeer [1.0 | 1.11] <peerID> <accessPoint> 224.0.0.0 4445 224.0.0.1 4446 224.0.0.2 4447
 ```
-To test the DELETE protocol run the following command:
+##### To test the DELETE protocol run the following command:
 ```bash
 #WINDOWS:
 java -cp out\production\SDIS-FEUP dbs.client.TestApp <Access Point> DELETE <File>
@@ -41,7 +46,7 @@ java -cp out\production\SDIS-FEUP dbs.client.TestApp <Access Point> DELETE <File
 #LINUX/UNIX:
 java -cp out/production/SDIS-FEUP dbs.client.TestApp <Access Point> DELETE <File>
 ```
-To test the BACKUP protocol run the following command:
+##### To test the BACKUP protocol run the following command:
 ```bash
 #WINDOWS:
 java -cp out\production\SDIS-FEUP dbs.client.TestApp <Access Point> BACKUP <File> <Replication Degree>
@@ -49,7 +54,7 @@ java -cp out\production\SDIS-FEUP dbs.client.TestApp <Access Point> BACKUP <File
 #LINUX/UNIX:
 java -cp out/production/SDIS-FEUP dbs.client.TestApp <Access Point> BACKUP <File> <Replication Degree>
 ```
-To test the RESTORE protocol run the following command:
+##### To test the RESTORE protocol run the following command:
 ```bash
 #WINDOWS:
 java -cp out\production\SDIS-FEUP dbs.client.TestApp <Access Point> RESTORE <File>
@@ -57,7 +62,7 @@ java -cp out\production\SDIS-FEUP dbs.client.TestApp <Access Point> RESTORE <Fil
 #LINUX/UNIX:
 java -cp out/production/SDIS-FEUP dbs.client.TestApp <Access Point> RESTORE <File>
 ```
-To test the SPACERECLAIM protocol run the following command:
+##### To test the SPACERECLAIM protocol run the following command:
 ```bash
 #WINDOWS:
 java -cp out\production\SDIS-FEUP dbs.client.TestApp <Access Point> SPACERECLAIM <Size>
@@ -65,7 +70,7 @@ java -cp out\production\SDIS-FEUP dbs.client.TestApp <Access Point> SPACERECLAIM
 #LINUX/UNIX:
 java -cp out/production/SDIS-FEUP dbs.client.TestApp <Access Point> SPACERECLAIM <Size>
 ```
-To test the STATE protocol run the following command:
+##### To test the STATE protocol run the following command:
 ```bash
 #WINDOWS:
 java -cp out\production\SDIS-FEUP dbs.client.TestApp <Access Point> STATE
