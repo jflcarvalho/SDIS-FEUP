@@ -6,3 +6,6 @@ Works of SDIS-FEUP classes at feup that we learn distributed systems and network
 
 ### First Project
   [Serverless Distributed Backup Service](https://github.com/jflcarvalho/SDIS-FEUP/tree/project)
+
+### Second Project
+  [Processing Balancer in Cluster Environment](https://github.com/jflcarvalho/SDIS-FEUP/tree/develop)
