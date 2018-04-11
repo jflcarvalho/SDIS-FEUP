@@ -57,6 +57,14 @@ java -cp out\production\SDIS-FEUP dbs.client.TestApp <Access Point> RESTORE <Fil
 #LINUX/UNIX:
 java -cp out/production/SDIS-FEUP dbs.client.TestApp <Access Point> RESTORE <File>
 ```
+To test the SPACERECLAIM protocol run the following command:
+```bash
+#WINDOWS:
+java -cp out\production\SDIS-FEUP dbs.client.TestApp <Access Point> SPACERECLAIM <Size>
+
+#LINUX/UNIX:
+java -cp out/production/SDIS-FEUP dbs.client.TestApp <Access Point> SPACERECLAIM <Size>
+```
 To test the STATE protocol run the following command:
 ```bash
 #WINDOWS:
