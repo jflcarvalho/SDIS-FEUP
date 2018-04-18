@@ -36,7 +36,7 @@ rmiregistry
 java -cp out\production\SDIS-FEUP dbs.peer.InitPeer [1.0 | 1.11] <peerID> <accessPoint> 224.0.0.0 4445 224.0.0.1 4446 224.0.0.2 4447
 
 #LINUX/UNIX:
-consolejava -cp out/production/SDIS-FEUP dbs.peer.InitPeer [1.0 | 1.11] <peerID> <accessPoint> 224.0.0.0 4445 224.0.0.1 4446 224.0.0.2 4447
+java -cp out/production/SDIS-FEUP dbs.peer.InitPeer [1.0 | 1.11] <peerID> <accessPoint> 224.0.0.0 4445 224.0.0.1 4446 224.0.0.2 4447
 ```
 ##### To test the DELETE protocol run the following command:
 ```bash
