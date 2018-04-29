@@ -1,3 +1,5 @@
+package peers;
+
 import network.M_Channel;
 
 import java.util.concurrent.ArrayBlockingQueue;
@@ -15,7 +17,7 @@ public class Worker {
 
     /**
      * Constructor
-     * @param worker_id - ID of Created Worker
+     * @param worker_id - ID of Created peers.Worker
      */
     public Worker(String worker_id) {
         this.worker_id = worker_id;

@@ -4,7 +4,7 @@ import java.util.Date;
 
 public abstract class Constants {
     public static final int PACKET_LENGTH = 65536;
-    public static final boolean DEBUG = false;
+    public static final boolean DEBUG = true;
     public static final double VERSION = 0.1;
 
     /* STRINGS */
@@ -35,7 +35,7 @@ public abstract class Constants {
 
 
     // LOGIN
-    public static final String MSG_LOGIN_USER_ALREADY_EXIST = "User Already Exist\n";
+    public static final String MSG_LOGIN_USER_ALREADY_EXIST = "user Already Exist\n";
     public static final String MSG_LOGIN_WRONG_PASSWORD = "Wrong Password\n";
     public static final String MSG_LOGIN_USER_DOES_NOT_EXIST = "Username not found.\nVerify if username is correct or Registry first\n";
 }

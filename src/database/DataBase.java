@@ -1,8 +1,10 @@
+package database;
+
 import java.util.HashSet;
 import java.util.Hashtable;
 
 public abstract class DataBase {
-    /** HashTable with all User infos to login */
+    /** HashTable with all user infos to login */
     private static Hashtable<String, String> loginHash = new Hashtable<>();
 
     /**

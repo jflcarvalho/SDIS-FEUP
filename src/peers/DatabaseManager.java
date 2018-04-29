@@ -1,4 +1,4 @@
-package database;
+package peers;
 
 public class DatabaseManager {
     public DatabaseManager() {

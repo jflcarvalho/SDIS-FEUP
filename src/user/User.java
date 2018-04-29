@@ -1,3 +1,6 @@
+package user;
+
+import database.DataBase;
 import utils.Utils;
 
 import java.io.Serializable;
@@ -10,7 +13,7 @@ public class User implements Serializable {
     private final String password;
 
     /**
-     * User constructor create User object and add to database
+     * user constructor create user object and add to database
      *
      * @param username of the user to create a new user
      * @param password password unhashed to create a user
@@ -24,7 +27,7 @@ public class User implements Serializable {
 
     /**
      * Username getter
-     * @return String with the username of the User
+     * @return String with the username of the user
      */
     public String getUsername() {
         return username;
@@ -32,7 +35,7 @@ public class User implements Serializable {
 
     /**
      * Password getter
-     * @return String with the password hash of the User
+     * @return String with the password hash of the user
      */
     public String getPassword() {
         return password;

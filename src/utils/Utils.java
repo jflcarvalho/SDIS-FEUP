@@ -111,6 +111,16 @@ public abstract class Utils {
                 return null;
             }
         } while (a < min || a > max);
+        cleanIn();
         return a;
+    }
+
+    private static void cleanIn(){
+        try {
+            System.in.skip(System.in.available());
+        } catch (IOException e) {
+            if(DEBUG)
+                e.printStackTrace();
+        }
     }
 }
