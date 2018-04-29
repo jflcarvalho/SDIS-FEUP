@@ -1,3 +1,5 @@
+import network.M_Channel;
+
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -8,6 +10,8 @@ public class Worker {
 
     /** Thread Pool to execute the Tasks, with 10 threads running concurrently */
     private ThreadPoolExecutor threadPool = new ThreadPoolExecutor(1, 10, 3, TimeUnit.SECONDS, new ArrayBlockingQueue<>(50));
+
+    private M_Channel[] channels;
 
     /**
      * Constructor

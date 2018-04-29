@@ -1,6 +1,7 @@
 package utils;
 
 import javax.xml.bind.DatatypeConverter;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -97,5 +98,19 @@ public abstract class Utils {
             else
                 System.out.println("[ERROR] Sleeping Thread");
         }
+    }
+
+    public static Integer inputIntBetween(int min, int max){
+        int a;
+        System.out.print(": ");
+        do {
+            try {
+                a = Character.getNumericValue(System.in.read());
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
+        } while (a < min || a > max);
+        return a;
     }
 }
