@@ -6,11 +6,7 @@ public class Main {
     public static void main(String[] args){
         System.out.print(MENU_TITLE);
         String username;
-        int tries = 0;
-        do{
-            username= UI_Login.authMenu();
-            tries++;
-        } while (username == null && tries < 3);
+        username = UI_Login.authMenu();
         System.out.println(username);
     }
 }
