@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 
-import static utils.Constants.DEBUG;
+import static utils.Utils.exceptionPrint;
 
 public abstract class FileManager {
     /**
@@ -22,10 +22,7 @@ public abstract class FileManager {
             if(!outFile.createNewFile())
                 return false;
         } catch (IOException e) {
-            if(DEBUG)
-                e.printStackTrace();
-            else
-                System.out.println("[ERROR] Creating File: " + file_path);
+            exceptionPrint(e, "[ERROR] Creating File: " + file_path);
         }
         return true;
     }
@@ -44,10 +41,7 @@ public abstract class FileManager {
             output.write(data, 0, data.length);
             output.close();
         } catch (IOException e) {
-            if(DEBUG)
-                e.printStackTrace();
-            else
-                System.out.println("[ERROR] Writing File: " + file_path);
+            exceptionPrint(e, "[ERROR] Writing File: " + file_path);
             return false;
         }
         return true;
@@ -66,10 +60,7 @@ public abstract class FileManager {
             try {
                 Files.delete(file.toPath());
             } catch (IOException e) {
-                if(DEBUG)
-                    e.printStackTrace();
-                else
-                    System.out.println("[ERROR] Deleting File: " + file_path);
+                exceptionPrint(e, "[ERROR] Deleting File: " + file_path);
                 return false;
             }
         }
@@ -88,10 +79,7 @@ public abstract class FileManager {
             try {
                 return Files.readAllBytes(file.toPath());
             } catch (IOException e) {
-                if(DEBUG)
-                    e.printStackTrace();
-                else
-                    System.out.println("[ERROR] Reading File: " + file_path);
+                exceptionPrint(e, "[ERROR] Reading File: " + file_path);
             }
         }
         return null;

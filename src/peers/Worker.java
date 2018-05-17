@@ -1,26 +1,15 @@
 package peers;
 
-import network.M_Channel;
-
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-public class Worker {
-    /** Worker ID */
-    private String worker_id;
-
+public class Worker extends Node{
     /** Thread Pool to execute the Tasks, with 10 threads running concurrently */
     private ThreadPoolExecutor threadPool = new ThreadPoolExecutor(1, 10, 3, TimeUnit.SECONDS, new ArrayBlockingQueue<>(50));
 
-    private M_Channel[] channels;
-
-    /**
-     * Constructor
-     * @param worker_id - ID of Created peers.Worker
-     */
-    public Worker(String worker_id) {
-        this.worker_id = worker_id;
+    public Worker(String node_IP, int node_Port) {
+        super(node_IP, node_Port);
     }
 
     public void execute(Runnable task){

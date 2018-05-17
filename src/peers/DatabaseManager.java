@@ -1,8 +1,9 @@
 package peers;
 
-public class DatabaseManager {
-    public DatabaseManager() {
+public class DatabaseManager extends Node{
 
+    public DatabaseManager(String node_IP, int node_Port) {
+        super(node_IP, node_Port);
     }
 
     public void downloadTask(){

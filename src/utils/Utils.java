@@ -2,6 +2,7 @@ package utils;
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -10,7 +11,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import static utils.Constants.DEBUG;
+import static utils.Constants.MSG_GET_MAC;
+import static utils.Constants.MSG_SLEEP_THREAD;
 
 public abstract class Utils {
     /**
@@ -19,19 +21,19 @@ public abstract class Utils {
      * @param data
      * @return string encoded in SHA-256
      */
-    public static String hashString(String data){
-        String encodedHash = null;
+    public static byte[] hashString(String data){
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte [] hashByte = digest.digest(data.getBytes(StandardCharsets.UTF_8));
-            encodedHash = getHex(hashByte);
+            return hashByte;
         } catch (NoSuchAlgorithmException e) {
-            if(DEBUG)
-                e.printStackTrace();
-            else
-                System.out.println("[ERROR] Hashing String");
+            exceptionPrint(e, "[ERROR] Hashing String");
         }
-        return encodedHash;
+        return null;
+    }
+
+    public static int get32bitHashValue(BigInteger bigInteger) {
+        return Integer.remainderUnsigned(Math.abs(bigInteger.intValue()), 128);
     }
 
     /**
@@ -40,7 +42,7 @@ public abstract class Utils {
      * @param raw
      * @return string with hexadecimal form
      */
-    private static String getHex(byte[] raw){
+    public static String getHex(byte[] raw){
         return DatatypeConverter.printHexBinary(raw);
     }
 
@@ -60,10 +62,7 @@ public abstract class Utils {
             if (networkInterface != null)
                 return networkInterface.getHardwareAddress();
         } catch (SocketException | UnknownHostException e) {
-            if(DEBUG)
-                e.printStackTrace();
-            else
-                System.out.println("[ERROR] Getting MAC Address");
+            exceptionPrint(e, MSG_GET_MAC);
         }
         return null;
     }
@@ -77,10 +76,7 @@ public abstract class Utils {
         try {
             Thread.sleep(sleepingTime);
         } catch (InterruptedException e) {
-            if(DEBUG)
-                e.printStackTrace();
-            else
-                System.out.println("[ERROR] Sleeping Thread");
+            exceptionPrint(e, MSG_SLEEP_THREAD);
         }
     }
 
@@ -93,10 +89,7 @@ public abstract class Utils {
         try {
             Thread.sleep((long) (Math.random() * sleepingTime));
         } catch (InterruptedException e) {
-            if(DEBUG)
-                e.printStackTrace();
-            else
-                System.out.println("[ERROR] Sleeping Thread");
+            exceptionPrint(e, MSG_SLEEP_THREAD);
         }
     }
 
@@ -107,7 +100,7 @@ public abstract class Utils {
             try {
                 a = Character.getNumericValue(System.in.read());
             } catch (IOException e) {
-                e.printStackTrace();
+                exceptionPrint(e, ""); //TODO: make error message
                 return null;
             }
         } while (a < min || a > max);
@@ -119,8 +112,14 @@ public abstract class Utils {
         try {
             System.in.skip(System.in.available());
         } catch (IOException e) {
-            if(DEBUG)
-                e.printStackTrace();
+            exceptionPrint(e, ""); //TODO: make error message
         }
+    }
+
+    public static void exceptionPrint(Throwable e, String errorExplain){
+        if(Constants.DEBUG)
+            e.printStackTrace();
+        else
+            System.out.println(errorExplain);
     }
 }

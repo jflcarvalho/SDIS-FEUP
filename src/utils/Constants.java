@@ -35,7 +35,12 @@ public abstract class Constants {
 
 
     // LOGIN
-    public static final String MSG_LOGIN_USER_ALREADY_EXIST = "user Already Exist\n";
-    public static final String MSG_LOGIN_WRONG_PASSWORD = "Wrong Password\n";
-    public static final String MSG_LOGIN_USER_DOES_NOT_EXIST = "Username not found.\nVerify if username is correct or Registry first\n";
+    public static final String MSG_LOGIN_USER_ALREADY_EXIST = "user Already Exist";
+    public static final String MSG_LOGIN_WRONG_PASSWORD = "Wrong Password";
+    public static final String MSG_LOGIN_USER_DOES_NOT_EXIST = "Username not found.\nVerify if username is correct or Registry first";
+
+
+    // ERROR MSG
+    public static final String MSG_SLEEP_THREAD = "[ERROR] Sleeping Thread";
+    public static final String MSG_GET_MAC = "[ERROR] Getting MAC Address";
 }

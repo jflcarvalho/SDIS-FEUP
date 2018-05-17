@@ -4,8 +4,8 @@ import user.User;
 
 import java.util.Scanner;
 
-import static utils.Constants.DEBUG;
 import static utils.Constants.MENU_AUTH;
+import static utils.Utils.exceptionPrint;
 import static utils.Utils.inputIntBetween;
 
 public abstract class UI_Login {
@@ -41,10 +41,7 @@ public abstract class UI_Login {
         try {
             return (new User(username, password)).getUsername();
         } catch (User.LoginException e) {
-            if(DEBUG)
-                e.printStackTrace();
-            else
-                System.out.println(e.getError());
+            exceptionPrint(e, e.getError());
             return null;
         }
     }
@@ -59,10 +56,7 @@ public abstract class UI_Login {
         try {
             User.login(username, password);
         } catch (User.LoginException e) {
-            if(DEBUG)
-                e.printStackTrace();
-            else
-                System.out.println(e.getError());
+            exceptionPrint(e, e.getError());
             return null;
         }
         return username;

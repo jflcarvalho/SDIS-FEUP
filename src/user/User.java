@@ -21,7 +21,7 @@ public class User implements Serializable {
      */
     public User(String username, String password) throws LoginException {
         this.username = username;
-        this.password = Utils.hashString(password);
+        this.password = Utils.getHex(Utils.hashString(password));
         registry(this);
     }
 
@@ -58,7 +58,7 @@ public class User implements Serializable {
     }
 
     //TODO: make javadoc
-    public static class LoginException extends Throwable{
+    public static class LoginException extends Throwable {
         //TODO: make javadoc
         private String error;
 
