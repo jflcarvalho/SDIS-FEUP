@@ -29,6 +29,8 @@ public class ChordNode extends Node {
             return true;
         }
         //TODO: Find successor
+        Network.sendRequest(contact, "FINDSUCCESSOR_" + node_address.getAddress().getHostAddress() + ":" + node_address.getPort());
+        //TODO: Notify successor
         return false;
     }
 
