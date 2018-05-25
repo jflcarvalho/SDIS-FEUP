@@ -3,6 +3,7 @@ package peers;
 import network.Network;
 import peers.Protocol.Message;
 import peers.Protocol.MessageFactory;
+import peers.Threads.ReceiveMessages;
 
 import java.net.InetSocketAddress;
 import java.util.Hashtable;
@@ -12,6 +13,7 @@ import static peers.Protocol.Message.MessageType.*;
 public class ChordNode extends Node {
     private Hashtable<Integer, InetSocketAddress> finger_table = new Hashtable<>();
     private Node predecessor = null;
+    private ReceiveMessages listener;
 
     public ChordNode(int node_Port) {
         super(node_Port);
@@ -23,6 +25,8 @@ public class ChordNode extends Node {
         for (int i = 0; i < 32; i++){
             finger_table.put(i, node_address);
         }
+        listener = new ReceiveMessages(this);
+        new Thread(listener).start();
     }
 
     public Node getPredecessor() {
@@ -47,28 +51,42 @@ public class ChordNode extends Node {
         Node successor = new Node(reply.get_node());
         updateFingerTable(1, successor.getAddress());
 
-        // Notify Successor that this node is the new predecessor
-
-        reply = Network.sendRequest(successor, MessageFactory.SetPredecessor(successor.getAddress()), true);
-        if(reply == null || reply.getType() != REPLY_SETSUCCESSOR)
+        predecessor = notify(successor);
+        if(predecessor == null)
             return false;
-        predecessor = new Node(reply.get_node());
 
         //TODO: start all threads
         return true;
+    }
+
+    public Node notify(Node successor){
+        // Notify Successor that this node is the new predecessor
+        Message reply = Network.sendRequest(successor, MessageFactory.SetPredecessor(node_address), true);
+        if(reply == null || reply.getType() != REPLY_SETPREDECESSOR)
+            return null;
+        return new Node(reply.get_node());
+    }
+
+    public void notified(Node node){
+        // Verify if is correct
+        if(predecessor != null){
+            Network.sendRequest(node, MessageFactory.ReplySetPredecessor(predecessor.getAddress()), false);
+        }
+        predecessor = node;
     }
 
     public void updateFingerTable(int i, InetSocketAddress node){
         finger_table.put(i, node);
     }
 
-    public void findSuccessor(Node node) {
+    public Node findSuccessor(Node node) {
         Node n = findPredecessor(node);
 
         Message reply = Network.sendRequest(n, MessageFactory.GetSuccessor(n.getAddress()), true);
         if(reply == null || reply.getType() != REPLY_GETSUCCESSOR)
-            return;
+            return null;
         Network.sendRequest(node, MessageFactory.ReplyFindSuccessor(reply.get_node()), false);
+        return new Node(reply.get_node());
     }
 
     public Node findPredecessor(Node node){

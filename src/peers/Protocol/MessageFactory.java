@@ -22,6 +22,8 @@ public abstract class MessageFactory {
         return new Message(SET_PREDECESSOR, node);
     }
 
+    public static Message ReplySetPredecessor(InetSocketAddress node){ return new Message(REPLY_SETPREDECESSOR, node); }
+
     public static Message GetSuccessor(InetSocketAddress node){
         return new Message(GET_SUCCESSOR, node);
     }

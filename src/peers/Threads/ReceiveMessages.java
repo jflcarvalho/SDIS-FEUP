@@ -13,16 +13,16 @@ import static utils.Utils.exceptionPrint;
 
 public class ReceiveMessages implements Runnable {
 
-    private ChordNode _node = null;
+    private ChordNode _node;
     private ServerSocket server_Socket;
     private boolean watching;
     private MessageHandler msgHandler;
 
-    public ReceiveMessages(ChordNode node, int port) {
+    public ReceiveMessages(ChordNode node) {
         _node = node;
         msgHandler = new MessageHandler();
         try {
-            this.server_Socket = new ServerSocket(port);
+            this.server_Socket = new ServerSocket(node.getPort());
         } catch (IOException e) {
             exceptionPrint(e, "[ERROR] Creating Server Socket");
         }
@@ -43,8 +43,8 @@ public class ReceiveMessages implements Runnable {
                 exceptionPrint(e, "[ERROR] Accepting connection");
                 continue;
             }
-            Message incommingMsg = Network.getResponse(s, _node);
-            msgHandler.handle(_node, incommingMsg);
+            Message incomingMsg = Network.getResponse(s);
+            msgHandler.handle(_node, incomingMsg, s);
         }
     }
 }

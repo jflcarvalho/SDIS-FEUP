@@ -14,42 +14,49 @@ public abstract class Network {
         if(server == null || request == null)
             return null;
 
-        Socket socket = send(server, request);
+        Socket socket = open(server);
         if(socket == null)
             return null;
+        send(socket, request);
 
         Message reply_MSG = null;
         if(reply) {
             sleepThread(100);
-            reply_MSG = getResponse(socket, server);
+            reply_MSG = getResponse(socket);
         }
 
         close(socket);
         return reply_MSG;
     }
 
-    private static Socket send(Node server, Message request){
-        Socket socket = null;
-
+    private static Socket open(Node server){
         try {
-            socket = new Socket(server.getIP(), server.getPort());
-            ObjectOutputStream oStream = new ObjectOutputStream(socket.getOutputStream());
-            oStream.writeObject(request);
+            return new Socket(server.getIP(), server.getPort());
         } catch (IOException e) {
             exceptionPrint(e, "[ERROR] Cannot connect to the server: " + server.getStringAddress());
         }
-
-        return socket;
+        return null;
     }
 
-    public static Message getResponse(Socket socket, Node server){
+    public static boolean send(Socket socket, Message request){
+        try {
+            ObjectOutputStream oStream = new ObjectOutputStream(socket.getOutputStream());
+            oStream.writeObject(request);
+        } catch (IOException e) {
+            exceptionPrint(e, "[ERROR] Sending message ");
+            return false;
+        }
+        return true;
+    }
+
+    public static Message getResponse(Socket socket){
         Message reply = null;
 
         try {
             ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
             reply = (Message) in.readObject();
         } catch (IOException e) {
-            exceptionPrint(e, "[ERROR] Cannot read reply from: " + server.getStringAddress());
+            exceptionPrint(e, "[ERROR] Cannot read reply Server");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
