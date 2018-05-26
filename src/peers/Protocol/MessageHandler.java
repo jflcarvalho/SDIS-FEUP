@@ -9,24 +9,28 @@ import java.net.Socket;
 
 public class MessageHandler {
     public void handle(ChordNode node, Message msg, Socket socket){
-        InetSocketAddress successor;
+        Node x;
         switch (msg.getType()) {
             case FINDSUCCESSOR:
-                successor = node.findSuccessor(new Node(msg.get_node()));
-                Network.send(socket, MessageFactory.ReplyFindSuccessor(successor));
+                x = node.findSuccessor(msg.getNode());
+                Network.send(socket, MessageFactory.ReplyFindSuccessor(x));
                 break;
             case SET_PREDECESSOR:
-                InetSocketAddress lastPred = node.notified(new Node(msg.get_node()));
+                Node lastPred = node.notified(msg.getNode());
                 if(lastPred != null)
                     Network.send(socket, MessageFactory.ReplySetPredecessor(lastPred));
                 break;
             case GET_CLOSEST:
-                Node closest = node.closestPrecedingFinger(new Node(msg.get_node()));
-                Network.send(socket, MessageFactory.ReplyGetCloset(closest.getAddress()));
+                Node closest = node.closestPrecedingFinger(msg.getNode());
+                Network.send(socket, MessageFactory.ReplyGetCloset(closest));
                 break;
             case GET_SUCCESSOR:
-                successor = node.getSuccessor().getAddress();
-                Network.send(socket, MessageFactory.ReplyGetSuccessor(successor));
+                x = node.getSuccessor();
+                Network.send(socket, MessageFactory.ReplyGetSuccessor(x));
+                break;
+            case GET_PREDECCESSOR:
+                x = node.getPredecessor();
+                Network.send(socket, MessageFactory.ReplyGetPredeccessor(x));
                 break;
             default:
                 break;

@@ -8,10 +8,9 @@ import java.util.regex.Pattern;
 
 import static peers.Key.getUniqueKey;
 import static utils.Utils.exceptionPrint;
-import static utils.Utils.hashString;
 
 public class Node implements Serializable {
-    protected Integer node_ID;
+    protected int node_ID;
     protected InetSocketAddress node_address;
 
     public Node(int node_Port) {
@@ -23,6 +22,11 @@ public class Node implements Serializable {
         } catch (UnknownHostException e) {
             exceptionPrint(e, "[ERROR] Fail Creating Node");
         }
+    }
+
+    public Node(Integer node_ID, InetSocketAddress node_address) {
+        this.node_ID = node_ID;
+        this.node_address = node_address;
     }
 
     public Node(String node_ip, int node_port){
@@ -57,7 +61,7 @@ public class Node implements Serializable {
         System.out.println("Node Address: " + node_address.getAddress().getHostAddress() + ":" + node_address.getPort());
     }
 
-    public Integer getNode_ID() {
+    public int getNode_ID() {
         return node_ID;
     }
 
@@ -66,7 +70,9 @@ public class Node implements Serializable {
     }
 
     public String getStringAddress(){
-        return node_address.getAddress().getHostAddress() + ":" + node_address.getPort();
+        if(node_address != null)
+            return node_address.getAddress().getHostAddress() + ":" + node_address.getPort();
+        return "";
     }
 
     public String getIP(){
@@ -82,7 +88,8 @@ public class Node implements Serializable {
     }
 
     public int difference(Node o){
-        return (int) (Integer.toUnsignedLong(o.node_ID) - Integer.toUnsignedLong(node_ID));
+        int diff = (int) (Integer.toUnsignedLong(o.node_ID) - Integer.toUnsignedLong(node_ID));
+        return diff == 0 ? -1 : diff;
     }
 
     @Override
@@ -95,6 +102,6 @@ public class Node implements Serializable {
         }
 
         final Node node = (Node) o;
-        return node_ID.equals(node.getNode_ID());
+        return node_ID == node.getNode_ID();
     }
 }

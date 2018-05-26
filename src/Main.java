@@ -19,8 +19,10 @@ public class Main {
         ChordNode node = new ChordNode(port);
         node.print();
         System.out.println("join?");
-        String nodeAdress = in.nextLine();
-        Node contact = new Node(nodeAdress);
-        node.join(contact);
+        String nodeAddress = in.nextLine();
+        if(nodeAddress.length() > 0) {
+            Node contact = new Node(nodeAddress);
+            node.join(contact);
+        } else node.join(null);
     }
 }
