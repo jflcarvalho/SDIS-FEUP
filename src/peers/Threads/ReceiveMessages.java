@@ -8,6 +8,7 @@ import peers.Protocol.MessageHandler;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import static utils.Utils.exceptionPrint;
 
@@ -17,9 +18,12 @@ public class ReceiveMessages implements Runnable {
     private ServerSocket server_Socket;
     private boolean watching;
     private MessageHandler msgHandler;
+    private ScheduledThreadPoolExecutor executor;
+    private final int MAX_THREADS = 10;
 
     public ReceiveMessages(ChordNode node) {
         _node = node;
+        executor = new ScheduledThreadPoolExecutor(MAX_THREADS);
         msgHandler = new MessageHandler();
         try {
             this.server_Socket = new ServerSocket(node.getPort());
@@ -45,8 +49,7 @@ public class ReceiveMessages implements Runnable {
                 continue;
             }
             Message incomingMsg = Network.getResponse(s);
-            new Thread(() -> msgHandler.handle(_node, incomingMsg, s)).start();
-
+            executor.execute(() -> msgHandler.handle(_node, incomingMsg, s));
         }
     }
 }
