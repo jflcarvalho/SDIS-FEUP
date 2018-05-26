@@ -34,9 +34,10 @@ public class ReceiveMessages implements Runnable {
 
     @Override
     public void run() {
-        Socket s;
+        // TODO: pool of socket or digest...
         watching = true;
         while (watching){
+            Socket s;
             try {
                 s = server_Socket.accept();
             } catch (IOException e) {
@@ -44,7 +45,8 @@ public class ReceiveMessages implements Runnable {
                 continue;
             }
             Message incomingMsg = Network.getResponse(s);
-            msgHandler.handle(_node, incomingMsg, s);
+            new Thread(() -> msgHandler.handle(_node, incomingMsg, s)).start();
+
         }
     }
 }

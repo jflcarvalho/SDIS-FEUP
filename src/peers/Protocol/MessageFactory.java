@@ -13,20 +13,18 @@ public abstract class MessageFactory {
         return new Message(FINDSUCCESSOR, node);
     }
 
-    public static Message ReplyFindSuccessor(InetSocketAddress node){
-        return new Message(REPLY_FINDSUCCESSOR, node);
-    }
+    public static Message ReplyFindSuccessor(InetSocketAddress node) { return new Message(REPLY_FINDSUCCESSOR, node); }
 
     // Message to inform some peer that the node is your's predecessor
     public static Message SetPredecessor(InetSocketAddress node) {
         return new Message(SET_PREDECESSOR, node);
     }
 
-    public static Message ReplySetPredecessor(InetSocketAddress node){ return new Message(REPLY_SETPREDECESSOR, node); }
+    public static Message ReplySetPredecessor(InetSocketAddress node) { return new Message(REPLY_SETPREDECESSOR, node); }
 
-    public static Message GetSuccessor(InetSocketAddress node){
-        return new Message(GET_SUCCESSOR, node);
-    }
+    public static Message GetSuccessor(InetSocketAddress node) { return new Message(GET_SUCCESSOR, node); }
+
+    public static Message ReplyGetSuccessor(InetSocketAddress node) { return new Message(REPLY_GETSUCCESSOR, node); }
 
     public static Message GetCloset(InetSocketAddress node){
         return new Message(GET_CLOSEST, node);

@@ -11,7 +11,7 @@ import java.util.Hashtable;
 import static peers.Protocol.Message.MessageType.*;
 
 public class ChordNode extends Node {
-    private Hashtable<Integer, InetSocketAddress> finger_table = new Hashtable<>();
+    private Hashtable<Integer, Node> finger_table = new Hashtable<>();
     private Node predecessor = null;
     private ReceiveMessages listener;
 
@@ -22,8 +22,8 @@ public class ChordNode extends Node {
 
     private void init(){
         predecessor = this;
-        for (int i = 0; i < 32; i++){
-            finger_table.put(i, node_address);
+        for (int i = 1; i <= 32; i++){
+            finger_table.put(i, this);
         }
         listener = new ReceiveMessages(this);
         new Thread(listener).start();
@@ -33,12 +33,12 @@ public class ChordNode extends Node {
         return predecessor;
     }
 
-    public InetSocketAddress getSuccessor(){
+    public Node getSuccessor(){
         return finger_table.get(1);
     }
 
     public boolean join (Node contact){
-        if (contact != null && !contact.equals(this)) {
+        if (contact == null || contact.equals(this)) {
             //TODO: start all threads
             return true;
         }
@@ -49,7 +49,7 @@ public class ChordNode extends Node {
             return false;
 
         Node successor = new Node(reply.get_node());
-        updateFingerTable(1, successor.getAddress());
+        updateFingerTable(1, successor);
 
         predecessor = notify(successor);
         if(predecessor == null)
@@ -67,31 +67,44 @@ public class ChordNode extends Node {
         return new Node(reply.get_node());
     }
 
-    public void notified(Node node){
+    public InetSocketAddress notified(Node node){
+        InetSocketAddress ret = null;
         // Verify if is correct
         if(predecessor != null){
-            Network.sendRequest(node, MessageFactory.ReplySetPredecessor(predecessor.getAddress()), false);
+            ret = predecessor.getAddress();
         }
+        if(getSuccessor().equals(this))
+            updateFingerTable(1, node);
         predecessor = node;
+        return ret;
     }
 
-    public void updateFingerTable(int i, InetSocketAddress node){
+    public void updateFingerTable(int i, Node node){
         finger_table.put(i, node);
+        for(i += 1; i < 32; i++){
+            if(Integer.compareUnsigned(this.difference(finger_table.get(i)), this.difference(node)) < 0)
+                finger_table.put(i, node);
+            else return;
+        }
     }
 
-    public Node findSuccessor(Node node) {
+    public InetSocketAddress findSuccessor(Node node) {
         Node n = findPredecessor(node);
 
+        if(this.compareTo(n) == 0)
+            return getSuccessor().getAddress();
         Message reply = Network.sendRequest(n, MessageFactory.GetSuccessor(n.getAddress()), true);
         if(reply == null || reply.getType() != REPLY_GETSUCCESSOR)
             return null;
-        Network.sendRequest(node, MessageFactory.ReplyFindSuccessor(reply.get_node()), false);
-        return new Node(reply.get_node());
+
+        return reply.get_node();
     }
 
     public Node findPredecessor(Node node){
         Node ret = this;
-        Node successor = new Node(((ChordNode) ret).getSuccessor());
+        Node successor = getSuccessor();
+        if(this.compareTo(successor) == 0)
+            return ret;
         while(Integer.compareUnsigned(ret.difference(node), ret.difference(successor)) > 0){
             if(ret.compareTo(this) == 0)
                 ret = closestPrecedingFinger(node);
@@ -107,15 +120,14 @@ public class ChordNode extends Node {
                 return null;
             successor = new Node(reply.get_node());
         }
-
         return ret;
     }
 
     public Node closestPrecedingFinger(Node node){
         for (int i = 31; i >= 0; i--){
-            Node closest_preceding = new Node(finger_table.get(i));
-            if(Integer.compareUnsigned(this.difference(node), this.difference(closest_preceding)) < 0)
-                return  closest_preceding;
+            Node closest_preceding = finger_table.get(i);
+            if(Integer.compareUnsigned(this.difference(closest_preceding), this.difference(node)) < 0)
+                return closest_preceding;
         }
         return null;
     }

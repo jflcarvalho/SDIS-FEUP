@@ -39,6 +39,7 @@ public abstract class Network {
     }
 
     public static boolean send(Socket socket, Message request){
+        System.out.println("SENDING_" + request.getType() + "_" + request.get_node().getAddress().getHostAddress() + ":" + request.get_node().getPort() + socket.toString());
         try {
             ObjectOutputStream oStream = new ObjectOutputStream(socket.getOutputStream());
             oStream.writeObject(request);
@@ -55,11 +56,11 @@ public abstract class Network {
         try {
             ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
             reply = (Message) in.readObject();
-        } catch (IOException e) {
+        } catch (IOException | ClassNotFoundException e) {
             exceptionPrint(e, "[ERROR] Cannot read reply Server");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
         }
+
+        System.out.println("RECEIVED_" + reply.getType() + "_" + reply.get_node().toString() + reply.get_node().getAddress().getHostAddress() + ":" + reply.get_node().getPort() + socket.toString());
 
         return reply;
     }

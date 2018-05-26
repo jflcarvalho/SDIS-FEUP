@@ -52,6 +52,11 @@ public class Node implements Serializable {
         }
     }
 
+    public void print(){
+        System.out.println("Node_ID: " + node_ID);
+        System.out.println("Node Address: " + node_address.getAddress().getHostAddress() + ":" + node_address.getPort());
+    }
+
     public Integer getNode_ID() {
         return node_ID;
     }
