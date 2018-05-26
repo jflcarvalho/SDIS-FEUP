@@ -1,3 +1,5 @@
+import utils.*;
+
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -91,8 +93,11 @@ public class Server{
                 
                 String msg = in.readLine();
                 System.out.println("MSG: " + msg);
-                String a = "Received: " + msg;
-                out.println(a); 
+                
+                if(msg.equals("GET LOGIN")){
+                    out.println(Constants.MENU_TITLE); 
+                }
+                
                 
                 //out.close();
                 //in.close();

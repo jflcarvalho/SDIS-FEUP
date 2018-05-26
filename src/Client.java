@@ -92,17 +92,23 @@ public class Client {
 
     public void start(){
         try{
-
-            //BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
             
-            String request = "ola";//stdIn.readLine();
+            String request = "GET LOGIN";
             this.out.println(request);
             
+            
+            /*
+            while((answer = this.in.readLine()) != null)
+            System.out.println(answer);
+            */
+            
             String answer = this.in.readLine();
-            System.out.println("Answer: " + answer);
+            System.out.println(answer);
+            while(this.in.ready()){
+                System.out.println(this.in.readLine());
+            }
             
             this.in.close();
-            //stdIn.close();
             this.out.close();
             this.socket.close();
         
