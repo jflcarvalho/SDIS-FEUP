@@ -1,9 +1,12 @@
 package peers.Threads;
 
 import network.Network;
-import peers.Protocol.Message;
 import peers.ChordNode;
+import peers.DatabaseManager;
+import peers.Protocol.APIMessage;
+import peers.Protocol.Message;
 import peers.Protocol.MessageHandler;
+import peers.Worker;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -49,7 +52,10 @@ public class ReceiveMessages implements Runnable {
                 continue;
             }
             Message incomingMsg = Network.getResponse(s);
-            executor.execute(() -> msgHandler.handle(_node, incomingMsg, s));
+            if(!(incomingMsg instanceof APIMessage))
+                executor.execute(() -> msgHandler.handle(_node, incomingMsg, s));
+            else if(_node instanceof DatabaseManager)
+                executor.execute(() -> msgHandler.handle(((DatabaseManager) _node), incomingMsg, s));
         }
     }
 }

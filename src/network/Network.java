@@ -1,7 +1,7 @@
 package network;
 
-import peers.Protocol.Message;
 import peers.Node;
+import peers.Protocol.Message;
 
 import java.io.*;
 import java.net.Socket;

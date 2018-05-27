@@ -1,7 +1,6 @@
 package user;
 
 import database.DataBase;
-import utils.Utils;
 
 import java.io.Serializable;
 import java.util.Hashtable;
@@ -16,13 +15,11 @@ public class User implements Serializable {
      * user constructor create user object and add to database
      *
      * @param username of the user to create a new user
-     * @param password password unhashed to create a user
-     * @throws LoginException in case of user already exists
+     * @param password Password hashed to create a user
      */
-    public User(String username, String password) throws LoginException {
+    public User(String username, String password) {
         this.username = username;
-        this.password = Utils.getHex(Utils.hashString(password));
-        registry(this);
+        this.password = password;
     }
 
     /**
@@ -41,29 +38,13 @@ public class User implements Serializable {
         return password;
     }
 
-
-    //TODO: make javadoc
-    public static void login(String username, String password) throws LoginException {
-        if(!getLoginHashTable().containsKey(username))
-            throw new LoginException(MSG_LOGIN_USER_DOES_NOT_EXIST);
-        if(!getLoginHashTable().get(username).equals(password))
-            throw new LoginException(MSG_LOGIN_WRONG_PASSWORD);
-    }
-
-    //TODO: make javadoc
-    private static void registry(User user) throws LoginException{
-        if(getLoginHashTable().containsKey(user.username))
-            throw new LoginException(MSG_LOGIN_USER_ALREADY_EXIST);
-        getLoginHashTable().put(user.username, user.password);
-    }
-
     //TODO: make javadoc
     public static class LoginException extends Throwable {
         //TODO: make javadoc
         private String error;
 
         //TODO: make javadoc
-        private LoginException(String error){
+        public LoginException(String error){
             this.error = error;
         }
 
@@ -71,9 +52,5 @@ public class User implements Serializable {
         public String getError() {
             return error;
         }
-    }
-
-    private static Hashtable<String, String> getLoginHashTable() {
-        return DataBase.getLoginHash();
     }
 }

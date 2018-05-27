@@ -20,6 +20,8 @@ import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.TrustManagerFactory;
 
+import static utils.Utils.exceptionPrint;
+
 public class Server{
 
     SSLServerSocket serverSocket;
@@ -60,27 +62,10 @@ public class Server{
 
             serverSocket.setNeedClientAuth(true);
         
-        } catch(UnknownHostException e){
-            e.printStackTrace();
+        } catch(KeyStoreException | NoSuchAlgorithmException | CertificateException | UnrecoverableKeyException | KeyManagementException | IOException e){
+            exceptionPrint(e, "[ERROR] internal server error");
 
-        } catch(KeyStoreException e){
-            e.printStackTrace();
-        
-        } catch(NoSuchAlgorithmException e){
-            e.printStackTrace();
-        
-        } catch(CertificateException e){
-            e.printStackTrace();
-
-        } catch(UnrecoverableKeyException e){
-            e.printStackTrace();
-        
-        } catch(KeyManagementException e){
-            e.printStackTrace();
-            
-        } catch(IOException e){
-            e.printStackTrace();
-        } 
+        }
     }
 
     public void read(){
@@ -103,7 +88,7 @@ public class Server{
                 //in.close();
             }
         } catch(IOException e) {
-            e.printStackTrace();
+            exceptionPrint(e, "[ERROR] reading...");
         }
     }
 }

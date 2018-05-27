@@ -1,6 +1,7 @@
 package peers;
 
 import network.Network;
+import peers.Protocol.ChordMessage;
 import peers.Protocol.Message;
 import peers.Protocol.MessageFactory;
 import peers.Threads.ReceiveMessages;
@@ -93,9 +94,9 @@ public class ChordNode extends Node implements Serializable {
             new Thread(stabilizer = new Stabilizer(this)).start();
             return true;
         }
-
-        Message reply = Network.sendRequest(contact, MessageFactory.FindSuccessor(this.getNode()), true);
-        if(reply == null || reply.getType() != REPLY_FINDSUCCESSOR)
+        Message msg = MessageFactory.getMessage(FIND_SUCCESSOR, new Serializable[]{this.getNode()});
+        ChordMessage reply = (ChordMessage) Network.sendRequest(contact, msg, true);
+        if(reply == null || reply.getType() != REPLY_FIND_SUCCESSOR)
             return false;
 
         Node successor = reply.getNode();
@@ -114,8 +115,9 @@ public class ChordNode extends Node implements Serializable {
 
     public Node notify(Node successor){
         // Notify Successor that this node is the new _predecessor
-        Message reply = Network.sendRequest(successor, MessageFactory.SetPredecessor(this.getNode()), true);
-        if(reply == null || reply.getType() != REPLY_SETPREDECESSOR)
+        Message msg = MessageFactory.getMessage(SET_PREDECESSOR, new Serializable[]{this.getNode()});
+        ChordMessage reply = (ChordMessage) Network.sendRequest(successor, msg, true);
+        if(reply == null || reply.getType() != REPLY_SET_PREDECESSOR)
             return null;
         return reply.getNode();
     }
@@ -132,8 +134,9 @@ public class ChordNode extends Node implements Serializable {
 
         if(this.compareTo(n) == 0)
             return getSuccessor();
-        Message reply = Network.sendRequest(n, MessageFactory.GetSuccessor(n), true);
-        if(reply == null || reply.getType() != REPLY_GETSUCCESSOR)
+        Message msg = MessageFactory.getMessage(GET_SUCCESSOR, new Serializable[]{n});
+        ChordMessage reply = (ChordMessage) Network.sendRequest(n, msg, true);
+        if(reply == null || reply.getType() != REPLY_GET_SUCCESSOR)
             return null;
 
         return reply.getNode();
@@ -148,14 +151,15 @@ public class ChordNode extends Node implements Serializable {
             if(ret.compareTo(this) == 0)
                 ret = closestPrecedingFinger(node);
             else {
-                Message reply = Network.sendRequest(ret, MessageFactory.GetCloset(node), true);
-                if(reply == null || reply.getType() != REPLY_GETCLOSEST)
+                Message msg = MessageFactory.getMessage(GET_CLOSEST, new Serializable[]{node});
+                ChordMessage reply = (ChordMessage) Network.sendRequest(ret, msg, true);
+                if(reply == null || reply.getType() != REPLY_GET_CLOSEST)
                     return null;
                 ret = reply.getNode();
             }
-
-            Message reply = Network.sendRequest(ret, MessageFactory.GetSuccessor(ret), true);
-            if(reply == null || reply.getType() != REPLY_GETSUCCESSOR)
+            Message msg = MessageFactory.getMessage(GET_SUCCESSOR, new Serializable[]{ret});
+            ChordMessage reply = (ChordMessage) Network.sendRequest(ret, msg, true);
+            if(reply == null || reply.getType() != REPLY_GET_SUCCESSOR)
                 return null;
             successor = reply.getNode();
         }
@@ -177,8 +181,9 @@ public class ChordNode extends Node implements Serializable {
         int i = updateFingerTable(1, successor);
         for(; i <= 32; i++){
             Node idealNode = new Node(this.node_ID + (int) Math.pow(2,i-1), null);
-            Message reply = Network.sendRequest(successor, MessageFactory.FindSuccessor(idealNode), true);
-            if(reply == null || reply.getType() != REPLY_FINDSUCCESSOR)
+            Message msg = MessageFactory.getMessage(FIND_SUCCESSOR, new Serializable[]{idealNode});
+            ChordMessage reply = (ChordMessage) Network.sendRequest(successor, msg, true);
+            if(reply == null || reply.getType() != REPLY_FIND_SUCCESSOR)
                 continue;
             System.out.print("Find: " + idealNode.node_ID + " reply: " + reply.getNode().node_ID);
             i = updateFingerTable(i, reply.getNode());
@@ -191,7 +196,8 @@ public class ChordNode extends Node implements Serializable {
         for(int i = 1; i <= 32; i++){
             Node idealNode = new Node(this.node_ID - (int) Math.pow(2,i-1), null);
             Node predeccessorN = findPredecessor(idealNode);
-            Network.sendRequest(predeccessorN, MessageFactory.UpdateFinger(_node), false);
+            Message msg = MessageFactory.getMessage(UPDATE_FINGER, new Serializable[]{_node});
+            Network.sendRequest(predeccessorN, msg, false);
         }
     }
 

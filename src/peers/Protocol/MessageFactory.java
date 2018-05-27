@@ -1,58 +1,22 @@
 package peers.Protocol;
 
 import peers.Node;
+import user.User;
 
-import java.net.InetSocketAddress;
+import java.io.Serializable;
 
-import static peers.Protocol.Message.MessageType.*;
 
 public abstract class MessageFactory {
-
     // TODO: create a message pool
-
-    // Message to get successor of the node
-    public static Message FindSuccessor(Node node) {
-        return new Message(FINDSUCCESSOR, node);
-    }
-
-    public static Message ReplyFindSuccessor(Node node) {
-        return new Message(REPLY_FINDSUCCESSOR, node);
-    }
-
-    // Message to inform some peer that the node is your's predecessor
-    public static Message SetPredecessor(Node node) {
-        return new Message(SET_PREDECESSOR,  node);
-    }
-
-    public static Message ReplySetPredecessor(Node node) {
-        return new Message(REPLY_SETPREDECESSOR, node);
-    }
-
-    public static Message GetSuccessor(Node node) {
-        return new Message(GET_SUCCESSOR, node);
-    }
-
-    public static Message ReplyGetSuccessor(Node node) {
-        return new Message(REPLY_GETSUCCESSOR, node);
-    }
-
-    public static Message GetCloset(Node node) {
-        return new Message(GET_CLOSEST, node);
-    }
-
-    public static Message ReplyGetCloset(Node node) {
-        return new Message(REPLY_GETCLOSEST, node);
-    }
-
-    public static Message GetPredeccessor(Node node) {
-        return new Message(GET_PREDECCESSOR, node);
-    }
-
-    public static Message ReplyGetPredeccessor(Node node) {
-        return new Message(REPLY_GETPREDECCESSOR, node);
-    }
-
-    public static Message UpdateFinger(Node node) {
-        return new Message(UPDATE_FINGER, node);
+    public static Message getMessage(Message.MessageType type, Serializable[] args){
+        if(type.getValue() >= 0 && type.getValue() < 11 && args.length == 1)
+            return new ChordMessage(type, (Node) args[0]);
+        else if(type.getValue() >= 11 && type.getValue() < 15) {
+            if(args.length == 1)
+                return new APIMessage(type, (User) args[0]);
+            else if(args.length == 2)
+                return new APIMessage(type, (User) args[0], (Boolean) args[1]);
+        }
+        return null;
     }
 }

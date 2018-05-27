@@ -3,13 +3,16 @@ package peers.Threads;
 import network.Network;
 import peers.ChordNode;
 import peers.Node;
+import peers.Protocol.ChordMessage;
 import peers.Protocol.Message;
 import peers.Protocol.MessageFactory;
 
+import java.io.Serializable;
 import java.util.concurrent.*;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static peers.Protocol.Message.MessageType.REPLY_GETPREDECCESSOR;
+import static peers.Protocol.Message.MessageType.GET_PREDECESSOR;
+import static peers.Protocol.Message.MessageType.REPLY_GET_PREDECESSOR;
 
 public class Stabilizer implements Runnable{
     private ChordNode _node;
@@ -50,11 +53,12 @@ public class Stabilizer implements Runnable{
     }
 
     private void stabilize(){
-        System.out.println("Stabilizing Network...");
+        //System.out.println("Stabilizing Network...");
         Node successor = _node.getSuccessor();
 
-        Message reply = Network.sendRequest(successor, MessageFactory.GetPredeccessor(successor), true);
-        if(reply == null || reply.getType() != REPLY_GETPREDECCESSOR)
+        Message msg = MessageFactory.getMessage(GET_PREDECESSOR, new Serializable[]{successor});
+        ChordMessage reply = (ChordMessage) Network.sendRequest(successor, msg, true);
+        if(reply == null || reply.getType() != REPLY_GET_PREDECESSOR)
             return;
         Node x = reply.getNode();
 
@@ -66,13 +70,13 @@ public class Stabilizer implements Runnable{
     }
 
     private void fix_fingers(){
-        System.out.println("Fixing FingerTable...");
+        //System.out.println("Fixing FingerTable...");
         int random_index = (int) (Math.random() * 31 + 1);
         Node idealNode = new Node(_node.getNode_ID() + (int) Math.pow(2, random_index - 1), null);
         Node x = _node.findSuccessor(idealNode);
         int change = _node.updateFingerTable(random_index, x);
         //updateDelay(change);
         executor.schedule(this::fix_fingers, startDelay, SECONDS);
-        System.out.print(_node.fingerToString());
+        //System.out.print(_node.fingerToString());
     }
 }

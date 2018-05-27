@@ -24,7 +24,7 @@ public abstract class Constants {
 
     public static final String MENU_AUTH =
             "1) Login     \n" +
-            "2) Register  \n\n" +
+            "2) register  \n\n" +
             "0) Exit      \n";
 
     public static final String MENU_USER_AREA =
