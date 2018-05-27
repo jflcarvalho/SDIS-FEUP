@@ -35,7 +35,7 @@ public abstract class Constants {
 
 
     // LOGIN
-    public static final String MSG_LOGIN_USER_ALREADY_EXIST = "user Already Exist";
+    public static final String MSG_LOGIN_USER_ALREADY_EXIST = "User Already Exist";
     public static final String MSG_LOGIN_WRONG_PASSWORD = "Wrong Password";
     public static final String MSG_LOGIN_USER_DOES_NOT_EXIST = "Username not found.\nVerify if username is correct or Registry first";
 

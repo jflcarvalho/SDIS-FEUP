@@ -3,16 +3,16 @@ package peers;
 import user.User;
 
 import java.util.HashSet;
-import java.util.Hashtable;
+import java.util.concurrent.ConcurrentHashMap;
 
 public interface DataBasePeer {
     /** HashTable with all user infos to login */
-    Hashtable<String, String> loginHash = new Hashtable<>();
+    ConcurrentHashMap<Integer, User> loginHash = new ConcurrentHashMap<>();
 
     /** HashTable with all tasks from user */
-    Hashtable<String, HashSet<String>> userTasks = new Hashtable<>();
+    ConcurrentHashMap<String, HashSet<String>> userTasks = new ConcurrentHashMap<>();
 
-    boolean login(User user) throws User.LoginException;
+    boolean login(User user);
 
-    boolean register(User user) throws User.LoginException;
+    boolean register(User user);
 }

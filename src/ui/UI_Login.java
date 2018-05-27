@@ -2,6 +2,7 @@ package ui;
 
 import network.Network;
 import peers.DatabaseManager;
+import peers.Node;
 import peers.Protocol.APIMessage;
 import peers.Protocol.Message;
 import peers.Protocol.MessageFactory;
@@ -16,7 +17,7 @@ import static utils.Utils.exceptionPrint;
 import static utils.Utils.inputIntBetween;
 
 public abstract class UI_Login {
-    public static User authMenu(DatabaseManager db){
+    public static User authMenu(Node db){
         User user;
         APIMessage msg;
         System.out.print(MENU_AUTH);
@@ -42,6 +43,7 @@ public abstract class UI_Login {
         }
         return user;
     }
+
     private static User inputUser(){
         System.out.println("LOGIN");
         Scanner in = new Scanner(System.in);

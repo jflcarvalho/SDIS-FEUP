@@ -39,7 +39,7 @@ public abstract class Network {
     }
 
     public static boolean send(Socket socket, Message request){
-        //System.out.println("SENDING_" + request.getType() + "_" + request.getNode().getStringAddress() + socket.toString());
+        System.out.println("SENDING_" + request.getType());
         try {
             ObjectOutputStream oStream = new ObjectOutputStream(socket.getOutputStream());
             oStream.writeObject(request);
@@ -60,8 +60,7 @@ public abstract class Network {
             exceptionPrint(e, "[ERROR] Cannot read reply Server");
         }
 
-        //System.out.println("RECEIVED_" + reply.getType() + "_" + reply.getNode().getStringAddress() + socket.toString());
-
+        System.out.println("RECEIVED_" + reply.getType());
         return reply;
     }
 

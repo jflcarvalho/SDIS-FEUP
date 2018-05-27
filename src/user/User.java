@@ -1,15 +1,11 @@
 package user;
 
-import database.DataBase;
-
 import java.io.Serializable;
-import java.util.Hashtable;
-
-import static utils.Constants.*;
 
 public class User implements Serializable {
     private final String username;
     private final String password;
+    private final int lookup;
 
     /**
      * user constructor create user object and add to database
@@ -20,6 +16,7 @@ public class User implements Serializable {
     public User(String username, String password) {
         this.username = username;
         this.password = password;
+        this.lookup = username.hashCode();
     }
 
     /**
@@ -36,6 +33,10 @@ public class User implements Serializable {
      */
     public String getPassword() {
         return password;
+    }
+
+    public int getLookup() {
+        return lookup;
     }
 
     //TODO: make javadoc

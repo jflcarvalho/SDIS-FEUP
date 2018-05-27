@@ -8,7 +8,6 @@ import java.io.Serializable;
 import java.net.Socket;
 
 import static peers.Protocol.Message.MessageType.*;
-import static utils.Utils.exceptionPrint;
 
 public class MessageHandler {
     public void handle(ChordNode node, Message msg, Socket socket){
@@ -49,21 +48,25 @@ public class MessageHandler {
     }
 
     public void handle(DatabaseManager node, Message msg, Socket socket) {
-        User user = ((APIMessage) msg).getUser();
+        User user;
         switch (msg.getType()) {
             case LOGIN:
-                msg = MessageFactory.getMessage(REPLY_LOGIN, new Serializable[]{user, node.tryLogin(user)});
+                user = ((APIMessage) msg).getUser();
+                msg = MessageFactory.getMessage(REPLY_LOGIN, new Serializable[]{user, node.login(user)});
                 Network.send(socket, msg);
                 break;
             case REGISTER:
-                msg = MessageFactory.getMessage(REPLY_LOGIN, new Serializable[]{user, node.tryRegister(user)});
+                user = ((APIMessage) msg).getUser();
+                msg = MessageFactory.getMessage(REPLY_LOGIN, new Serializable[]{user, node.register(user)});
+                Network.send(socket, msg);
+                break;
+            case GET_LOGIN_DATA:
+                msg = MessageFactory.getMessage(REPLY_LOGIN_DATA, new Serializable[]{null, node.getDataResponsibilities(((DatabaseMessage) msg).getNode())});
                 Network.send(socket, msg);
                 break;
             default:
                 break;
         }
-    }
-
-    public void handle(WorkerPeer node, Message msg, Socket socket) {
+        System.out.println("2");
     }
 }

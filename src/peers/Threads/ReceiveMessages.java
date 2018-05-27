@@ -1,12 +1,8 @@
 package peers.Threads;
 
 import network.Network;
-import peers.ChordNode;
-import peers.DatabaseManager;
-import peers.Protocol.APIMessage;
-import peers.Protocol.Message;
-import peers.Protocol.MessageHandler;
-import peers.Worker;
+import peers.*;
+import peers.Protocol.*;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -41,7 +37,6 @@ public class ReceiveMessages implements Runnable {
 
     @Override
     public void run() {
-        // TODO: pool of socket or digest...
         watching = true;
         while (watching){
             Socket s;
@@ -52,7 +47,9 @@ public class ReceiveMessages implements Runnable {
                 continue;
             }
             Message incomingMsg = Network.getResponse(s);
-            if(!(incomingMsg instanceof APIMessage))
+            if(incomingMsg instanceof DatabaseMessage && _node instanceof DatabaseManager)
+                executor.execute(() -> msgHandler.handle(((DatabaseManager) _node), incomingMsg, s));
+            else if(!(incomingMsg instanceof APIMessage))
                 executor.execute(() -> msgHandler.handle(_node, incomingMsg, s));
             else if(_node instanceof DatabaseManager)
                 executor.execute(() -> msgHandler.handle(((DatabaseManager) _node), incomingMsg, s));
