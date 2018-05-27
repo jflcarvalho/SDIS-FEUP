@@ -12,12 +12,17 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.util.Scanner;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
+
+import utils.*;
+import user.User;
+import ui.UI_Login;
 
 public class Client {
 
@@ -26,6 +31,9 @@ public class Client {
     PrintWriter out;
     BufferedReader in;
     SSLSocket socket;
+    SSLContext sslContext;
+    User user;
+    Boolean loginSuccess = false;
 
     public static void main(String[] args){
         if(args.length != 2){
@@ -54,17 +62,13 @@ public class Client {
             KeyManagerFactory keyMF = KeyManagerFactory.getInstance("SunX509");
             keyMF.init(clientKS, "clientpw".toCharArray());
             
-            SSLContext sslContext = SSLContext.getInstance("SSL");
+            this.sslContext = SSLContext.getInstance("SSL");
             
             SecureRandom secRand = new SecureRandom();
             secRand.nextInt();
-            sslContext.init(keyMF.getKeyManagers(), trustMF.getTrustManagers(), secRand);
+            this.sslContext.init(keyMF.getKeyManagers(), trustMF.getTrustManagers(), secRand);
 
-            this.socket = (SSLSocket) sslContext.getSocketFactory().createSocket(this.address, this.port);
-
-            this.out = new PrintWriter(this.socket.getOutputStream(), true);
-            this.in = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
-
+            initSocket();            
         
         } catch(UnknownHostException e){
             e.printStackTrace();
@@ -90,27 +94,167 @@ public class Client {
 
     }
 
-    public void start(){
+    public void initSocket(){
         try{
+
+            this.socket = (SSLSocket) this.sslContext.getSocketFactory().createSocket(this.address, this.port);
             
-            String request = "GET LOGIN";
-            this.out.println(request);
+            this.out = new PrintWriter(this.socket.getOutputStream(), true);
+            this.in = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
             
-            
-            /*
-            while((answer = this.in.readLine()) != null)
-            System.out.println(answer);
-            */
-            
-            String answer = this.in.readLine();
-            System.out.println(answer);
+        } catch(IOException e){
+            e.printStackTrace();
+        }
+    }
+
+    public void closeSocket(){
+        try{
+
+            this.socket.close();
+            this.out.close();
+            this.in.close();
+        
+        } catch(IOException e){
+            e.printStackTrace();
+        } 
+    }
+
+    public void restartSocket(){
+        closeSocket();
+        initSocket();
+
+    }
+
+    public int login(String[] msg){
+        int min = Integer.parseInt(msg[1]);
+        int max = Integer.parseInt(msg[2]);
+        
+        try{
+
             while(this.in.ready()){
                 System.out.println(this.in.readLine());
             }
             
-            this.in.close();
-            this.out.close();
-            this.socket.close();
+            Integer choice = Utils.inputIntBetween(min, max);
+            Scanner stdIn = new Scanner(System.in);
+            String username, password;
+        
+            switch(choice){
+                case 1: 
+                    System.out.println("\n\nLOGIN\n");
+                    System.out.print("Username: ");
+                    username = stdIn.nextLine();
+                    
+                    System.out.print("Password: ");
+                    password = stdIn.nextLine();
+                    
+                    this.user = new User(username, Utils.getHex(Utils.hashString(password)));
+                    restartSocket();
+                    this.out.println("LOGIN " + user.getUsername() + " " + user.getPassword());
+                    System.out.println("LOGIN " + user.getUsername() + " " + user.getPassword());
+                    waitAnsLogin();
+                    break;
+                case 2:    
+                    System.out.println("\n\nREGISTER\n");
+                    System.out.print("Username: ");
+                    username = stdIn.nextLine();
+                    
+                    System.out.print("Password: ");
+                    password = stdIn.nextLine();
+                    
+                    this.user = new User(username, Utils.getHex(Utils.hashString(password)));
+                    restartSocket();
+                    this.out.println("LOGIN " + user.getUsername() + " " + user.getPassword());
+                    System.out.println("LOGIN " + user.getUsername() + " " + user.getPassword());
+                    waitAnsLogin();
+                    break;
+
+                default:
+                    stdIn.close();
+                    return -1;
+            
+            }
+
+            stdIn.close();
+                
+        } catch(IOException e) {
+            e.printStackTrace();
+            return -1;
+        }
+        return 0;
+    }
+
+    public void waitAnsLogin(){
+
+        try{
+
+            String answer = this.in.readLine();
+            System.out.println(answer);
+            
+            if(answer.equals("200")){
+                while(this.in.ready()){
+                    System.out.println(this.in.readLine());
+                }
+                
+                this.loginSuccess = true;
+                
+                restartSocket();
+                this.out.println("USER_MENU");
+            } else if(answer.equals("400")) {
+                
+                this.loginSuccess = false;
+                System.out.println("[ERROR] Login Incorrect");
+            }
+            
+        } catch(IOException e){
+            e.printStackTrace();
+        } catch(NullPointerException e){
+            System.err.println("[ERROR] Unexpected Error from Server");
+            System.exit(-1);
+        }
+    }
+    
+    public void start(){
+        try{
+            
+            String request = "MENU_TITLE";
+            this.out.println(request);
+
+            String answer = this.in.readLine();
+            System.out.println(answer);
+            
+            if(answer.equals("200")){
+                while(this.in.ready())
+                    System.out.println(this.in.readLine());
+                
+            } else
+                System.err.println("[ERROR] Unexpected message from server");
+            
+
+            while(!loginSuccess){
+
+                restartSocket();
+                request = "MENU_AUTH";
+                this.out.println(request);
+                
+                answer = this.in.readLine();
+                System.out.println(answer);
+                
+                if(answer.equals("300")){
+                    String ans = this.in.readLine();
+                    String[] divAnswer = ans.split("\\s");
+                    
+                    if(divAnswer[0].equals("AUTH")){
+                        if(login(divAnswer) == -1)
+                            return;
+                        
+                    }
+                    
+                } else
+                    System.err.println("[ERROR] Unexpected message from server");
+            }
+            
+            closeSocket();
         
         } catch(IOException e){
             e.printStackTrace();

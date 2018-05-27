@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.io.Serializable;
 import java.net.UnknownHostException;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
@@ -20,16 +21,22 @@ import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.TrustManagerFactory;
 
+import peers.Node;
+import user.User;
+import peers.Protocol.*;
+import network.*;
+
 import static utils.Utils.exceptionPrint;
 
 public class Server{
 
     SSLServerSocket serverSocket;
     int port;
+    Node node;
 
     public static void main(String[] args){
-        if(args.length != 1){
-            System.err.println("Wrong number of arguments!\nTry: Java Server <server_port>");
+        if(args.length != 2){
+            System.err.println("Wrong number of arguments!\nTry: Java Server <server_port> <ip_address:port>");
             return;
         }
 
@@ -40,6 +47,8 @@ public class Server{
 
     public Server(String[] args){
         this.port = Integer.parseInt(args[0]);
+        setNodeChord(args[1]);
+
         try{
 
             KeyStore clientKS = KeyStore.getInstance("JKS");
@@ -68,6 +77,10 @@ public class Server{
         }
     }
 
+    public void setNodeChord(String address){
+        this.node = new Node(address);
+    }
+
     public void read(){
         try{
 
@@ -77,15 +90,31 @@ public class Server{
                 BufferedReader in = new BufferedReader(new InputStreamReader(request.getInputStream()));
                 
                 String msg = in.readLine();
-                System.out.println("MSG: " + msg);
                 
-                if(msg.equals("GET LOGIN")){
-                    out.println(Constants.MENU_TITLE); 
+                System.out.println("MSG: " + msg); //TODO erase this
+                String[] splitMsg = msg.split("\\s");
+
+                switch(splitMsg[0]){
+                    case "MENU_TITLE":
+                        out.println(Constants.MSG_OK + Constants.MENU_TITLE);
+                    case "MENU_AUTH":
+                        out.println(Constants.MSG_MULTIPLE_CHOICES + "AUTH 0 2\n" + Constants.MENU_AUTH); 
+                        break;
+                    case "LOGIN":
+                        User user = new User(splitMsg[1], splitMsg[2]);
+
+                        APIMessage apiMsg = (APIMessage) MessageFactory.getMessage(Message.MessageType.LOGIN, new Serializable[]{user});
+                        apiMsg = (APIMessage) Network.sendRequest(this.node, apiMsg, true);
+                        System.out.println(apiMsg.getReplyValue());
+
+                        //TODO reply to client if correct or not
+                    //TODO other msgs
+
                 }
                 
                 
-                //out.close();
-                //in.close();
+                out.close();
+                in.close();
             }
         } catch(IOException e) {
             exceptionPrint(e, "[ERROR] reading...");

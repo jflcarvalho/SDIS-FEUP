@@ -1,7 +1,5 @@
 package user;
 
-import database.DataBase;
-
 import java.io.Serializable;
 import java.util.Hashtable;
 

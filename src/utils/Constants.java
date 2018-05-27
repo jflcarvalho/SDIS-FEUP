@@ -33,6 +33,9 @@ public abstract class Constants {
             "3) Consult Finnish Tasks   \n\n" +
             "0) Exit  \n";
 
+    public static final String MSG_OK = "200\n";
+    public static final String MSG_MULTIPLE_CHOICES = "300\n";
+    public static final String MSG_CLIENT_ERROR = "400\n";
 
     // LOGIN
     public static final String MSG_LOGIN_USER_ALREADY_EXIST = "user Already Exist";
