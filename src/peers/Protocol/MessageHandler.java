@@ -32,6 +32,8 @@ public class MessageHandler {
                 x = node.getPredecessor();
                 Network.send(socket, MessageFactory.ReplyGetPredeccessor(x));
                 break;
+            case UPDATE_FINGER:
+                node.updateFingerTable(msg.getNode());
             default:
                 break;
         }

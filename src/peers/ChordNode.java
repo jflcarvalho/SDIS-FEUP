@@ -75,6 +75,18 @@ public class ChordNode extends Node implements Serializable {
         return 33;
     }
 
+    public int updateFingerTable(Node node){
+        int diff = this.difference(node);
+        int index = (int) (Math.log(diff) / Math.log(2));
+        for(int i = index; i > 0; i--){
+            if(Integer.compareUnsigned(this.difference(finger_table.get(i)), diff) > 0){
+                finger_table.put(i, node);
+            }
+            else return i;
+        }
+        return 0;
+    }
+
     public boolean join (Node contact){
         System.out.println("Joining to Network...");
         if (contact == null || contact.equals(this)) {
@@ -94,8 +106,7 @@ public class ChordNode extends Node implements Serializable {
         System.out.println("Successor: " + successor.node_ID + " - " + successor.getStringAddress());
         System.out.println("Predecessor: " + _predecessor.node_ID + " - " + _predecessor.getStringAddress());
         initFingerTable(successor);
-
-        //updateOthersFinger();
+        updateOthersFinger();
 
         new Thread(stabilizer = new Stabilizer(this)).start();
         return true;
@@ -161,7 +172,7 @@ public class ChordNode extends Node implements Serializable {
         }
         return null;
     }
-    
+
     private void initFingerTable(Node successor) {
         int i = updateFingerTable(1, successor);
         for(; i <= 32; i++){
@@ -176,12 +187,11 @@ public class ChordNode extends Node implements Serializable {
         }
     }
 
-    //TODO: update other
     private void updateOthersFinger() {
         for(int i = 1; i <= 32; i++){
             Node idealNode = new Node(this.node_ID - (int) Math.pow(2,i-1), null);
             Node predeccessorN = findPredecessor(idealNode);
-            //predeccessorN.updateFinger()
+            Network.sendRequest(predeccessorN, MessageFactory.UpdateFinger(_node), false);
         }
     }
 

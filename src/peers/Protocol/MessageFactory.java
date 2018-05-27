@@ -51,4 +51,8 @@ public abstract class MessageFactory {
     public static Message ReplyGetPredeccessor(Node node) {
         return new Message(REPLY_GETPREDECCESSOR, node);
     }
+
+    public static Message UpdateFinger(Node node) {
+        return new Message(UPDATE_FINGER, node);
+    }
 }
