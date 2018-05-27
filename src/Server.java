@@ -81,7 +81,7 @@ public class Server{
         this.node = new Node(address);
     }
 
-    public void read(){
+    public void read(){ //TODO make this in threads
         try{
 
             while(true){
@@ -97,22 +97,54 @@ public class Server{
                 switch(splitMsg[0]){
                     case "MENU_TITLE":
                         out.println(Constants.MSG_OK + Constants.MENU_TITLE);
+                        break;
+
                     case "MENU_AUTH":
                         out.println(Constants.MSG_MULTIPLE_CHOICES + "AUTH 0 2\n" + Constants.MENU_AUTH); 
                         break;
+
+                    case "MENU_USER":
+                        out.println(Constants.MSG_MULTIPLE_CHOICES + "MENU_USER 0 3\n" + Constants.MENU_USER_AREA);
+                        break;
+
                     case "LOGIN":
                         User user = new User(splitMsg[1], splitMsg[2]);
 
                         APIMessage apiMsg = (APIMessage) MessageFactory.getMessage(Message.MessageType.LOGIN, new Serializable[]{user});
                         apiMsg = (APIMessage) Network.sendRequest(this.node, apiMsg, true);
-                        System.out.println(apiMsg.getReplyValue());
-
+                        System.out.println(apiMsg.getReplyValue()); //TODO erase this
                         //TODO reply to client if correct or not
-                    //TODO other msgs
+                        break;
 
-                }
-                
-                
+                    case "REGISTER":
+                        User regUser = new User(splitMsg[1], splitMsg[2]);
+                        APIMessage regMsg = (APIMessage) MessageFactory.getMessage(Message.MessageType.REGISTER, new Serializable[]{regUser});
+                        regMsg = (APIMessage) Network.sendRequest(this.node, regMsg, true);
+                        System.out.println(regMsg.getReplyValue()); //TODO erase this
+                        //TODO reply to client if successfull or not
+                        break;
+
+                    case "TASK":
+                        //TODO AddTask
+                        break;
+
+                    case "LIST_TASKS":
+                        //TODO get all tasks and return it
+                        break;
+
+                    case "DELETE":
+                        //TODO Delete task
+                        break;
+                    
+                    case "CONSULT":
+                        //TODO Return tasks and if finished or not
+                        break;
+                    
+                    default:
+                        //TODO Do we do something or simply ignore it?
+                        break;
+                    }
+                    
                 out.close();
                 in.close();
             }

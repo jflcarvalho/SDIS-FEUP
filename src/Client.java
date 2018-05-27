@@ -12,6 +12,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import javax.net.ssl.KeyManagerFactory;
@@ -70,25 +71,7 @@ public class Client {
 
             initSocket();            
         
-        } catch(UnknownHostException e){
-            e.printStackTrace();
-
-        } catch(KeyStoreException e){
-            e.printStackTrace();
-        
-        } catch(NoSuchAlgorithmException e){
-            e.printStackTrace();
-        
-        } catch(CertificateException e){
-            e.printStackTrace();
-        
-        } catch(UnrecoverableKeyException e){
-            e.printStackTrace();
-        
-        } catch(KeyManagementException e){
-            e.printStackTrace();
-            
-        } catch(IOException e){
+        } catch(KeyStoreException | NoSuchAlgorithmException | CertificateException | UnrecoverableKeyException | KeyManagementException | IOException e){
             e.printStackTrace();
         } 
 
@@ -164,8 +147,8 @@ public class Client {
                     
                     this.user = new User(username, Utils.getHex(Utils.hashString(password)));
                     restartSocket();
-                    this.out.println("LOGIN " + user.getUsername() + " " + user.getPassword());
-                    System.out.println("LOGIN " + user.getUsername() + " " + user.getPassword());
+                    this.out.println("REGISTER " + user.getUsername() + " " + user.getPassword());
+                    System.out.println("REGISTER " + user.getUsername() + " " + user.getPassword());
                     waitAnsLogin();
                     break;
 
@@ -197,9 +180,8 @@ public class Client {
                 }
                 
                 this.loginSuccess = true;
-                
-                restartSocket();
-                this.out.println("USER_MENU");
+                menu();
+
             } else if(answer.equals("400")) {
                 
                 this.loginSuccess = false;
@@ -256,6 +238,169 @@ public class Client {
             
             closeSocket();
         
+        } catch(IOException e){
+            e.printStackTrace();
+        }
+    }
+
+    public void addTask(){
+        try{
+
+            System.out.println("\n\nADD TASK\n");
+            Scanner stdIn = new Scanner(System.in);
+            System.out.print("File path: ");
+            String path = stdIn.nextLine();
+            
+            restartSocket();
+            this.out.println("TASK " + path);
+            
+            String answer = this.in.readLine();
+            System.out.println(answer);
+            
+            if(answer.equals("200")){
+                while(this.in.ready()){
+                    System.out.println("Successfull added task with ID " + this.in.readLine());
+                }
+            } else {
+                System.err.println("[ERROR] Couldn't add task. Please try again");
+            }
+            
+            stdIn.close();
+        } catch(IOException e){
+            e.printStackTrace();
+        }
+    }
+
+    public void consult(){
+        try{
+
+            System.out.println("\n\nCONSULT TASKS\n");
+            
+            restartSocket();
+            this.out.println("CONSULT");
+            
+            String answer = this.in.readLine();
+            System.out.println(answer);
+            
+            if(answer.equals("200")){
+                String print;
+                while(this.in.ready()){
+                    answer = this.in.readLine();
+                    String[] splitAns = answer.split("\\s");
+                    
+                    //TODO check this block of code cuz I'm assuming the response comes in <NUM ID> where NUM is 0 or 1 if finished or not
+                    if(splitAns[0].equals("0")){
+                        System.out.println("Finished: " + splitAns[1]);
+                    } else if(splitAns[0].equals("1")){
+                        System.out.println("Working on it: " + splitAns[1]);
+                    }
+                }
+            } else {
+                System.err.println("[ERROR] Couldn't consult the tasks");
+            }
+        
+        } catch(IOException e){
+            e.printStackTrace();
+        } 
+    }
+
+    public void delete(){
+        try{
+
+            System.out.println("\n\nDELETE TASKS\n");
+            
+            restartSocket();
+            this.out.println("LIST_TASKS");
+            
+            String answer = this.in.readLine();
+            System.out.println(answer);
+            
+            if(answer.equals("200")){
+                ArrayList<String> tasks = new ArrayList<String>();
+                int num = 1;
+                while(this.in.ready()){
+                    answer = this.in.readLine();
+                    System.out.println(num + ") " + answer);
+                    tasks.add(answer);
+                    num++;
+                }
+                System.out.println("\n0) Cancel");
+                
+                Integer choice = Utils.inputIntBetween(0, num - 1);
+                if(choice != 0){
+                    restartSocket();
+                    this.out.println("DELETE " + tasks.get(num - 2));
+                    
+                    String ans = this.in.readLine();
+                    System.out.println(ans);
+                    
+                    if(ans.equals("200")){
+                        while(this.in.ready()){
+                            System.out.println("Successfull deleted task with ID " + this.in.readLine());
+                        }
+                    } else {
+                        System.err.println("[ERROR] Couldn't delete task. Please try again");
+                    }
+                } else {
+                    return;
+                }
+                
+            } else {
+                System.err.println("[ERROR] Couldn't get the tasks");
+            }
+        
+        } catch(IOException e){
+            e.printStackTrace();
+        }
+
+    }
+        
+    public void menu(){
+
+        try{
+
+            while(true){
+                
+                restartSocket();
+                this.out.println("MENU_USER");
+                
+                String answer = this.in.readLine();
+                System.out.println(answer);
+                
+                if(answer.equals("300")){
+                    String ans = this.in.readLine();
+                    String[] divAnswer = ans.split("\\s");
+                    
+                    if(divAnswer[0].equals("MENU_USER")){
+                        int min = Integer.parseInt(divAnswer[1]);
+                        int max = Integer.parseInt(divAnswer[2]);
+                        
+                        while(this.in.ready()){
+                            System.out.println(this.in.readLine());
+                        }
+                        
+                        Integer choice = Utils.inputIntBetween(min, max);
+                        switch(choice){
+                            case 1:
+                                addTask();
+                                break;
+                            case 2:
+                                delete();
+                                break;
+                            case 3:
+                                consult();
+                                break;
+                            default:
+                                return;
+                        }
+                        
+                    }
+                    
+                } else
+                System.err.println("[ERROR] Unexpected message from server");
+                
+            }
+            
         } catch(IOException e){
             e.printStackTrace();
         }
