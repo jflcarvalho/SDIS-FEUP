@@ -5,6 +5,7 @@ import peers.Protocol.*;
 import user.User;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 import static peers.Protocol.Message.MessageType.*;
@@ -18,6 +19,7 @@ public class DatabaseManager extends ChordNode implements DataBasePeer {
 
     public DatabaseManager(int node_Port) {
         super(node_Port);
+        lookupLogin.putAll(loginHash);
     }
 
     private boolean tryLogin(User user) throws User.LoginException {
@@ -84,17 +86,25 @@ public class DatabaseManager extends ChordNode implements DataBasePeer {
     @Override
     protected void initFingerTable(Node successor) {
         super.initFingerTable(successor);
-        Message msg = MessageFactory.getMessage(GET_LOGIN_DATA, new Serializable[]{successor, null});
-        msg = Network.sendRequest(successor, msg, true);
-        ConcurrentSkipListMap<Integer, User> data = ((DatabaseMessage) msg).getLogin_Data();
-        loginHash.putAll(data);
-        new Thread(() -> lookupLogin.putAll(data)).start();
+        new Thread(() -> {
+            Message msg = MessageFactory.getMessage(GET_LOGIN_DATA, new Serializable[]{getNode(), null});
+            msg = Network.sendRequest(successor, msg, true);
+            ConcurrentSkipListMap<Integer, User> data = ((DatabaseMessage) msg).getLogin_Data();
+            System.out.println("Received " + data.size() + " Login Entries");
+            loginHash.putAll(data);
+            lookupLogin.putAll(data);
+        }).start();
     }
 
     public ConcurrentSkipListMap<Integer, User> getDataResponsibilities(Node predecessor){
-        ConcurrentSkipListMap<Integer, User> ret = new ConcurrentSkipListMap<>(lookupLogin.subMap(0, predecessor.node_ID));
-        lookupLogin = new ConcurrentSkipListMap<>(lookupLogin.subMap(predecessor.node_ID,true,  this.node_ID, true));
+        ConcurrentSkipListMap<Integer, User> ret = new ConcurrentSkipListMap<>();
+        for(ConcurrentSkipListMap.Entry<Integer, User> entry : lookupLogin.entrySet()) {
+            if(Integer.compareUnsigned(this.difference(new Node(entry.getKey(), null)), this.difference(predecessor)) < 0) {
+                ret.put(entry.getKey(), entry.getValue());
+                lookupLogin.remove(entry.getKey());
+            }
+        }
+
         return ret;
     }
-
 }

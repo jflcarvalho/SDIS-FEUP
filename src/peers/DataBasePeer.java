@@ -3,6 +3,7 @@ package peers;
 import user.User;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public interface DataBasePeer {

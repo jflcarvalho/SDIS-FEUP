@@ -18,29 +18,31 @@ import static utils.Utils.inputIntBetween;
 
 public abstract class UI_Login {
     public static User authMenu(Node db){
-        User user;
+        User user = null;
         APIMessage msg;
-        System.out.print(MENU_AUTH);
-        Integer choice = inputIntBetween(0, 2);
-        if (choice == null)
-            return null;
-        System.out.print(choice);
-        switch (choice) {
-            case 1:
-                user = inputUser();
-                msg = (APIMessage) MessageFactory.getMessage(Message.MessageType.LOGIN, new Serializable[]{user});
-                msg = (APIMessage) Network.sendRequest(db, msg, true);
-                System.out.println(msg.getReplyValue());
-                break;
-            case 2:
-                user = inputUser();
-                msg = (APIMessage) MessageFactory.getMessage(Message.MessageType.REGISTER, new Serializable[]{user});
-                msg = (APIMessage) Network.sendRequest(db, msg, true);
-                System.out.println(msg.getReplyValue());
-                break;
-            default:
+        Integer choice;
+        do {
+            System.out.print(MENU_AUTH);
+            choice = inputIntBetween(0, 2);
+            if (choice == null)
                 return null;
-        }
+            switch (choice) {
+                case 1:
+                    user = inputUser();
+                    msg = (APIMessage) MessageFactory.getMessage(Message.MessageType.LOGIN, new Serializable[]{user});
+                    msg = (APIMessage) Network.sendRequest(db, msg, true);
+                    System.out.println(msg.getReplyValue());
+                    break;
+                case 2:
+                    user = inputUser();
+                    msg = (APIMessage) MessageFactory.getMessage(Message.MessageType.REGISTER, new Serializable[]{user});
+                    msg = (APIMessage) Network.sendRequest(db, msg, true);
+                    System.out.println(msg.getReplyValue() + " - " + user.getLookup());
+                    break;
+                default:
+                    break;
+            }
+        } while (choice != 0);
         return user;
     }
 

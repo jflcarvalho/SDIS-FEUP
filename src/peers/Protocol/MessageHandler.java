@@ -67,6 +67,5 @@ public class MessageHandler {
             default:
                 break;
         }
-        System.out.println("2");
     }
 }

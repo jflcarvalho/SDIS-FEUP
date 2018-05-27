@@ -90,7 +90,7 @@ public class ChordNode extends Node implements ChordPeer, Serializable {
     public boolean join (Node contact) {
         System.out.println("Joining to Network...");
         if (contact == null || contact.equals(this)) {
-            //new Thread(stabilizer = new Stabilizer(this)).start();
+            new Thread(stabilizer = new Stabilizer(this)).start();
             return true;
         }
         Message msg = MessageFactory.getMessage(FIND_SUCCESSOR, new Serializable[]{this.getNode()});
@@ -108,7 +108,7 @@ public class ChordNode extends Node implements ChordPeer, Serializable {
         initFingerTable(successor);
         updateOthersFinger();
 
-        //new Thread(stabilizer = new Stabilizer(this)).start();
+        new Thread(stabilizer = new Stabilizer(this)).start();
         return true;
     }
 
