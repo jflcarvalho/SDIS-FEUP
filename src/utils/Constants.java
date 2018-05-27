@@ -4,7 +4,7 @@ import java.util.Date;
 
 public abstract class Constants {
     public static final int PACKET_LENGTH = 65536;
-    public static final boolean DEBUG = true;
+    public static final boolean DEBUG = false;
     public static final double VERSION = 0.1;
 
     /* STRINGS */

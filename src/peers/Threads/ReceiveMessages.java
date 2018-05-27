@@ -28,6 +28,7 @@ public class ReceiveMessages implements Runnable {
             this.server_Socket = new ServerSocket(node.getPort());
         } catch (IOException e) {
             exceptionPrint(e, "[ERROR] Creating Server Socket");
+            System.exit(-1);
         }
     }
 

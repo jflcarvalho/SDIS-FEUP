@@ -2,6 +2,7 @@ package network;
 
 import peers.Node;
 import peers.Protocol.Message;
+import utils.Constants;
 
 import java.io.*;
 import java.net.Socket;
@@ -39,7 +40,8 @@ public abstract class Network {
     }
 
     public static boolean send(Socket socket, Message request){
-        System.out.println("SENDING_" + request.getType());
+        if(Constants.DEBUG)
+            System.out.println("SENDING_" + request.getType());
         try {
             ObjectOutputStream oStream = new ObjectOutputStream(socket.getOutputStream());
             oStream.writeObject(request);
@@ -60,7 +62,8 @@ public abstract class Network {
             exceptionPrint(e, "[ERROR] Cannot read reply Server");
         }
 
-        System.out.println("RECEIVED_" + reply.getType());
+        if(Constants.DEBUG)
+            System.out.println("RECEIVED_" + reply.getType());
         return reply;
     }
 

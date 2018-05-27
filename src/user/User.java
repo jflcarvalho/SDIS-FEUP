@@ -1,6 +1,7 @@
 package user;
 
 import java.io.Serializable;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class User implements Serializable {
     private final String username;
