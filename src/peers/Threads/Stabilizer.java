@@ -2,6 +2,7 @@ package peers.Threads;
 
 import network.Network;
 import peers.ChordNode;
+import peers.ChordPeer;
 import peers.Node;
 import peers.Protocol.ChordMessage;
 import peers.Protocol.Message;

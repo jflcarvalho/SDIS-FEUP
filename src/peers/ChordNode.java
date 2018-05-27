@@ -8,12 +8,10 @@ import peers.Threads.ReceiveMessages;
 import peers.Threads.Stabilizer;
 
 import java.io.Serializable;
-import java.util.Hashtable;
 
 import static peers.Protocol.Message.MessageType.*;
 
-public class ChordNode extends Node implements Serializable {
-    private Hashtable<Integer, Node> finger_table = new Hashtable<>();
+public class ChordNode extends Node implements ChordPeer, Serializable {
     private Node _predecessor = null;
     private ReceiveMessages listener;
     private Stabilizer stabilizer;
@@ -33,7 +31,7 @@ public class ChordNode extends Node implements Serializable {
         new Thread(listener = new ReceiveMessages(this)).start();
     }
 
-    private Node getNode() {
+    protected Node getNode() {
         return _node;
     }
 
@@ -61,7 +59,7 @@ public class ChordNode extends Node implements Serializable {
         return ret;
     }
 
-    public int updateFingerTable(int i, Node node){
+    public int updateFingerTable(int i, Node node) {
         int last_index = i;
         for(; i <= 32; i++){
             if(finger_table.get(i).equals(node))
@@ -76,7 +74,7 @@ public class ChordNode extends Node implements Serializable {
         return 33;
     }
 
-    public int updateFingerTable(Node node){
+    public int updateFingerTable(Node node) {
         int diff = this.difference(node);
         int index = (int) (Math.log(diff) / Math.log(2));
         for(int i = index; i > 0; i--){
@@ -88,10 +86,11 @@ public class ChordNode extends Node implements Serializable {
         return 0;
     }
 
-    public boolean join (Node contact){
+    @Override
+    public boolean join (Node contact) {
         System.out.println("Joining to Network...");
         if (contact == null || contact.equals(this)) {
-            new Thread(stabilizer = new Stabilizer(this)).start();
+            //new Thread(stabilizer = new Stabilizer(this)).start();
             return true;
         }
         Message msg = MessageFactory.getMessage(FIND_SUCCESSOR, new Serializable[]{this.getNode()});
@@ -109,11 +108,12 @@ public class ChordNode extends Node implements Serializable {
         initFingerTable(successor);
         updateOthersFinger();
 
-        new Thread(stabilizer = new Stabilizer(this)).start();
+        //new Thread(stabilizer = new Stabilizer(this)).start();
         return true;
     }
 
-    public Node notify(Node successor){
+    @Override
+    public Node notify(Node successor) {
         // Notify Successor that this node is the new _predecessor
         Message msg = MessageFactory.getMessage(SET_PREDECESSOR, new Serializable[]{this.getNode()});
         ChordMessage reply = (ChordMessage) Network.sendRequest(successor, msg, true);
@@ -122,13 +122,15 @@ public class ChordNode extends Node implements Serializable {
         return reply.getNode();
     }
 
-    public Node notified(Node node){
+    @Override
+    public Node notified(Node node) {
         if(getSuccessor().equals(this))
             updateFingerTable(1, node);
 
         return setPredecessor(node);
     }
 
+    @Override
     public Node findSuccessor(Node node) {
         Node n = findPredecessor(node);
 
@@ -142,7 +144,7 @@ public class ChordNode extends Node implements Serializable {
         return reply.getNode();
     }
 
-    public Node findPredecessor(Node node){
+    private Node findPredecessor(Node node){
         Node ret = this.getNode();
         Node successor = getSuccessor();
         if(this.compareTo(successor) == 0)
@@ -166,6 +168,7 @@ public class ChordNode extends Node implements Serializable {
         return ret;
     }
 
+    @Override
     public Node closestPrecedingFinger(Node node){
         if(this.compareTo(node) == 0)
             return _predecessor;
@@ -177,7 +180,7 @@ public class ChordNode extends Node implements Serializable {
         return null;
     }
 
-    private void initFingerTable(Node successor) {
+    protected void initFingerTable(Node successor) {
         int i = updateFingerTable(1, successor);
         for(; i <= 32; i++){
             Node idealNode = new Node(this.node_ID + (int) Math.pow(2,i-1), null);

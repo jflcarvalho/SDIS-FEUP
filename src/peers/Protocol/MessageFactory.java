@@ -4,11 +4,15 @@ import peers.Node;
 import user.User;
 
 import java.io.Serializable;
+import java.util.concurrent.ConcurrentNavigableMap;
+import java.util.concurrent.ConcurrentSkipListMap;
+
+import static peers.Protocol.Message.MessageType.GET_LOGIN_DATA;
 
 
 public abstract class MessageFactory {
     // TODO: create a message pool
-    public static Message getMessage(Message.MessageType type, Serializable[] args){
+    public static Message getMessage(Message.MessageType type, Serializable[] args) {
         if(type.getValue() >= 0 && type.getValue() < 11 && args.length == 1)
             return new ChordMessage(type, (Node) args[0]);
         else if(type.getValue() >= 11 && type.getValue() < 15) {
@@ -16,6 +20,10 @@ public abstract class MessageFactory {
                 return new APIMessage(type, (User) args[0]);
             else if(args.length == 2)
                 return new APIMessage(type, (User) args[0], (Boolean) args[1]);
+        } else if(type.getValue() >= 15 && type.getValue() < 17) {
+            if(args.length == 2) {
+                return new DatabaseMessage(type, (Node) args[0], (ConcurrentSkipListMap<Integer, User>) args[1]);
+            }
         }
         return null;
     }

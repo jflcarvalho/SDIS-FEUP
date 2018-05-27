@@ -1,6 +1,9 @@
 package peers.Protocol;
 
 import peers.Node;
+import user.User;
+
+import java.util.concurrent.ConcurrentSkipListMap;
 
 public class ChordMessage extends Message {
     private Node _node;
