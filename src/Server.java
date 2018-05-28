@@ -112,18 +112,26 @@ public class Server{
 
                         APIMessage apiMsg = (APIMessage) MessageFactory.getMessage(Message.MessageType.LOGIN, new Serializable[]{user});
                         apiMsg = (APIMessage) Network.sendRequest(this.node, apiMsg, true);
-                        System.out.println(apiMsg.getReplyValue()); //TODO erase this
-                        //TODO reply to client if correct or not
+                        Boolean responseLogin = apiMsg.getReplyValue();
+                        System.out.println(responseLogin); //TODO erase this
+                        if(responseLogin)
+                            out.println(Constants.MSG_OK);
+                        else
+                            out.println(Constants.MSG_CLIENT_ERROR);
                         break;
 
                     case "REGISTER":
                         User regUser = new User(splitMsg[1], splitMsg[2]);
                         APIMessage regMsg = (APIMessage) MessageFactory.getMessage(Message.MessageType.REGISTER, new Serializable[]{regUser});
                         regMsg = (APIMessage) Network.sendRequest(this.node, regMsg, true);
-                        System.out.println(regMsg.getReplyValue()); //TODO erase this
-                        //TODO reply to client if successfull or not
+                        Boolean responseRegister = regMsg.getReplyValue();
+                        System.out.println(responseRegister); //TODO erase this
+                        if(responseRegister)
+                            out.println(Constants.MSG_OK);
+                        else
+                            out.println(Constants.MSG_CLIENT_ERROR);
                         break;
-
+                        
                     case "TASK":
                         //TODO AddTask
                         break;

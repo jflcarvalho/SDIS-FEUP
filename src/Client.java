@@ -158,7 +158,7 @@ public class Client {
             
             }
 
-            stdIn.close();
+            
                 
         } catch(IOException e) {
             e.printStackTrace();
@@ -265,7 +265,6 @@ public class Client {
                 System.err.println("[ERROR] Couldn't add task. Please try again");
             }
             
-            stdIn.close();
         } catch(IOException e){
             e.printStackTrace();
         }
