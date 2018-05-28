@@ -252,7 +252,7 @@ public class Client {
             String path = stdIn.nextLine();
             
             restartSocket();
-            this.out.println("TASK " + path);
+            this.out.println("TASK " + this.user.getUsername() + " " + this.user.getPassword() + " " + path);
             
             String answer = this.in.readLine();
             System.out.println(answer);
@@ -276,7 +276,7 @@ public class Client {
             System.out.println("\n\nCONSULT TASKS\n");
             
             restartSocket();
-            this.out.println("CONSULT");
+            this.out.println("CONSULT " + this.user.getUsername() + " " + this.user.getPassword());
             
             String answer = this.in.readLine();
             System.out.println(answer);
@@ -309,7 +309,7 @@ public class Client {
             System.out.println("\n\nDELETE TASKS\n");
             
             restartSocket();
-            this.out.println("LIST_TASKS");
+            this.out.println("LIST_TASKS " + this.user.getUsername() + " " + this.user.getPassword());
             
             String answer = this.in.readLine();
             System.out.println(answer);
@@ -328,7 +328,7 @@ public class Client {
                 Integer choice = Utils.inputIntBetween(0, num - 1);
                 if(choice != 0){
                     restartSocket();
-                    this.out.println("DELETE " + tasks.get(num - 2));
+                    this.out.println("DELETE " + this.user.getUsername() + " " + this.user.getPassword() + tasks.get(num - 2));
                     
                     String ans = this.in.readLine();
                     System.out.println(ans);
