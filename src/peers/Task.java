@@ -40,4 +40,9 @@ public class Task implements Serializable {
     public int getTask_ID() {
         return task_ID;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        return task_ID == ((Task) o).task_ID;
+    }
 }
