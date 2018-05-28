@@ -17,9 +17,9 @@ public class Main {
         System.out.println("Worker (w) / Database (d)");
         String choice = in.nextLine();
         if(choice.equals("w"))
-            worker(null);
+            worker(args);
         else if(choice.equals("d"))
-            database(null);
+            database(args);
     }
 
     private static void database(String[] args){

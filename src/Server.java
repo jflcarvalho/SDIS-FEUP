@@ -192,7 +192,7 @@ public class Server{
 
                         String ansConsult= "";
                         for(Task t: consultTasks){
-                            ansConsult += (t.getExitValue() == null ) ? "1 " : "0 " + t.getTask_ID() + "\n";
+                            ansConsult += ((t.getExitValue() == -1 ) ? "1 " : "0 ") + t.getTask_ID() + "\n";
                         }
                         
                         String print = Constants.MSG_OK + ansConsult;
