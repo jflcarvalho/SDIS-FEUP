@@ -152,12 +152,12 @@ public class Server{
                     case "LIST_TASKS":
                         User listUser = new User(splitMsg[1], splitMsg[2]);
                         WorkerMessage listMsg = (WorkerMessage) MessageFactory.getMessage(Message.MessageType.GET_TASKS, new Serializable[]{listUser});
-                        listMsg = (WorkerMessage) Network.sendRequest(this.workerNode, listMsg, true);
+                        listMsg = (WorkerMessage) Network.sendRequest(this.databaseNode, listMsg, true);
                         HashSet<Task> tasks = (HashSet<Task>) listMsg.getArg();
                         
                         ans = "";
                         for(Task t: tasks){
-                            ans += " " + t.getTask_ID();
+                            ans += t.getTask_ID() + " ";
                         }
                         
                         ans += "\n";
@@ -193,7 +193,7 @@ public class Server{
 
                         String ansConsult= "";
                         for(Task t: consultTasks){
-                            ansConsult += (t.getExitValue() == null ) ? " 1 " : " 0 " + t.getTask_ID() + "\n";
+                            ansConsult += (t.getExitValue() == null ) ? "1 " : "0 " + t.getTask_ID() + "\n";
                         }
                         
                         String print = Constants.MSG_OK + ansConsult;
