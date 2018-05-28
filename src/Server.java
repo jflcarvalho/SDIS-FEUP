@@ -14,6 +14,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.util.HashSet;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -22,6 +23,7 @@ import javax.net.ssl.SSLSocket;
 import javax.net.ssl.TrustManagerFactory;
 
 import peers.Node;
+import peers.Task;
 import user.User;
 import peers.Protocol.*;
 import network.*;
@@ -32,11 +34,11 @@ public class Server{
 
     SSLServerSocket serverSocket;
     int port;
-    Node node;
+    Node databaseNode, workerNode;
 
     public static void main(String[] args){
-        if(args.length != 2){
-            System.err.println("Wrong number of arguments!\nTry: Java Server <server_port> <ip_address:port>");
+        if(args.length != 3){
+            System.err.println("Wrong number of arguments!\nTry: java Server <server_port> <db_ip_address:db_port> <worker_ip_address:worker_port>");
             return;
         }
 
@@ -47,7 +49,8 @@ public class Server{
 
     public Server(String[] args){
         this.port = Integer.parseInt(args[0]);
-        setNodeChord(args[1]);
+        setNodeDatabase(args[1]);
+        setNodeWorker(args[2]);
 
         try{
 
@@ -77,8 +80,12 @@ public class Server{
         }
     }
 
-    public void setNodeChord(String address){
-        this.node = new Node(address);
+    public void setNodeDatabase(String address){
+        this.databaseNode = new Node(address);
+    }
+
+    public void setNodeWorker(String address){
+        this.workerNode = new Node(address);
     }
 
     public void read(){ //TODO make this in threads
@@ -93,6 +100,8 @@ public class Server{
                 
                 System.out.println("MSG: " + msg); //TODO erase this
                 String[] splitMsg = msg.split("\\s");
+
+                String ans;
 
                 switch(splitMsg[0]){
                     case "MENU_TITLE":
@@ -111,7 +120,7 @@ public class Server{
                         User user = new User(splitMsg[1], splitMsg[2]);
 
                         APIMessage apiMsg = (APIMessage) MessageFactory.getMessage(Message.MessageType.LOGIN, new Serializable[]{user});
-                        apiMsg = (APIMessage) Network.sendRequest(this.node, apiMsg, true);
+                        apiMsg = (APIMessage) Network.sendRequest(this.databaseNode, apiMsg, true);
                         Boolean responseLogin = apiMsg.getReplyValue();
                         System.out.println(responseLogin); //TODO erase this
                         if(responseLogin)
@@ -123,7 +132,7 @@ public class Server{
                     case "REGISTER":
                         User regUser = new User(splitMsg[1], splitMsg[2]);
                         APIMessage regMsg = (APIMessage) MessageFactory.getMessage(Message.MessageType.REGISTER, new Serializable[]{regUser});
-                        regMsg = (APIMessage) Network.sendRequest(this.node, regMsg, true);
+                        regMsg = (APIMessage) Network.sendRequest(this.databaseNode, regMsg, true);
                         Boolean responseRegister = regMsg.getReplyValue();
                         System.out.println(responseRegister); //TODO erase this
                         if(responseRegister)
@@ -133,18 +142,62 @@ public class Server{
                         break;
                         
                     case "TASK":
-                        //TODO AddTask
+                        User taskUser = new User(splitMsg[1], splitMsg[2]);
+                        Task task = new Task("Process", taskUser); //TODO change to be the one received by the client
+                        WorkerMessage taskMsg = (WorkerMessage) MessageFactory.getMessage(Message.MessageType.SUBMIT, new Serializable[]{task});
+                        taskMsg = (WorkerMessage) Network.sendRequest(this.workerNode, taskMsg, false);
+                        out.println(Constants.MSG_OK);
                         break;
 
                     case "LIST_TASKS":
+                        User listUser = new User(splitMsg[1], splitMsg[2]);
+                        WorkerMessage listMsg = (WorkerMessage) MessageFactory.getMessage(Message.MessageType.GET_TASKS, new Serializable[]{listUser});
+                        listMsg = (WorkerMessage) Network.sendRequest(this.workerNode, listMsg, true);
+                        HashSet<Task> tasks = (HashSet<Task>) listMsg.getArg();
+                        
+                        ans = "";
+                        for(Task t: tasks){
+                            ans += " " + t.getTask_ID();
+                        }
+                        
+                        ans += "\n";
+                        out.println(Constants.MSG_OK + ans);
+                        
                         //TODO get all tasks and return it
                         break;
 
                     case "DELETE":
+                        User deleteUser = new User(splitMsg[1], splitMsg[2]);
+                        WorkerMessage deleteListMsg = (WorkerMessage) MessageFactory.getMessage(Message.MessageType.GET_TASKS, new Serializable[]{deleteUser});
+                        deleteListMsg = (WorkerMessage) Network.sendRequest(this.workerNode, deleteListMsg, true);
+
+                        Task deleteTask = null;
+                        HashSet<Task> tasksSet = (HashSet<Task>) deleteListMsg.getArg();
+
+                        for(Task t: tasksSet){
+                            if(t.getTask_ID() == Integer.parseInt(splitMsg[3]))
+                                deleteTask = t;
+                        }
+                        
+                        WorkerMessage deleteMsg = (WorkerMessage) MessageFactory.getMessage(Message.MessageType.DELETE_TASK, new Serializable[]{deleteTask});
+                        deleteMsg = (WorkerMessage) Network.sendRequest(this.workerNode, deleteMsg, false);
+
                         //TODO Delete task
                         break;
                     
                     case "CONSULT":
+                        User consultUser = new User(splitMsg[1], splitMsg[2]);
+                        WorkerMessage consultMsg = (WorkerMessage) MessageFactory.getMessage(Message.MessageType.GET_TASKS, new Serializable[]{consultUser});
+                        consultMsg = (WorkerMessage) Network.sendRequest(this.workerNode, consultMsg, true);
+                        HashSet<Task> consultTasks = (HashSet<Task>) consultMsg.getArg();
+
+                        String ansConsult= "";
+                        for(Task t: consultTasks){
+                            ansConsult += (t.getExitValue() == null ) ? " 1 " : " 0 " + t.getTask_ID() + "\n";
+                        }
+                        
+
+                        out.println(Constants.MSG_OK + ansConsult);
                         //TODO Return tasks and if finished or not
                         break;
                     

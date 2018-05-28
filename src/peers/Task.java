@@ -25,7 +25,7 @@ public class Task implements Serializable {
         return command;
     }
 
-    public int getExitValue() {
+    public Integer getExitValue() {
         return exitValue;
     }
 
