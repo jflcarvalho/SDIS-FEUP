@@ -152,7 +152,7 @@ public class Server{
                     case "LIST_TASKS":
                         User listUser = new User(splitMsg[1], splitMsg[2]);
                         WorkerMessage listMsg = (WorkerMessage) MessageFactory.getMessage(Message.MessageType.GET_TASKS, new Serializable[]{listUser});
-                        listMsg = (WorkerMessage) Network.sendRequest(this.workerNode, listMsg, true);
+                        listMsg = (WorkerMessage) Network.sendRequest(this.workerNode, listMsg, false);
                         HashSet<Task> tasks = (HashSet<Task>) listMsg.getArg();
                         
                         ans = "";
@@ -161,6 +161,7 @@ public class Server{
                         }
                         
                         ans += "\n";
+                        System.out.println(ans);
                         out.println(Constants.MSG_OK + ans);
                         
                         //TODO get all tasks and return it
@@ -169,7 +170,7 @@ public class Server{
                     case "DELETE":
                         User deleteUser = new User(splitMsg[1], splitMsg[2]);
                         WorkerMessage deleteListMsg = (WorkerMessage) MessageFactory.getMessage(Message.MessageType.GET_TASKS, new Serializable[]{deleteUser});
-                        deleteListMsg = (WorkerMessage) Network.sendRequest(this.workerNode, deleteListMsg, true);
+                        deleteListMsg = (WorkerMessage) Network.sendRequest(this.workerNode, deleteListMsg, false);
 
                         Task deleteTask = null;
                         HashSet<Task> tasksSet = (HashSet<Task>) deleteListMsg.getArg();
@@ -182,6 +183,7 @@ public class Server{
                         WorkerMessage deleteMsg = (WorkerMessage) MessageFactory.getMessage(Message.MessageType.DELETE_TASK, new Serializable[]{deleteTask});
                         deleteMsg = (WorkerMessage) Network.sendRequest(this.workerNode, deleteMsg, false);
 
+                        out.println(Constants.MSG_OK);
                         //TODO Delete task
                         break;
                     
@@ -190,12 +192,13 @@ public class Server{
                         WorkerMessage consultMsg = (WorkerMessage) MessageFactory.getMessage(Message.MessageType.GET_TASKS, new Serializable[]{consultUser});
                         consultMsg = (WorkerMessage) Network.sendRequest(this.workerNode, consultMsg, true);
                         HashSet<Task> consultTasks = (HashSet<Task>) consultMsg.getArg();
+                        System.out.println("AAAA");
 
                         String ansConsult= "";
                         for(Task t: consultTasks){
-                            ansConsult += (t.getExitValue() == null ) ? " 1 " : " 0 " + t.getTask_ID() + "\n";
+                            ansConsult += ((t.getExitValue() == null ) ? " 1 " : " 0 ") + t.getTask_ID() + "\n";
                         }
-                        
+                        System.out.println(ansConsult);
 
                         out.println(Constants.MSG_OK + ansConsult);
                         //TODO Return tasks and if finished or not
