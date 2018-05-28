@@ -98,7 +98,7 @@ public class Server{
                 
                 String msg = in.readLine();
                 
-                System.out.println("MSG: " + msg); //TODO erase this
+                System.out.println("MSG: " + msg); 
                 String[] splitMsg = msg.split("\\s");
 
                 String ans;
@@ -122,7 +122,7 @@ public class Server{
                         APIMessage apiMsg = (APIMessage) MessageFactory.getMessage(Message.MessageType.LOGIN, new Serializable[]{user});
                         apiMsg = (APIMessage) Network.sendRequest(this.databaseNode, apiMsg, true);
                         Boolean responseLogin = apiMsg.getReplyValue();
-                        System.out.println(responseLogin); //TODO erase this
+                        
                         if(responseLogin)
                             out.println(Constants.MSG_OK);
                         else
@@ -134,7 +134,7 @@ public class Server{
                         APIMessage regMsg = (APIMessage) MessageFactory.getMessage(Message.MessageType.REGISTER, new Serializable[]{regUser});
                         regMsg = (APIMessage) Network.sendRequest(this.databaseNode, regMsg, true);
                         Boolean responseRegister = regMsg.getReplyValue();
-                        System.out.println(responseRegister); //TODO erase this
+                        
                         if(responseRegister)
                             out.println(Constants.MSG_OK);
                         else
@@ -157,20 +157,18 @@ public class Server{
                         
                         ans = "";
                         for(Task t: tasks){
-                            ans += t.getTask_ID() + " ";
+                            ans += t.getTask_ID() + "\n";
                         }
                         
-                        ans += "\n";
                         System.out.println(ans);
                         out.println(Constants.MSG_OK + ans);
                         
-                        //TODO get all tasks and return it
                         break;
 
                     case "DELETE":
                         User deleteUser = new User(splitMsg[1], splitMsg[2]);
                         WorkerMessage deleteListMsg = (WorkerMessage) MessageFactory.getMessage(Message.MessageType.GET_TASKS, new Serializable[]{deleteUser});
-                        deleteListMsg = (WorkerMessage) Network.sendRequest(this.workerNode, deleteListMsg, false);
+                        deleteListMsg = (WorkerMessage) Network.sendRequest(this.workerNode, deleteListMsg, true);
 
                         Task deleteTask = null;
                         HashSet<Task> tasksSet = (HashSet<Task>) deleteListMsg.getArg();
@@ -184,7 +182,6 @@ public class Server{
                         deleteMsg = (WorkerMessage) Network.sendRequest(this.workerNode, deleteMsg, false);
 
                         out.println(Constants.MSG_OK);
-                        //TODO Delete task
                         break;
                     
                     case "CONSULT":
@@ -192,7 +189,6 @@ public class Server{
                         WorkerMessage consultMsg = (WorkerMessage) MessageFactory.getMessage(Message.MessageType.GET_TASKS, new Serializable[]{consultUser});
                         consultMsg = (WorkerMessage) Network.sendRequest(this.databaseNode, consultMsg, true);
                         HashSet<Task> consultTasks = (HashSet<Task>) consultMsg.getArg();
-                        System.out.println("AAAA");
 
                         String ansConsult= "";
                         for(Task t: consultTasks){
@@ -201,11 +197,10 @@ public class Server{
                         
                         String print = Constants.MSG_OK + ansConsult;
                         out.println(print);
-                        //TODO Return tasks and if finished or not
                         break;
                     
                     default:
-                        //TODO Do we do something or simply ignore it?
+                        //Ignores the message
                         break;
                     }
                     

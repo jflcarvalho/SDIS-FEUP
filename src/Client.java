@@ -134,7 +134,6 @@ public class Client {
                     this.user = new User(username, Utils.getHex(Utils.hashString(password)));
                     restartSocket();
                     this.out.println("LOGIN " + user.getUsername() + " " + user.getPassword());
-                    System.out.println("LOGIN " + user.getUsername() + " " + user.getPassword());
                     waitAnsLogin();
                     break;
                 case 2:    
@@ -148,7 +147,6 @@ public class Client {
                     this.user = new User(username, Utils.getHex(Utils.hashString(password)));
                     restartSocket();
                     this.out.println("REGISTER " + user.getUsername() + " " + user.getPassword());
-                    System.out.println("REGISTER " + user.getUsername() + " " + user.getPassword());
                     waitAnsLogin();
                     break;
 
@@ -172,7 +170,6 @@ public class Client {
         try{
 
             String answer = this.in.readLine();
-            System.out.println(answer);
             
             if(answer.equals("200")){
                 while(this.in.ready()){
@@ -203,7 +200,6 @@ public class Client {
             this.out.println(request);
 
             String answer = this.in.readLine();
-            System.out.println(answer);
             
             if(answer.equals("200")){
                 while(this.in.ready())
@@ -220,7 +216,6 @@ public class Client {
                 this.out.println(request);
                 
                 answer = this.in.readLine();
-                System.out.println(answer);
                 
                 if(answer.equals("300")){
                     String ans = this.in.readLine();
@@ -255,7 +250,6 @@ public class Client {
             this.out.println("TASK " + this.user.getUsername() + " " + this.user.getPassword() + " " + path);
             
             String answer = this.in.readLine();
-            System.out.println(answer);
             
             if(answer.equals("200")){
                 while(this.in.ready()){
@@ -279,7 +273,6 @@ public class Client {
             this.out.println("CONSULT " + this.user.getUsername() + " " + this.user.getPassword());
             
             String answer = this.in.readLine();
-            System.out.println(answer);
             
             if(answer.equals("200")){
                 String print;
@@ -287,7 +280,6 @@ public class Client {
                     answer = this.in.readLine();
                     String[] splitAns = answer.split("\\s");
                     
-                    //TODO check this block of code cuz I'm assuming the response comes in <NUM ID> where NUM is 0 or 1 if finished or not
                     if(splitAns[0].equals("0")){
                         System.out.println("Finished: " + splitAns[1]);
                     } else if(splitAns[0].equals("1")){
@@ -312,7 +304,6 @@ public class Client {
             this.out.println("LIST_TASKS " + this.user.getUsername() + " " + this.user.getPassword());
             
             String answer = this.in.readLine();
-            System.out.println(answer);
             
             if(answer.equals("200")){
                 ArrayList<String> tasks = new ArrayList<String>();
@@ -328,10 +319,9 @@ public class Client {
                 Integer choice = Utils.inputIntBetween(0, num - 1);
                 if(choice != 0){
                     restartSocket();
-                    this.out.println("DELETE " + this.user.getUsername() + " " + this.user.getPassword() + tasks.get(num - 2));
+                    this.out.println("DELETE " + this.user.getUsername() + " " + this.user.getPassword() + " " + tasks.get(num - 2));
                     
                     String ans = this.in.readLine();
-                    System.out.println(ans);
                     
                     if(ans.equals("200")){
                         while(this.in.ready()){
@@ -364,7 +354,6 @@ public class Client {
                 this.out.println("MENU_USER");
                 
                 String answer = this.in.readLine();
-                System.out.println(answer);
                 
                 if(answer.equals("300")){
                     String ans = this.in.readLine();
