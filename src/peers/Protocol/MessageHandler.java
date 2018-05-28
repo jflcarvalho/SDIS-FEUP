@@ -65,6 +65,9 @@ public class MessageHandler {
                 msg = MessageFactory.getMessage(REPLY_LOGIN_DATA, new Serializable[]{null, node.getDataResponsibilities(((DatabaseMessage) msg).getNode())});
                 Network.send(socket, msg);
                 break;
+            case GET_TASKS_DATA:
+                msg = MessageFactory.getMessage(REPLY_TASKS_DATA, new Serializable[]{null, node.getTasksResponsibilities(((DatabaseMessage) msg).getNode())});
+                Network.send(socket, msg);
             default:
                 break;
         }

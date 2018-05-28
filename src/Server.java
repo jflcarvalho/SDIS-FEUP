@@ -152,12 +152,12 @@ public class Server{
                     case "LIST_TASKS":
                         User listUser = new User(splitMsg[1], splitMsg[2]);
                         WorkerMessage listMsg = (WorkerMessage) MessageFactory.getMessage(Message.MessageType.GET_TASKS, new Serializable[]{listUser});
-                        listMsg = (WorkerMessage) Network.sendRequest(this.workerNode, listMsg, false);
+                        listMsg = (WorkerMessage) Network.sendRequest(this.databaseNode, listMsg, true);
                         HashSet<Task> tasks = (HashSet<Task>) listMsg.getArg();
                         
                         ans = "";
                         for(Task t: tasks){
-                            ans += " " + t.getTask_ID();
+                            ans += t.getTask_ID() + " ";
                         }
                         
                         ans += "\n";
@@ -190,17 +190,17 @@ public class Server{
                     case "CONSULT":
                         User consultUser = new User(splitMsg[1], splitMsg[2]);
                         WorkerMessage consultMsg = (WorkerMessage) MessageFactory.getMessage(Message.MessageType.GET_TASKS, new Serializable[]{consultUser});
-                        consultMsg = (WorkerMessage) Network.sendRequest(this.workerNode, consultMsg, true);
+                        consultMsg = (WorkerMessage) Network.sendRequest(this.databaseNode, consultMsg, true);
                         HashSet<Task> consultTasks = (HashSet<Task>) consultMsg.getArg();
                         System.out.println("AAAA");
 
                         String ansConsult= "";
                         for(Task t: consultTasks){
-                            ansConsult += ((t.getExitValue() == null ) ? " 1 " : " 0 ") + t.getTask_ID() + "\n";
+                            ansConsult += (t.getExitValue() == null ) ? "1 " : "0 " + t.getTask_ID() + "\n";
                         }
-                        System.out.println(ansConsult);
-
-                        out.println(Constants.MSG_OK + ansConsult);
+                        
+                        String print = Constants.MSG_OK + ansConsult;
+                        out.println(print);
                         //TODO Return tasks and if finished or not
                         break;
                     

@@ -6,6 +6,7 @@ import user.User;
 
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 import static peers.Protocol.Message.MessageType.*;
@@ -93,6 +94,12 @@ public class DatabaseManager extends ChordNode implements DataBasePeer {
             System.out.println("Received " + data.size() + " Login Entries");
             loginHash.putAll(data);
             lookupLogin.putAll(data);
+
+            msg = MessageFactory.getMessage(GET_TASKS_DATA, new Serializable[]{getNode(), null});
+            msg = Network.sendRequest(successor, msg, true);
+            ConcurrentHashMap<Integer, HashSet<Task>> tasks = ((DatabaseMessage) msg).getTasks_Data();
+            System.out.println("Received " + tasks.size() + " Tasks Entries");
+            userTasks.putAll(tasks);
         }).start();
     }
 
@@ -102,6 +109,18 @@ public class DatabaseManager extends ChordNode implements DataBasePeer {
             if(Integer.compareUnsigned(this.difference(new Node(entry.getKey(), null)), this.difference(predecessor)) < 0) {
                 ret.put(entry.getKey(), entry.getValue());
                 lookupLogin.remove(entry.getKey());
+            }
+        }
+
+        return ret;
+    }
+
+    public ConcurrentHashMap<Integer, HashSet<Task>> getTasksResponsibilities(Node predecessor){
+        ConcurrentHashMap<Integer, HashSet<Task>> ret = new ConcurrentHashMap<>();
+        for(ConcurrentHashMap.Entry<Integer, HashSet<Task>> entry : userTasks.entrySet()) {
+            if(Integer.compareUnsigned(this.difference(new Node(entry.getKey(), null)), this.difference(predecessor)) < 0) {
+                ret.put(entry.getKey(), entry.getValue());
+                userTasks.remove(entry.getKey());
             }
         }
 
