@@ -8,7 +8,7 @@ import java.util.Date;
 public class Task implements Serializable {
     private int task_ID;
     private String command;
-    private int exitValue;
+    private int exitValue = -1;
     private User _userOwner;
 
     /**
@@ -25,7 +25,7 @@ public class Task implements Serializable {
         return command;
     }
 
-    public Integer getExitValue() {
+    public int getExitValue() {
         return exitValue;
     }
 

@@ -145,7 +145,16 @@ public class DatabaseManager extends ChordNode implements DataBasePeer {
         if(userTasks.containsKey(task.getOwner().getLookup())){
             tasks = userTasks.get(task.getOwner().getLookup());
         }
-        tasks.add(task);
+        boolean found = false;
+        for(Task t : tasks) {
+            if (t.equals(task)) {
+                t.setExitValue(task.getExitValue());
+                found = true;
+                break;
+            }
+        }
+        if(!found)
+            tasks.add(task);
         userTasks.put(task.getOwner().getLookup(), tasks);
         System.out.println("Saved task from User: " + task.getOwner().getUsername() + "(" + task.getOwner().getLookup() + ")" + " Task_ID: " + task.getTask_ID());
     }
