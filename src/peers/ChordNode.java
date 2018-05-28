@@ -109,6 +109,7 @@ public class ChordNode extends Node implements ChordPeer, Serializable {
         updateOthersFinger();
 
         new Thread(stabilizer = new Stabilizer(this)).start();
+        System.out.println("Join with Success");
         return true;
     }
 

@@ -6,6 +6,7 @@ import user.User;
 
 import java.io.Serializable;
 import java.net.Socket;
+import java.util.HashSet;
 
 import static peers.Protocol.Message.MessageType.*;
 
@@ -63,6 +64,31 @@ public class MessageHandler {
             case GET_LOGIN_DATA:
                 msg = MessageFactory.getMessage(REPLY_LOGIN_DATA, new Serializable[]{null, node.getDataResponsibilities(((DatabaseMessage) msg).getNode())});
                 Network.send(socket, msg);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public void handle(ChordNode node, WorkerMessage msg, Socket socket) {
+        switch (msg.getType()) {
+            case SUBMIT:
+                ((Worker) node).submit((Task) msg.getArg());
+                break;
+            case EXECUTE:
+                ((Worker) node).execute((Task) msg.getArg());
+                break;
+            case SAVE_TASK:
+                ((DatabaseManager) node).saveTask((Task) msg.getArg());
+                break;
+            case DELETE_TASK:
+                ((Worker) node).deleteTask((Task) msg.getArg());
+                break;
+            case GET_TASKS:
+                User user = (User) msg.getArg();
+                HashSet<Task> tasks = ((DatabaseManager) node).getUserTasks(user);
+                Message reply = MessageFactory.getMessage(REPLY_GET_TASKS, new Serializable[]{tasks});
+                Network.send(socket, reply);
                 break;
             default:
                 break;

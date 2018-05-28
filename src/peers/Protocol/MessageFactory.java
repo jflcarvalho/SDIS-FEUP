@@ -1,13 +1,12 @@
 package peers.Protocol;
 
 import peers.Node;
+import peers.Task;
 import user.User;
 
 import java.io.Serializable;
-import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
-import static peers.Protocol.Message.MessageType.GET_LOGIN_DATA;
 
 
 public abstract class MessageFactory {
@@ -24,6 +23,9 @@ public abstract class MessageFactory {
             if(args.length == 2) {
                 return new DatabaseMessage(type, (Node) args[0], (ConcurrentSkipListMap<Integer, User>) args[1]);
             }
+        } else if(type.getValue() >= 17 && type.getValue() < 23){
+            if(args.length == 1)
+                return new WorkerMessage(type, args[0]);
         }
         return null;
     }

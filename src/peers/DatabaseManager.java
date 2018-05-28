@@ -5,7 +5,7 @@ import peers.Protocol.*;
 import user.User;
 
 import java.io.Serializable;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 import static peers.Protocol.Message.MessageType.*;
@@ -106,5 +106,52 @@ public class DatabaseManager extends ChordNode implements DataBasePeer {
         }
 
         return ret;
+    }
+
+    public void saveTask(Task task){
+        if(task == null)
+            return;
+        Node lookup_Node = new Node(task.getOwner().getLookup(), null);
+        if(Integer.compareUnsigned(getPredecessor().difference(lookup_Node), getPredecessor().difference(getNode())) < 0 ) {
+            _saveTask(task);
+        } else {
+            Node n = findSuccessor(lookup_Node);
+            Message msg = MessageFactory.getMessage(SAVE_TASK, new Serializable[]{task});
+            Network.sendRequest(n, msg, false);
+        }
+    }
+
+    private void _saveTask(Task task) {
+        HashSet<Task> tasks = new HashSet<>();
+        if(userTasks.containsKey(task.getOwner().getLookup())){
+            tasks = userTasks.get(task.getOwner().getLookup());
+        }
+        tasks.add(task);
+        userTasks.put(task.getOwner().getLookup(), tasks);
+        System.out.println("Saved task from User: " + task.getOwner().getUsername() + "(" + task.getOwner().getLookup() + ")" + " Task_ID: " + task.getTask_ID());
+    }
+
+    public HashSet<Task> getUserTasks(User user){
+        if(user == null)
+            return new HashSet<>();
+        Node lookup_Node = new Node(user.getLookup(), null);
+        if(Integer.compareUnsigned(getPredecessor().difference(lookup_Node), getPredecessor().difference(getNode())) < 0 ) {
+            return _getUserTasks(user);
+        } else {
+            Node n = findSuccessor(lookup_Node);
+            Message msg = MessageFactory.getMessage(GET_TASKS, new Serializable[]{user});
+            msg = Network.sendRequest(n, msg, true);
+            if(msg != null && msg.getType() == REPLY_GET_TASKS)
+                return (HashSet<Task>) ((WorkerMessage) msg).getArg();
+        }
+        return new HashSet<>();
+    }
+
+    private HashSet<Task> _getUserTasks(User user) {
+        if(userTasks.containsKey(user.getLookup())){
+            System.out.println("Getting tasks of User: " + user.getUsername()+ "(" + user.getLookup() + ")");
+            return userTasks.get(user.getLookup());
+        }
+        return new HashSet<>();
     }
 }

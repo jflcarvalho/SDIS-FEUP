@@ -35,6 +35,8 @@ public class Node implements Serializable {
 
     public Node(String address){
         String[] replySplited = address.split(":");
+        if(replySplited.length != 2)
+            System.exit(-1);
         boolean valid_IP = Pattern.matches("\\d{1,3}.\\d{1,3}.\\d{1,3}.\\d{1,3}", replySplited[0]);
         boolean valid_port = Pattern.matches("\\d{1,5}", replySplited[1]);
 

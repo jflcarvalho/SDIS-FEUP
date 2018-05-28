@@ -2,7 +2,6 @@ package peers.Protocol;
 
 import peers.Node;
 import user.User;
-
 import java.util.concurrent.ConcurrentSkipListMap;
 
 public class DatabaseMessage extends ChordMessage {

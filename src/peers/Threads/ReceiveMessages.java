@@ -47,8 +47,12 @@ public class ReceiveMessages implements Runnable {
                 exceptionPrint(e, "[ERROR] Accepting connection");
                 continue;
             }
+
             Message incomingMsg = Network.getResponse(s);
-            if(incomingMsg instanceof DatabaseMessage && _node instanceof DatabaseManager)
+
+            if(incomingMsg instanceof WorkerMessage)
+                executor.execute(() -> msgHandler.handle(_node, (WorkerMessage) incomingMsg, s));
+            else if(incomingMsg instanceof DatabaseMessage && _node instanceof DatabaseManager)
                 executor.execute(() -> msgHandler.handle(((DatabaseManager) _node), incomingMsg, s));
             else if(!(incomingMsg instanceof APIMessage))
                 executor.execute(() -> msgHandler.handle(_node, incomingMsg, s));

@@ -11,7 +11,7 @@ public interface DataBasePeer {
     ConcurrentHashMap<Integer, User> loginHash = new ConcurrentHashMap<>();
 
     /** HashTable with all tasks from user */
-    ConcurrentHashMap<String, HashSet<String>> userTasks = new ConcurrentHashMap<>();
+    ConcurrentHashMap<Integer, HashSet<Task>> userTasks = new ConcurrentHashMap<>();
 
     boolean login(User user);
 

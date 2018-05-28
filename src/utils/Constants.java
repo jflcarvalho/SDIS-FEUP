@@ -28,9 +28,9 @@ public abstract class Constants {
             "0) Exit      \n";
 
     public static final String MENU_USER_AREA =
-            "1) Add Task                \n" +
-            "2) Delete Pending Task     \n" +
-            "3) Consult Finnish Tasks   \n\n" +
+            "1) Add peers.Task                \n" +
+            "2) Delete Pending peers.Task     \n" +
+            "3) Consult All Tasks   \n\n" +
             "0) Exit  \n";
 
     public static final String MSG_OK = "200\n";
