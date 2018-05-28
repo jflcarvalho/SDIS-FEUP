@@ -1,5 +1,2 @@
 *.iml
-*.class
 \.idea/
-
-out/

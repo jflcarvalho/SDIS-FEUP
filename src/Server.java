@@ -55,9 +55,9 @@ public class Server{
         try{
 
             KeyStore clientKS = KeyStore.getInstance("JKS");
-            clientKS.load(new FileInputStream("../client.public"), "public".toCharArray());
+            clientKS.load(new FileInputStream("client.public"), "public".toCharArray());
             KeyStore serverKS = KeyStore.getInstance("JKS");
-            serverKS.load(new FileInputStream("../server.private"), "serverpw".toCharArray());
+            serverKS.load(new FileInputStream("server.private"), "serverpw".toCharArray());
             
             TrustManagerFactory trustMF = TrustManagerFactory.getInstance("SunX509");
             trustMF.init(clientKS);
