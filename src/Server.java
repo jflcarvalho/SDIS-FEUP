@@ -161,6 +161,7 @@ public class Server{
                         }
                         
                         ans += "\n";
+                        System.out.println(ans);
                         out.println(Constants.MSG_OK + ans);
                         
                         //TODO get all tasks and return it
@@ -169,7 +170,7 @@ public class Server{
                     case "DELETE":
                         User deleteUser = new User(splitMsg[1], splitMsg[2]);
                         WorkerMessage deleteListMsg = (WorkerMessage) MessageFactory.getMessage(Message.MessageType.GET_TASKS, new Serializable[]{deleteUser});
-                        deleteListMsg = (WorkerMessage) Network.sendRequest(this.workerNode, deleteListMsg, true);
+                        deleteListMsg = (WorkerMessage) Network.sendRequest(this.workerNode, deleteListMsg, false);
 
                         Task deleteTask = null;
                         HashSet<Task> tasksSet = (HashSet<Task>) deleteListMsg.getArg();
@@ -182,6 +183,7 @@ public class Server{
                         WorkerMessage deleteMsg = (WorkerMessage) MessageFactory.getMessage(Message.MessageType.DELETE_TASK, new Serializable[]{deleteTask});
                         deleteMsg = (WorkerMessage) Network.sendRequest(this.workerNode, deleteMsg, false);
 
+                        out.println(Constants.MSG_OK);
                         //TODO Delete task
                         break;
                     
@@ -190,6 +192,7 @@ public class Server{
                         WorkerMessage consultMsg = (WorkerMessage) MessageFactory.getMessage(Message.MessageType.GET_TASKS, new Serializable[]{consultUser});
                         consultMsg = (WorkerMessage) Network.sendRequest(this.databaseNode, consultMsg, true);
                         HashSet<Task> consultTasks = (HashSet<Task>) consultMsg.getArg();
+                        System.out.println("AAAA");
 
                         String ansConsult= "";
                         for(Task t: consultTasks){
